@@ -150,7 +150,6 @@
             border-color: var(--accent-color);
             box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
         }
-        /* تصميم بطاقة إضافة الإعلان المطوية */
         .add-toggle-card {
             background: linear-gradient(135deg, #2c3e50, #34495e);
             color: white;
@@ -162,10 +161,6 @@
             cursor: pointer;
             margin-bottom: 20px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            transition: 0.2s;
-        }
-        .add-toggle-card:hover {
-            opacity: 0.95;
         }
         .form-container {
             display: none;
@@ -234,7 +229,6 @@
             color: var(--gray-text);
             margin: 0 0 10px 0;
         }
-        /* صور استعراضية للمنتجات داخل البطاقة */
         .product-gallery {
             display: flex;
             gap: 8px;
@@ -278,6 +272,8 @@
             padding: 15px;
             font-size: 12px;
             color: var(--gray-text);
+            cursor: pointer;
+            user-select: none;
         }
     </style>
 </head>
@@ -288,7 +284,6 @@
             <p>دليلك المحلي الشامل في القيارة والموصل للمحلات والمشاريع</p>
         </header>
 
-        <!-- بطاقة الإدارة -->
         <div class="admin-card">
             <h3>💬 الإدارة لسؤال عن استفسار</h3>
             <p>لأي استفسار، يمكنك التواصل مباشرة مع إدارة التطبيق (إبراهيم عمر):</p>
@@ -298,12 +293,10 @@
             </div>
         </div>
 
-        <!-- زر إضافة إعلان (مطوي) -->
         <div class="add-toggle-card" onclick="toggleAddForm()">
             📢 اضغط هنا لتقديم طلب إضافة إعلان جديد
         </div>
 
-        <!-- خانات تقديم الإعلان -->
         <div id="addFormContainer" class="form-container">
             <h3 style="margin-top:0; color:var(--primary-color); font-size:16px;">تقديم طلب إعلان جديد</h3>
             <p style="font-size:12px; color:var(--gray-text);">املأ تفاصيل محلك وضع رقمك العراقي أو رابط صفحتك للتواصل:</p>
@@ -344,7 +337,6 @@
         </div>
 
         <div id="vendorsList">
-            <!-- نموذج محل استعراضي مليء بالصور والمنتجات -->
             <div class="card vip" data-name="سوبرماركت البركة" data-cat="ألبان وأجبان" data-desc="ألبان وأجبان ومواد غذائية طازجة - حي سكر">
                 <div class="card-header">
                     <h3 class="card-title">سوبرماركت البركة</h3>
@@ -352,7 +344,6 @@
                 </div>
                 <p class="card-desc">ألبان وأجبان ومواد غذائية طازجة - حي سكر (تتوفر توصيل سريع)</p>
                 
-                <!-- صور استعراضية للمنتجات لإعطاء شكل مليء بالحيوية -->
                 <div class="product-gallery">
                     <img src="https://images.unsplash.com/photo-1563245372-f21724e3856d?w=150" class="product-thumb" alt="منتج">
                     <img src="https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=150" class="product-thumb" alt="منتج">
@@ -366,12 +357,28 @@
             </div>
         </div>
 
-        <div class="footer">
+        <!-- الفوتر السري للوصول للوحة الإدارة -->
+        <div class="footer" onclick="triggerAdminLogin()">
             جميع الحقوق محفوظة © سهل الوصول 2026
         </div>
     </div>
 
     <script>
+        let clickCount = 0;
+        function triggerAdminLogin() {
+            clickCount++;
+            if (clickCount >= 3) {
+                clickCount = 0;
+                let pin = prompt("أدخل الرمز السري للوحة الإدارة:");
+                if (pin === "334455ff") {
+                    alert("مرحباً بك يا إبراهيم! تم التحقق من صلاحيات المدير بنجاح.");
+                } else if (pin !== null) {
+                    alert("الرمز السري غير صحيح!");
+                }
+            }
+            setTimeout(() => { clickCount = 0; }, 1500);
+        }
+
         function toggleAddForm() {
             let form = document.getElementById('addFormContainer');
             if(form.style.display === 'block') {
