@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>سهل الوصول - الدليل المحلي الشامل في القيارة والموصل</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2c3e50">
+    <meta name="theme-color" content="#1b4f72">
     <style>
         :root {
-            --primary-color: #2c3e50;
+            --primary-color: #1b4f72;
             --accent-color: #3498db;
             --success-color: #27ae60;
             --danger-color: #c0392b;
@@ -34,61 +34,64 @@
             max-width: 600px;
             margin: auto;
         }
+        /* تصغير خانة الهيدر واسم التطبيق وإضافة اللون الأزرق الجذاب */
         header {
-            background: linear-gradient(135deg, #2c3e50, #34495e);
+            background: linear-gradient(135deg, #1b4f72, #3498db);
             color: white;
-            padding: 25px 20px;
-            border-radius: 16px;
+            padding: 15px 15px;
+            border-radius: 14px;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.25);
+            margin-bottom: 15px;
         }
         header h1 {
-            margin: 0 0 10px 0;
-            font-size: 26px;
+            margin: 0 0 5px 0;
+            font-size: 22px;
         }
         header p {
             margin: 0;
-            font-size: 14px;
+            font-size: 12px;
             color: #ecf0f1;
             opacity: 0.9;
         }
         .admin-card {
             background: linear-gradient(135deg, #fff, #f8f9fa);
             border: 2px solid var(--accent-color);
-            border-radius: 14px;
-            padding: 15px 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.15);
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 8px rgba(52, 152, 219, 0.12);
         }
         .admin-card h3 {
             margin-top: 0;
             color: var(--primary-color);
-            font-size: 18px;
+            font-size: 16px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            margin-bottom: 8px;
         }
         .admin-card p {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--gray-text);
-            margin-bottom: 12px;
-            line-height: 1.5;
+            margin-bottom: 10px;
+            line-height: 1.4;
         }
         .admin-links {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
+        /* تصغير خانات وأزرار تفاصيل الإدارة */
         .admin-btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             text-decoration: none;
             font-weight: bold;
-            font-size: 14px;
-            padding: 8px 12px;
-            border-radius: 8px;
+            font-size: 12px;
+            padding: 5px 10px;
+            border-radius: 6px;
             transition: 0.2s;
             width: fit-content;
         }
@@ -101,9 +104,9 @@
             color: var(--instagram-color);
         }
         .section-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
-            margin: 20px 0 10px 5px;
+            margin: 15px 0 8px 5px;
             color: var(--primary-color);
             border-right: 4px solid var(--accent-color);
             padding-right: 8px;
@@ -115,13 +118,13 @@
             display: flex;
             gap: 8px;
             overflow-x: auto;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
         }
         .cat-btn {
             background: #ffffff;
             border: 1px solid #ddd;
-            padding: 8px 14px;
+            padding: 6px 12px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: bold;
@@ -137,11 +140,11 @@
         }
         .search-box {
             width: 100%;
-            padding: 12px 15px;
+            padding: 10px 12px;
             border: 1px solid #ddd;
-            border-radius: 12px;
-            font-size: 14px;
-            margin-bottom: 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 15px;
             box-sizing: border-box;
             outline: none;
             transition: 0.2s;
@@ -150,52 +153,53 @@
             border-color: var(--accent-color);
             box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
         }
+        /* زر إضافة إعلان بلون أزرق متناسق */
         .add-toggle-card {
-            background: linear-gradient(135deg, #2c3e50, #34495e);
+            background: linear-gradient(135deg, #1b4f72, #3498db);
             color: white;
-            padding: 15px 20px;
-            border-radius: 14px;
+            padding: 12px 15px;
+            border-radius: 12px;
             text-align: center;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 14px;
             cursor: pointer;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.2);
         }
         .form-container {
             display: none;
             background: var(--card-bg);
-            border-radius: 14px;
-            padding: 20px;
-            margin-bottom: 20px;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             border: 2px solid var(--accent-color);
         }
         .form-container input, .form-container select, .form-container textarea {
             width: 100%;
-            padding: 10px 12px;
-            margin-bottom: 12px;
+            padding: 9px 10px;
+            margin-bottom: 10px;
             border: 1px solid #ddd;
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 12px;
             box-sizing: border-box;
         }
         .submit-btn {
             background: var(--success-color);
             color: white;
             border: none;
-            padding: 12px;
+            padding: 10px;
             width: 100%;
             border-radius: 8px;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
         }
         .card {
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
+            padding: 12px;
+            margin-bottom: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             border-right: 4px solid #ddd;
             position: relative;
@@ -208,10 +212,10 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         .card-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             color: var(--primary-color);
             margin: 0;
@@ -219,42 +223,42 @@
         .vip-badge {
             background: var(--vip-color);
             color: #7d6608;
-            font-size: 11px;
-            padding: 2px 8px;
-            border-radius: 6px;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 5px;
             font-weight: bold;
         }
         .card-desc {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--gray-text);
-            margin: 0 0 10px 0;
+            margin: 0 0 8px 0;
         }
         .product-gallery {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             overflow-x: auto;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
         }
         .product-thumb {
-            width: 70px;
-            height: 70px;
-            border-radius: 8px;
+            width: 60px;
+            height: 60px;
+            border-radius: 6px;
             object-fit: cover;
             border: 1px solid #eee;
         }
         .card-footer {
             display: flex;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 8px;
+            margin-top: 8px;
         }
         .action-btn {
             flex: 1;
-            padding: 8px;
-            border-radius: 8px;
+            padding: 6px;
+            border-radius: 6px;
             text-align: center;
             text-decoration: none;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
             display: inline-block;
         }
@@ -268,9 +272,9 @@
         }
         .footer {
             text-align: center;
-            margin-top: 30px;
-            padding: 15px;
-            font-size: 12px;
+            margin-top: 20px;
+            padding: 12px;
+            font-size: 11px;
             color: var(--gray-text);
             user-select: none;
             -webkit-user-select: none;
@@ -298,8 +302,8 @@
         </div>
 
         <div id="addFormContainer" class="form-container">
-            <h3 style="margin-top:0; color:var(--primary-color); font-size:16px;">تقديم طلب إعلان جديد</h3>
-            <p style="font-size:12px; color:var(--gray-text);">املأ تفاصيل محلك وضع روابط حساباتك للتواصل:</p>
+            <h3 style="margin-top:0; color:var(--primary-color); font-size:15px;">تقديم طلب إعلان جديد</h3>
+            <p style="font-size:11px; color:var(--gray-text);">املأ تفاصيل محلك وضع روابط حساباتك للتواصل:</p>
             <input type="text" placeholder="اسم المحل أو المتجر (مثال: متجر السعادة)">
             <select>
                 <option>-- اختر القسم المناسب لمحلِك --</option>
@@ -308,9 +312,9 @@
                 <option>منظفات وكوزمتك</option>
                 <option>مطاعم ومشاريع منزلية</option>
             </select>
-            <label style="font-size:12px; font-weight:bold; display:block; margin-bottom:5px;">👤 صورة البروفايل أو الشعار:</label>
+            <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">👤 صورة البروفايل أو الشعار:</label>
             <input type="file">
-            <label style="font-size:12px; font-weight:bold; display:block; margin-bottom:5px;">🖼️ صور استعراضية للمنتجات:</label>
+            <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">🖼️ صور استعراضية للمنتجات:</label>
             <input type="file" multiple>
             <input type="text" placeholder="العنوان / الحي (مثال: الموصل - حي سكر قرب السوق)">
             <textarea placeholder="نبذة عن المحل أو الخدمات المقدمة..." rows="2"></textarea>
