@@ -272,8 +272,8 @@
             padding: 15px;
             font-size: 12px;
             color: var(--gray-text);
-            cursor: pointer;
             user-select: none;
+            -webkit-user-select: none;
         }
     </style>
 </head>
@@ -299,7 +299,7 @@
 
         <div id="addFormContainer" class="form-container">
             <h3 style="margin-top:0; color:var(--primary-color); font-size:16px;">تقديم طلب إعلان جديد</h3>
-            <p style="font-size:12px; color:var(--gray-text);">املأ تفاصيل محلك وضع رقمك العراقي أو رابط صفحتك للتواصل:</p>
+            <p style="font-size:12px; color:var(--gray-text);">املأ تفاصيل محلك وضع روابط حساباتك للتواصل:</p>
             <input type="text" placeholder="اسم المحل أو المتجر (مثال: متجر السعادة)">
             <select>
                 <option>-- اختر القسم المناسب لمحلِك --</option>
@@ -315,7 +315,9 @@
             <input type="text" placeholder="العنوان / الحي (مثال: الموصل - حي سكر قرب السوق)">
             <textarea placeholder="نبذة عن المحل أو الخدمات المقدمة..." rows="2"></textarea>
             <textarea placeholder="أدخل المنتجات الجديدة (كل منتج مع سعره)..." rows="2"></textarea>
-            <input type="text" placeholder="رقم عراقي محلي (مثال: 07701234567) أو رابط فيسبوك">
+            <input type="text" placeholder="رقم هاتف عراقي محلي (مثال: 07701234567)">
+            <input type="text" placeholder="🔵 رابط أو اسم صفحة الفيسبوك">
+            <input type="text" placeholder="📸 حساب الإنستغرام (مثال: @username)">
             <button class="submit-btn" onclick="alert('تم إرسال طلبك بنجاح إلى الإدارة وسيتم مراجعته قريباً!')">إرسال الطلب</button>
         </div>
 
@@ -357,27 +359,34 @@
             </div>
         </div>
 
-        <!-- الفوتر السري للوصول للوحة الإدارة -->
-        <div class="footer" onclick="triggerAdminLogin()">
+        <div class="footer" id="adminFooter">
             جميع الحقوق محفوظة © سهل الوصول 2026
         </div>
     </div>
 
     <script>
-        let clickCount = 0;
-        function triggerAdminLogin() {
-            clickCount++;
-            if (clickCount >= 3) {
-                clickCount = 0;
+        let pressTimer;
+        const footer = document.getElementById('adminFooter');
+
+        function startPress() {
+            pressTimer = setTimeout(() => {
                 let pin = prompt("أدخل الرمز السري للوحة الإدارة:");
                 if (pin === "334455ff") {
                     alert("مرحباً بك يا إبراهيم! تم التحقق من صلاحيات المدير بنجاح.");
                 } else if (pin !== null) {
                     alert("الرمز السري غير صحيح!");
                 }
-            }
-            setTimeout(() => { clickCount = 0; }, 1500);
+            }, 2000);
         }
+
+        function cancelPress() {
+            clearTimeout(pressTimer);
+        }
+
+        footer.addEventListener('touchstart', startPress);
+        footer.addEventListener('touchend', cancelPress);
+        footer.addEventListener('mousedown', startPress);
+        footer.addEventListener('mouseup', cancelPress);
 
         function toggleAddForm() {
             let form = document.getElementById('addFormContainer');
