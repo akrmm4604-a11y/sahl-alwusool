@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>سهل الوصول - الدليل المحلي الشامل في القيارة والموصل</title>
     
-    <!-- وسوم المعاينة الاحترافية لفيسبوك ومسنجر (تظهر اسم التطبيق، الشعار، والوصف وزر التثبيت) -->
+    <!-- وسوم المعاينة الاحترافية لفيسبوك ومسنجر -->
     <meta property="og:title" content="سهل الوصول - الدليل المحلي في القيارة والموصل">
     <meta property="og:description" content="دليلك المحلي الشامل للمحلات والمشاريع وخدمات التوصيل. اضغط لتثبيت التطبيق الآن!">
     <meta property="og:image" content="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600">
@@ -327,9 +327,10 @@
                 <option>ألبان وأجبان</option>
                 <option>منظفات وكوزمتك</option>
                 <option>مطاعم ومشاريع منزلية</option>
+                <option>أقمشة</option>
+                <option>أثاث</option>
             </select>
             
-            <!-- تم تعديل حقول رفع الصور لتفتح الاستوديو والكاميرا مباشرة -->
             <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">👤 صورة البروفايل أو الشعار (الاستوديو / الكاميرا):</label>
             <input type="file" accept="image/*">
             
@@ -354,9 +355,12 @@
             <button class="cat-btn" onclick="filterCat('حلويات')">🍰 حلويات</button>
             <button class="cat-btn" onclick="filterCat('ألبان وأجبان')">🧀 ألبان وأجبان</button>
             <button class="cat-btn" onclick="filterCat('منظفات')">✨ منظفات</button>
+            <button class="cat-btn" onclick="filterCat('أقمشة')">🧵 أقمشة</button>
+            <button class="cat-btn" onclick="filterCat('أثاث')">🛋️ أثاث</button>
         </div>
 
-        <input type="text" id="searchInput" class="search-box" placeholder="ابحث عن اسم محل، منطقة (مثل حي سكر)، أو منتج..." oninput="handleSearch()">
+        <!-- خانة البحث الذكي الشامل -->
+        <input type="text" id="searchInput" class="search-box" placeholder="بحث ذكي: ابحث عن عطور، أقمشة، أثاث، اسم محل، أو منطقة..." oninput="handleSearch()">
 
         <div class="section-title">
             المحلات والأَسواق المعتمَدة
@@ -436,13 +440,16 @@
             });
         }
 
+        // البحث الذكي الشامل (يبحث في الاسم، القسم، الوصف، وكل محتوى البطاقة)
         function handleSearch() {
             let query = document.getElementById('searchInput').value.toLowerCase();
             let cards = document.querySelectorAll('.card');
             cards.forEach(card => {
-                let name = card.dataset.name.toLowerCase();
-                let desc = card.dataset.desc.toLowerCase();
-                if(name.includes(query) || desc.includes(query)) {
+                let cardText = card.innerText.toLowerCase();
+                let cardName = (card.dataset.name || '').toLowerCase();
+                let cardCat = (card.dataset.cat || '').toLowerCase();
+                
+                if(cardText.includes(query) || cardName.includes(query) || cardCat.includes(query)) {
                     card.style.display = 'block';
                 } else {
                     card.style.display = 'none';
