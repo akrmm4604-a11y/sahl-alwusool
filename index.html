@@ -3,34 +3,1779 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سهل الوصول - دليل القيارة والموصل</title>
+    <title>سهل الوصول - الدليل المحلي الشامل في القيارة والموصل</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2c3e50">
     <style>
-        body { font-family: Tahoma, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; direction: rtl; text-align: right; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; text-align: center; }
-        p { color: #555; text-align: center; }
-        .card { background: #eef2f3; padding: 15px; margin: 15px 0; border-radius: 8px; border-right: 5px solid #3498db; }
-        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #888; }
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #c0392b;
+            --warning-color: #e67e22;
+            --instagram-color: #c13584;
+            --install-color: #9b59b6;
+            --vip-color: #f1c40f;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333533;
+            --gray-text: #7f8c8d;
+        }
+        body {
+            font-family: 'Tahoma', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px;
+            direction: rtl;
+            text-align: right;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 25px 20px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        header h1 {
+            margin: 0 0 10px 0;
+            font-size: 26px;
+        }
+        header p {
+            margin: 0;
+            font-size: 14px;
+            color: #ecf0f1;
+            opacity: 0.9;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0 10px 5px;
+            color: var(--primary-color);
+            border-right: 4px solid var(--accent-color);
+            padding-right: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        /* أزرار تصفية الأقسام */
+        .categories-bar {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        .cat-btn {
+            background: #ffffff;
+            border: 1px solid #ddd;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--primary-color);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .cat-btn.active, .cat-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+        .card {
+            background: var(--card-bg);
+            padding: 18px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            border-right: 5px solid var(--accent-color);
+            overflow: hidden;
+            position: relative;
+        }
+        .card.vip-card {
+            border-right: 5px solid var(--vip-color);
+            background: #fffdf0;
+        }
+        .card.add-ad-card {
+            border-right: 5px solid var(--success-color);
+            background: #fefefe;
+        }
+        .card.admin-card {
+            border-right: 5px solid var(--warning-color);
+            background: #fffdf9;
+        }
+        .card.contact-card {
+            border-right: 5px solid var(--instagram-color);
+            background: #fff9fc;
+        }
+        .card.install-card {
+            border-right: 5px solid var(--install-color);
+            background: #fdf8fe;
+            display: none;
+            text-align: center;
+        }
+        
+        /* تنسيق رأس المحل */
+        .store-header-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .store-avatar {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent-color);
+            background: #eee;
+            flex-shrink: 0;
+        }
+        .store-title-area h3 {
+            margin: 0 0 4px 0;
+            font-size: 17px;
+            color: var(--primary-color);
+        }
+        .store-title-area p {
+            margin: 0;
+            font-size: 12px;
+            color: var(--gray-text);
+        }
+
+        .store-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            background: #eee;
+        }
+        .form-group {
+            margin-bottom: 12px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            box-sizing: border-box;
+            background: #fff;
+            font-family: 'Tahoma', sans-serif;
+        }
+        .form-control:focus {
+            border-color: var(--success-color);
+        }
+        textarea.form-control {
+            resize: vertical;
+            height: 70px;
+        }
+        .btn {
+            width: 100%;
+            border: none;
+            padding: 11px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: white;
+            text-align: center;
+        }
+        .btn-success { background-color: var(--success-color); }
+        .btn-danger { background-color: var(--danger-color); }
+        .btn-warning { background-color: var(--warning-color); }
+        .btn-primary { background-color: var(--accent-color); }
+        .btn-install { background-color: var(--install-color); font-size: 15px; padding: 12px; }
+        .btn:active { transform: scale(0.98); }
+        
+        .badge {
+            display: inline-block;
+            background: #e8f4fc;
+            color: var(--accent-color);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            margin-top: 8px;
+            font-weight: bold;
+        }
+        .vip-badge {
+            display: inline-block;
+            background: #fef5d1;
+            color: #b7950b;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            margin-top: 8px;
+            font-weight: bold;
+            border: 1px solid #f1c40f;
+        }
+        .stats-badge {
+            font-size: 11px;
+            color: #555;
+            background: #f1f2f6;
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-left: 5px;
+        }
+        
+        .admin-secret-info {
+            background: #fcf3cf;
+            border: 1px dashed #f39c12;
+            padding: 8px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #7d6608;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .product-item-card {
+            background: #f9f9f9;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        .product-item-card h4 {
+            margin: 0 0 5px 0;
+            font-size: 14px;
+            color: var(--primary-color);
+        }
+        .product-item-card p {
+            margin: 0;
+            font-size: 12px;
+            color: #e67e22;
+            font-weight: bold;
+        }
+
+        #storeDetailView {
+            display: none;
+        }
+        
+        #adminPanel {
+            display: none;
+            background: #fff8f0;
+            border: 2px dashed var(--warning-color);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .pending-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #eee;
+        }
+        .admin-login-box {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+        }
+        .admin-actions {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px dashed #e0e0e0;
+            display: flex;
+            gap: 8px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            font-size: 12px;
+            color: var(--gray-text);
+            border-top: 1px solid #e0e0e0;
+            cursor: pointer;
+            user-select: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>سهل الوصول</h1>
-        <p>دليلك المحلي الشامل في القيارة والموصل</p>
-        
-        <div class="card">
-            <h3>🛍️ المحلات والأسواق التجارية</h3>
-            <p>استعرض متاجر الألبسة، محلات الكوزمتك، والمطاعم المحلية بكل سهولة.</p>
+        <header>
+            <h1>سهل الوصول</h1>
+            <p>دليلك المحلي الشامل في القيارة والموصل للمحلات والمشاريع</p>
+        </header>
+
+        <!-- صندوق تسجيل دخول المدير المخفي -->
+        <div id="adminLoginBox" style="display: none;" class="card admin-card">
+            <h3>تسجيل دخول المدير (الرمز: 334455ff)</h3>
+            <div class="admin-login-box">
+                <input type="password" id="adminPin" class="form-control" placeholder="أدخل رمز السر">
+                <button onclick="checkAdmin()" class="btn btn-success" style="width: 100px;">دخول</button>
+            </div>
+            <button onclick="hideAdminLogin()" class="btn btn-danger" style="margin-top: 8px; padding: 6px; font-size: 12px;">إلغاء</button>
         </div>
 
-        <div class="card">
-            <h3>🏡 المشاريع المنزلية النسائية</h3>
-            <p>منصة مخصصة لدعم وتسويق منتجات الأعمال المنزلية والمشاريع الصغيرة.</p>
+        <!-- لوحة تحكم الإدارة -->
+        <div id="adminPanel">
+            <h3 style="color: var(--warning-color); margin-top: 0;">🛠️ لوحة إدارة الطلبات والاشتراكات</h3>
+            <p style="font-size: 13px;">المتاجر المميزة تظهر أولاً. يمكنك تعديل حالة الاشتراك والملاحظات المالية السرية من زر التعديل.</p>
+            <div id="pendingList"></div>
+            <button onclick="closeAdminPanel()" class="btn btn-danger" style="width:100%; margin-top:10px; padding: 8px;">إغلاق لوحة الإدارة وتسجيل الخروج</button>
         </div>
 
-        <div class="footer">
-            <p>جميع الحقوق محفوظة © سهل الوصول 2026</p>
+        <!-- العرض الرئيسي -->
+        <div id="mainHomeView">
+            
+            <div id="installAppCard" class="card install-card">
+                <h3>📱 تثبيت تطبيق سهل الوصول</h3>
+                <p>ثبت التطبيق على هاتفك الآن ليعمل بسرعة فائقة وبدون الحاجة لفتح المتصفح في كل مرة!</p>
+                <button onclick="installPWA()" class="btn btn-install">📥 ثبت التطبيق الآن</button>
+            </div>
+
+            <!-- بطاقة التواصل مع الإدارة -->
+            <div class="card contact-card">
+                <h3>💬 الإدارة للتواصل والاستفسار</h3>
+                <p>لأي استفسار عن إضافة المحلات أو الإعلانات، يمكنك التواصل مباشرة مع إدارة التطبيق (إبراهيم عمر):</p>
+                <div style="margin-top: 8px; font-size: 13px; display: flex; flex-direction: column; gap: 6px;">
+                    <a href="https://wa.me/9647765171407" target="_blank" style="color: var(--success-color); text-decoration: none; font-weight: bold;">📱 واتساب الإدارة: 07765171407</a>
+                    <a href="https://instagram.com/aecdhdy" target="_blank" style="color: var(--instagram-color); text-decoration: none; font-weight: bold;">📸 انستغرام الإدارة: @aecdhdy (إبراهيم عمر)</a>
+                </div>
+            </div>
+
+            <div class="section-title">تصفح حسب الأقسام</div>
+            <div class="categories-bar">
+                <button class="cat-btn active" onclick="filterCategory('الكل', this)">الكل</button>
+                <button class="cat-btn" onclick="filterCategory('حلويات', this)">🍰 حلويات</button>
+                <button class="cat-btn" onclick="filterCategory('ألبان', this)">🥛 ألبان وأجبان</button>
+                <button class="cat-btn" onclick="filterCategory('منظفات', this)">✨ منظفات</button>
+                <button class="cat-btn" onclick="filterCategory('لحوم', this)">🥩 لحوم ودواجن</button>
+                <button class="cat-btn" onclick="filterCategory('كوزمتك', this)">💄 كوزمتك والعناية</button>
+                <button class="cat-btn" onclick="filterCategory('ألبسة', this)">👕 ألبسة وموضة</button>
+                <button class="cat-btn" onclick="filterCategory('أخرى', this)">🛒 أخرى</button>
+            </div>
+
+            <!-- خانة البحث الفوري الجديدة -->
+            <div class="form-group" style="margin-bottom: 15px;">
+                <input type="text" id="searchInput" class="form-control" placeholder="🔍 ابحث عن اسم محل، منطقة (مثل حي سكر)، أو منتج..." oninput="handleSearch()">
+            </div>
+
+            <div class="section-title">المحلات والأسواق المعتمدة</div>
+            <div id="approvedStoresList"></div>
+
+            <!-- استمارة إضافة محل -->
+            <div class="section-title">أضف مشروعك أو محلك معنا</div>
+            <div class="card add-ad-card">
+                <h3>📢 تقديم طلب إعلان جديد</h3>
+                <p>املأ تفاصيل محلك وضع رقمك العراقي أو رابط صفحتك للتواصل:</p>
+                
+                <form id="adForm" onsubmit="submitAd(event)">
+                    <div class="form-group">
+                        <input type="text" id="storeName" class="form-control" placeholder="اسم المحل أو المتجر (مثال: متجر السعادة)" required>
+                    </div>
+                    <div class="form-group">
+                        <select id="storeCategory" class="form-control" required>
+                            <option value="">-- اختر القسم المناسب لمحلك --</option>
+                            <option value="حلويات">🍰 حلويات</option>
+                            <option value="ألبان">🥛 ألبان وأجبان</option>
+                            <option value="منظفات">✨ منظفات</option>
+                            <option value="لحوم">🥩 لحوم ودواجن</option>
+                            <option value="كوزمتك">💄 كوزمتك والعناية</option>
+                            <option value="ألبسة">👕 ألبسة وموضة</option>
+                            <option value="أخرى">🛒 أخرى</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="font-size: 12px; color: var(--primary-color); font-weight: bold; display: block; margin-bottom: 5px;">👤 صورة البروفايل أو الشعار:</label>
+                        <input type="file" id="storeAvatarFile" class="form-control" accept="image/*" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="font-size: 12px; color: var(--primary-color); font-weight: bold; display: block; margin-bottom: 5px;">🖼️ صورة واجهة المحل أو الغلاف:</label>
+                        <input type="file" id="storeImageFile" class="form-control" accept="image/*" required>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" id="storeAddress" class="form-control" placeholder="العنوان / الحي (مثال: الموصل - حي سكر قرب السوق)" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="storeNotes" class="form-control" placeholder="نبذة عن المحل أو الخدمات المقدمة..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="storeProducts" class="form-control" placeholder="أدخل المنتجات الجديدة (كل منتج مع سعره)..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="storeContact" class="form-control" placeholder="رقم عراقي محلي (مثال: 07701234567) أو رابط فيسبوك/انستغرام" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">إرسال الطلب للإدارة 📤</button>
+                </form>
+            </div>
         </div>
+
+        <!-- صفحة تفاصيل المحل والمنتجات -->
+        <div id="storeDetailView">
+            <button onclick="backToHome()" class="btn btn-primary" style="margin-bottom: 15px; width: auto; padding: 8px 15px;">⬅️ عودة إلى الرئيسية</button>
+            <div id="storeDetailContent"></div>
+        </div>
+
+        <!-- الفوتر السري -->
+        <footer onclick="handleSecretAdminTrigger()">
+            <p>جميع الحقوق محفوظة © سهل الوصول 2026 | القيارة - الموصل</p>
+            <p style="margin-top: 3px; font-size: 10px; opacity: 0.5;">دليلك المحلي المتكامل</p>
+        </footer>
     </div>
+
+    <script>
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installAppCard').style.display = 'block';
+        });
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('تم تثبيت التطبيق بنجاح');
+                    }
+                    deferredPrompt = null;
+                    document.getElementById('installAppCard').style.display = 'none';
+                });
+            }
+        }
+
+        let isAdmin = localStorage.getItem('sahl_admin_logged') === 'true';
+        let currentFilter = 'الكل';
+        let searchQuery = '';
+        let clickCount = 0;
+        let clickTimer = null;
+
+        function handleSecretAdminTrigger() {
+            clickCount++;
+            if (clickTimer) clearTimeout(clickTimer);
+            
+            clickTimer = setTimeout(() => { clickCount = 0; }, 600);
+
+            if (clickCount >= 3) {
+                clickCount = 0;
+                if (isAdmin) {
+                    document.getElementById('adminPanel').style.display = 'block';
+                    renderPendingStores();
+                } else {
+                    document.getElementById('adminLoginBox').style.display = 'block';
+                }
+            }
+        }
+
+        function hideAdminLogin() {
+            document.getElementById('adminLoginBox').style.display = 'none';
+        }
+
+        function getStoredData(key) {
+            let data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : [];
+        }
+
+        function saveData(key, data) {
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+
+        function filterCategory(cat, btnElement) {
+            currentFilter = cat;
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+            renderApprovedStores();
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+            renderApprovedStores();
+        }
+
+        function renderApprovedStores() {
+            let list = document.getElementById('approvedStoresList');
+            let stores = getStoredData('approvedStores');
+
+            // ترتيب المتاجر بحيث تظهر المتاجر المميزة (VIP) في البداية تلقائياً
+            stores.sort((a, b) => {
+                let aVip = a.isVip ? 1 : 0;
+                let bVip = b.isVip ? 1 : 0;
+                return bVip - aVip;
+            });
+
+            // تصفية المحلات حسب القسم المختار وحسب نص البحث الفوري
+            let filteredStores = stores.filter(store => {
+                let matchesCategory = (currentFilter === 'الكل' || store.category === currentFilter);
+                if (!matchesCategory) return false;
+
+                if (!searchQuery) return true;
+
+                let nameMatch = store.name.toLowerCase().includes(searchQuery);
+                let addressMatch = store.address.toLowerCase().includes(searchQuery);
+                let notesMatch = store.notes.toLowerCase().includes(searchQuery);
+                let productsMatch = store.products.toLowerCase().includes(searchQuery);
+                let categoryMatch = store.category.toLowerCase().includes(searchQuery);
+
+                return nameMatch || addressMatch || notesMatch || productsMatch || categoryMatch;
+            });
+
+            if (filteredStores.length === 0) {
+                list.innerHTML = `
+                    <div class="card" style="text-align: center; padding: 20px;">
+                        <p style="color: var(--gray-text);">عذراً، لم نجد نتائج مطابقة لبحثك أو في هذا القسم.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = '';
+            filteredStores.forEach((store) => {
+                let originalIndex = stores.findIndex(s => s === store);
+                let views = store.views || 0;
+                let likes = store.likes || 0;
+                let catName = store.category || 'عام';
+                let avatarSrc = store.avatar || 'https://img.icons8.com/color/96/000000/user.png';
+                let imgSrc = store.image || 'https://img.icons8.com/color/192/000000/shop.png';
+
+                let cardClass = store.isVip ? "card vip-card" : "card";
+                let vipBadgeHTML = store.isVip ? `<span class="vip-badge">⭐ متجر مميز VIP</span>` : `<span class="badge">📂 ${catName}</span>`;
+
+                let adminSecretDiv = isAdmin ? `
+                    <div class="admin-secret-info">
+                        🔒 <strong>معلومات الإدارة الخاصة:</strong><br>
+                        - حالة الاشتراك: <strong>${store.subStatus || 'نشط'}</strong><br>
+                        - ملاحظات مالية: ${store.subNotes || 'لا توجد ملاحظات'}
+                    </div>
+                ` : '';
+
+                let adminButtonsHTML = isAdmin ? `
+                    <div class="admin-actions">
+                        <button onclick="event.stopPropagation(); editApprovedStore(${originalIndex})" class="btn btn-primary" style="padding: 6px; font-size: 12px;">✏️ تعديل المحل والاشتراك</button>
+                        <button onclick="event.stopPropagation(); deleteApprovedStore(${originalIndex})" class="btn btn-danger" style="padding: 6px; font-size: 12px;">🗑️ حذف المحل</button>
+                    </div>
+                ` : '';
+
+                list.innerHTML += `
+                    <div class="${cardClass}" onclick="openStoreDetails(${originalIndex})" style="cursor: pointer;">
+                        <div class="store-header-row">
+                            <img src="${avatarSrc}" class="store-avatar" alt="بروفايل">
+                            <div class="store-title-area">
+                                <h3>🏪 ${store.name}</h3>
+                                <p>📍 ${store.address}</p>
+                            </div>
+                        </div>
+                        <img src="${imgSrc}" class="store-img" alt="${store.name}">
+                        <p style="margin-top: 5px;">📝 ${store.notes}</p>
+                        ${vipBadgeHTML}
+                        <div style="margin-top: 8px;">
+                            <span class="stats-badge">👁️ ${views} مشاهدة</span>
+                            <span class="stats-badge">❤️ ${likes} إعجاب</span>
+                        </div>
+                        ${adminSecretDiv}
+                        ${adminButtonsHTML}
+                    </div>
+                `;
+            });
+        }
+
+        function openStoreDetails(index) {
+            let stores = getStoredData('approvedStores');
+            let store = stores[index];
+
+            store.views = (store.views || 0) + 1;
+            saveData('approvedStores', stores);
+
+            displayStoreView(store, index);
+        }
+
+        function displayStoreView(store, index) {
+            document.getElementById('mainHomeView').style.display = 'none';
+            let detailView = document.getElementById('storeDetailView');
+            detailView.style.display = 'block';
+
+            let avatarSrc = store.avatar || 'https://img.icons8.com/color/96/000000/user.png';
+            let imgSrc = store.image || 'https://img.icons8.com/color/192/000000/shop.png';
+            let productLines = store.products ? store.products.split('\n') : [];
+            let productsHTML = '';
+            
+            if (productLines.length > 0 && productLines[0].trim() !== "") {
+                productsHTML = `<div class="products-grid">`;
+                productLines.forEach(item => {
+                    let parts = item.split('-');
+                    let pName = parts[0] ? parts[0].trim() : item;
+                    let pPrice = parts[1] ? parts[1].trim() : 'السعر عند الطلب';
+                    productsHTML += `
+                        <div class="product-item-card">
+                            <h4>🛍️ ${pName}</h4>
+                            <p>💰 ${pPrice}</p>
+                        </div>
+                    `;
+                });
+                productsHTML += `</div>`;
+            } else {
+                productsHTML = `<p style="text-align:center; color:#7f8c8d; margin-top:15px;">لا توجد منتجات مضافة حالياً.</p>`;
+            }
+
+            let vipBadgeHTML = store.isVip ? `<span class="vip-badge" style="margin-bottom:8px; display:inline-block;">⭐ متجر مميز VIP</span>` : '';
+
+            let contactInfo = store.contact || '';
+            let contactButtonHTML = '';
+            if (contactInfo.includes('http') || contactInfo.includes('instagram.com') || contactInfo.includes('facebook.com') || contactInfo.includes('facebook') || contactInfo.includes('instagram')) {
+                contactButtonHTML = `<a href="${contactInfo}" target="_blank" class="btn btn-warning" style="display:inline-block; text-decoration:none; padding: 12px; font-size:15px; color:white;">🔗 زيارة صفحة التواصل (فيسبوك/انستغرام)</a>`;
+            } else {
+                let cleanPhone = contactInfo.replace(/^0/, '');
+                contactButtonHTML = `<a href="https://wa.me/964${cleanPhone}" target="_blank" class="btn btn-success" style="display:inline-block; text-decoration:none; padding: 12px; font-size:15px;">💬 تواصل مع صاحب المحل عبر الواتساب</a>`;
+            }
+
+            let content = document.getElementById('storeDetailContent');
+            content.innerHTML = `
+                <div class="card" style="border-right: 5px solid var(--success-color);">
+                    <div class="store-header-row">
+                        <img src="${avatarSrc}" class="store-avatar" alt="بروفايل">
+                        <div class="store-title-area">
+                            <h2>🏪 ${store.name}</h2>
+                            <p>📂 القسم: ${store.category || 'عام'}</p>
+                        </div>
+                    </div>
+                    ${vipBadgeHTML}
+                    <img src="${imgSrc}" class="store-img" alt="${store.name}">
+                    <p>📍 <strong>العنوان:</strong> ${store.address}</p>
+                    <p>📝 <strong>التفاصيل:</strong> ${store.notes}</p>
+                    <div style="margin: 10px 0;">
+                        <span class="stats-badge" id="viewCountBadge">👁️ ${store.views || 1} مشاهدة</span>
+                        <span class="stats-badge" id="likeCountBadge">❤️ ${store.likes || 0} إعجاب</span>
+                    </div>
+                    <button onclick="likeStore(${index})" class="btn btn-warning" style="margin-top: 5px; padding: 8px; font-size: 13px;">❤️ إعجاب بهذا المحل (لايك)</button>
+                </div>
+
+                <div class="section-title">قائمة المنتجات والعروض</div>
+                ${productsHTML}
+
+                <div style="margin-top: 20px; text-align: center;">
+                    ${contactButtonHTML}
+                </div>
+            `;
+            window.scrollTo(0, 0);
+        }
+
+        function likeStore(index) {
+            let stores = getStoredData('approvedStores');
+            stores[index].likes = (stores[index].likes || 0) + 1;
+            saveData('approvedStores', stores);
+            
+            document.getElementById('likeCountBadge').innerText = `❤️ ${stores[index].likes} إعجاب`;
+            alert('❤️ شكراً لك! تم تسجيل إعجابك بالمحل.');
+        }
+
+        function backToHome() {
+            document.getElementById('storeDetailView').style.display = 'none';
+            document.getElementById('mainHomeView').style.display = 'block';
+            renderApprovedStores();
+        }
+
+        function submitAd(event) {
+            event.preventDefault();
+            let avatarFile = document.getElementById('storeAvatarFile').files[0];
+            let imageFile = document.getElementById('storeImageFile').files[0];
+
+            if (!avatarFile || !imageFile) {
+                alert('الرجاء اختيار صورة البروفايل وصورة واجهة المحل.');
+                return;
+            }
+
+            let readerAvatar = new FileReader();
+            readerAvatar.onload = function(eAvatar) {
+                let avatarData = eAvatar.target.result;
+
+                let readerImage = new FileReader();
+                readerImage.onload = function(eImage) {
+                    let imageData = eImage.target.result;
+
+                    let newStore = {
+                        name: document.getElementById('storeName').value.trim(),
+                        category: document.getElementById('storeCategory').value,
+                        avatar: avatarData,
+                        image: imageData,
+                        address: document.getElementById('storeAddress').value.trim(),
+                        notes: document.getElementById('storeNotes').value,
+                        products: document.getElementById('storeProducts').value,
+                        contact: document.getElementById('storeContact').value.trim(),
+                        isVip: false,
+                        subStatus: 'نشط',
+                        subNotes: 'اشتراك جديد',
+                        views: 0,
+                        likes: 0
+                    };
+
+                    let pending = getStoredData('pendingStores');
+                    pending.push(newStore);
+                    saveData('pendingStores', pending);
+
+                    alert('✅ تم إرسال طلبك بنجاح! هو الآن معلق بانتظار مراجعته والموافقة عليه من قبل الإدارة.');
+                    document.getElementById('adForm').reset();
+                };
+                readerImage.readAsDataURL(imageFile);
+            };
+            readerAvatar.readAsDataURL(avatarFile);
+        }
+
+        function checkAdmin() {
+            let pin = document.getElementById('adminPin').value;
+            if (pin === '334455ff') {
+                isAdmin = true;
+                localStorage.setItem('sahl_admin_logged', 'true');
+                document.getElementById('adminLoginBox').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                renderPendingStores();
+                renderApprovedStores();
+                alert('🔓 تم تسجيل الدخول بنجاح كمدير!');
+            } else {
+                alert('❌ رمز السر غير صحيح!');
+            }
+        }
+
+        function closeAdminPanel() {
+            if (confirm('هل تريد تسجيل الخروج وإغلاق لوحة الإدارة؟')) {
+                isAdmin = false;
+                localStorage.setItem('sahl_admin_logged', 'false');
+                document.getElementById('adminPanel').style.display = 'none';
+                renderApprovedStores();
+            }
+        }
+
+        function renderPendingStores() {
+            let list = document.getElementById('pendingList');
+            let pending = getStoredData('pendingStores');
+
+            if (pending.length === 0) {
+                list.innerHTML = '<p>لا توجد طلبات إعلان معلقة حالياً.</p>';
+                return;
+            }
+
+            list.innerHTML = '';
+            pending.forEach((store, index) => {
+                list.innerHTML += `
+                    <div class="pending-item">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                            <img src="${store.avatar}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+                            <strong>${store.name}</strong> (${store.category})
+                        </div>
+                        <img src="${store.image}" style="width:100%; height:110px; object-fit:cover; border-radius:6px; margin-bottom:8px;">
+                        <span style="font-size: 12px; color: #666;">📍 ${store.address} | 🔗 للتواصل: ${store.contact}</span><br>
+                        <p style="margin: 5px 0; font-size: 12px;">${store.notes}</p>
+                        <div style="display: flex; gap: 5px; margin-top: 8px;">
+                            <button onclick="approveStore(${index})" class="btn btn-success" style="padding: 6px; font-size: 11px;">✅ موافقة ونشر (دمج ذكي)</button>
+                            <button onclick="rejectStore(${index})" class="btn btn-danger" style="padding: 6px; font-size: 11px;">❌ رفض</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function approveStore(index) {
+            let pending = getStoredData('pendingStores');
+            let approved = getStoredData('approvedStores');
+
+            let storeToApprove = pending.splice(index, 1)[0];
+
+            let existingStoreIndex = approved.findIndex(s => 
+                s.name.toLowerCase() === storeToApprove.name.toLowerCase() || 
+                s.contact === storeToApprove.contact
+            );
+
+            if (existingStoreIndex !== -1) {
+                approved[existingStoreIndex].products = approved[existingStoreIndex].products + '\n' + storeToApprove.products;
+                approved[existingStoreIndex].notes = storeToApprove.notes || approved[existingStoreIndex].notes;
+                approved[existingStoreIndex].contact = storeToApprove.contact || approved[existingStoreIndex].contact;
+                alert('🔄 تم التعرف على المحل مسبقاً! تم دمج المنتجات الجديدة تلقائياً.');
+            } else {
+                approved.push(storeToApprove);
+                alert('🚀 تمت الموافقة ونشر المحل الجديد بنجاح!');
+            }
+
+            saveData('pendingStores', pending);
+            saveData('approvedStores', approved);
+
+            renderPendingStores();
+            renderApprovedStores();
+
+            let contactVal = storeToApprove.contact;
+            if (!contactVal.includes('http') && !contactVal.includes('instagram') && !contactVal.includes('facebook')) {
+                let cleanPhone = contactVal.replace(/^0/, '');
+                let message = `مرحباً ${storeToApprove.name} 🎉%0Aأبشرك، تمت الموافقة من قبل إدارة "سهل الوصول" وتم تحديث/نشر منتجاتك رسمياً في التطبيق!%0Aرابط التطبيق:%0Ahttps://akrmm4604-a11y.github.io/sahl-alwusool/`;
+                let whatsappUrl = `https://wa.me/964${cleanPhone}?text=${message}`;
+                window.open(whatsappUrl, '_blank');
+            }
+        }
+
+        function rejectStore(index) {
+            let pending = getStoredData('pendingStores');
+            pending.splice(index, 1);
+            saveData('pendingStores', pending);
+            renderPendingStores();
+            alert('🗑️ تم رفض الطلب.');
+        }
+
+        function deleteApprovedStore(index) {
+            if (confirm('هل أنت متأكد من حذف هذا المحل نهائياً من الدليل؟')) {
+                let stores = getStoredData('approvedStores');
+                stores.splice(index, 1);
+                saveData('approvedStores', stores);
+                renderApprovedStores();
+                alert('🗑️ تم حذف المحل بنجاح.');
+            }
+        }
+
+        function editApprovedStore(index) {
+            let stores = getStoredData('approvedStores');
+            let store = stores[index];
+
+            let newName = prompt('تعديل اسم المحل:', store.name);
+            if (newName === null) return;
+            let newCat = prompt('تعديل القسم (حلويات، ألبان، منظفات، لحوم، كوزمتك، ألبسة، أخرى):', store.category);
+            if (newCat === null) return;
+            
+            let vipPrompt = prompt('هل ترغب بجعل هذا المحل مميزاً VIP ويظهر في بداية التطبيق؟ (اكتب: نعم أو لا):', store.isVip ? 'نعم' : 'لا');
+            let isVipVal = vipPrompt && vipPrompt.trim() === 'نعم';
+
+            let newSubStatus = prompt('حالة الاشتراك (مثال: نشط، منتهي، قيد الانتظار):', store.subStatus || 'نشط');
+            if (newSubStatus === null) return;
+            let newSubNotes = prompt('ملاحظات مالية سرية (مثال: تم دفع الاشتراك نقداً لشهر 6):', store.subNotes || '');
+            if (newSubNotes === null) return;
+
+            let newAddress = prompt('تعديل العنوان أو الحي:', store.address);
+            if (newAddress === null) return;
+            let newNotes = prompt('تعديل التفاصيل:', store.notes);
+            if (newNotes === null) return;
+            let newProducts = prompt('تعديل المنتجات:', store.products);
+            if, (newProducts === null) return;
+            let newContact = prompt('تعديل رقم الواتساب أو رابط التواصل:', store.contact);
+            if (newContact === null) return;
+
+            stores[index] = {
+                name: newName,
+                category: newCat || 'أخرى',
+                avatar: store.avatar,
+                image: store.image,
+                address: newAddress,
+                notes: newNotes,
+                products: newProducts,
+                contact: newContact,
+                isVip: isVipVal,
+                subStatus: newSubStatus,
+                subNotes: newSubNotes,
+                views: store.views || 0,
+                likes: store.likes || 0
+            };
+
+            saveData('approvedStores', stores);
+            renderApprovedStores();
+            alert('✏️ تم تحديث بيانات المحل وحالة الاشتراك والـ VIP بنجاح!');
+        }
+
+        window.onload = function() {
+            renderApprovedStores();
+        };
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سهل الوصول - الدليل المحلي الشامل في القيارة والموصل</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2c3e50">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #c0392b;
+            --warning-color: #e67e22;
+            --instagram-color: #c13584;
+            --install-color: #9b59b6;
+            --vip-color: #f1c40f;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333533;
+            --gray-text: #7f8c8d;
+        }
+        body {
+            font-family: 'Tahoma', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px;
+            direction: rtl;
+            text-align: right;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 25px 20px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        header h1 {
+            margin: 0 0 10px 0;
+            font-size: 26px;
+        }
+        header p {
+            margin: 0;
+            font-size: 14px;
+            color: #ecf0f1;
+            opacity: 0.9;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0 10px 5px;
+            color: var(--primary-color);
+            border-right: 4px solid var(--accent-color);
+            padding-right: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        /* أزرار تصفية الأقسام */
+        .categories-bar {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        .cat-btn {
+            background: #ffffff;
+            border: 1px solid #ddd;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--primary-color);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .cat-btn.active, .cat-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+        .card {
+            background: var(--card-bg);
+            padding: 18px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            border-right: 5px solid var(--accent-color);
+            overflow: hidden;
+            position: relative;
+        }
+        .card.vip-card {
+            border-right: 5px solid var(--vip-color);
+            background: #fffdf0;
+        }
+        .card.add-ad-card {
+            border-right: 5px solid var(--success-color);
+            background: #fefefe;
+        }
+        .card.admin-card {
+            border-right: 5px solid var(--warning-color);
+            background: #fffdf9;
+        }
+        .card.contact-card {
+            border-right: 5px solid var(--instagram-color);
+            background: #fff9fc;
+        }
+        .card.install-card {
+            border-right: 5px solid var(--install-color);
+            background: #fdf8fe;
+            display: none;
+            text-align: center;
+        }
+        
+        /* تنسيق رأس المحل */
+        .store-header-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .store-avatar {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent-color);
+            background: #eee;
+            flex-shrink: 0;
+        }
+        .store-title-area h3 {
+            margin: 0 0 4px 0;
+            font-size: 17px;
+            color: var(--primary-color);
+        }
+        .store-title-area p {
+            margin: 0;
+            font-size: 12px;
+            color: var(--gray-text);
+        }
+
+        .store-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            background: #eee;
+        }
+        .form-group {
+            margin-bottom: 12px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            box-sizing: border-box;
+            background: #fff;
+            font-family: 'Tahoma', sans-serif;
+        }
+        .form-control:focus {
+            border-color: var(--success-color);
+        }
+        textarea.form-control {
+            resize: vertical;
+            height: 70px;
+        }
+        .btn {
+            width: 100%;
+            border: none;
+            padding: 11px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: white;
+            text-align: center;
+        }
+        .btn-success { background-color: var(--success-color); }
+        .btn-danger { background-color: var(--danger-color); }
+        .btn-warning { background-color: var(--warning-color); }
+        .btn-primary { background-color: var(--accent-color); }
+        .btn-install { background-color: var(--install-color); font-size: 15px; padding: 12px; }
+        .btn:active { transform: scale(0.98); }
+        
+        .badge {
+            display: inline-block;
+            background: #e8f4fc;
+            color: var(--accent-color);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            margin-top: 8px;
+            font-weight: bold;
+        }
+        .vip-badge {
+            display: inline-block;
+            background: #fef5d1;
+            color: #b7950b;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            margin-top: 8px;
+            font-weight: bold;
+            border: 1px solid #f1c40f;
+        }
+        .stats-badge {
+            font-size: 11px;
+            color: #555;
+            background: #f1f2f6;
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-left: 5px;
+        }
+        
+        .admin-secret-info {
+            background: #fcf3cf;
+            border: 1px dashed #f39c12;
+            padding: 8px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #7d6608;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .product-item-card {
+            background: #f9f9f9;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        .product-item-card h4 {
+            margin: 0 0 5px 0;
+            font-size: 14px;
+            color: var(--primary-color);
+        }
+        .product-item-card p {
+            margin: 0;
+            font-size: 12px;
+            color: #e67e22;
+            font-weight: bold;
+        }
+
+        #storeDetailView {
+            display: none;
+        }
+        
+        #adminPanel {
+            display: none;
+            background: #fff8f0;
+            border: 2px dashed var(--warning-color);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .pending-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #eee;
+        }
+        .admin-login-box {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+        }
+        .admin-actions {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px dashed #e0e0e0;
+            display: flex;
+            gap: 8px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            font-size: 12px;
+            color: var(--gray-text);
+            border-top: 1px solid #e0e0e0;
+            cursor: pointer;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>سهل الوصول</h1>
+            <p>دليلك المحلي الشامل في القيارة والموصل للمحلات والمشاريع</p>
+        </header>
+
+        <!-- صندوق تسجيل دخول المدير المخفي -->
+        <div id="adminLoginBox" style="display: none;" class="card admin-card">
+            <h3>تسجيل دخول المدير (الرمز: 334455ff)</h3>
+            <div class="admin-login-box">
+                <input type="password" id="adminPin" class="form-control" placeholder="أدخل رمز السر">
+                <button onclick="checkAdmin()" class="btn btn-success" style="width: 100px;">دخول</button>
+            </div>
+            <button onclick="hideAdminLogin()" class="btn btn-danger" style="margin-top: 8px; padding: 6px; font-size: 12px;">إلغاء</button>
+        </div>
+
+        <!-- لوحة تحكم الإدارة -->
+        <div id="adminPanel">
+            <h3 style="color: var(--warning-color); margin-top: 0;">🛠️ لوحة إدارة الطلبات والاشتراكات</h3>
+            <p style="font-size: 13px;">المتاجر المميزة تظهر أولاً. يمكنك تعديل حالة الاشتراك والملاحظات المالية السرية من زر التعديل.</p>
+            <div id="pendingList"></div>
+            <button onclick="closeAdminPanel()" class="btn btn-danger" style="width:100%; margin-top:10px; padding: 8px;">إغلاق لوحة الإدارة وتسجيل الخروج</button>
+        </div>
+
+        <!-- العرض الرئيسي -->
+        <div id="mainHomeView">
+            
+            <div id="installAppCard" class="card install-card">
+                <h3>📱 تثبيت تطبيق سهل الوصول</h3>
+                <p>ثبت التطبيق على هاتفك الآن ليعمل بسرعة فائقة وبدون الحاجة لفتح المتصفح في كل مرة!</p>
+                <button onclick="installPWA()" class="btn btn-install">📥 ثبت التطبيق الآن</button>
+            </div>
+
+            <!-- بطاقة التواصل مع الإدارة -->
+            <div class="card contact-card">
+                <h3>💬 الإدارة للتواصل والاستفسار</h3>
+                <p>لأي استفسار عن إضافة المحلات أو الإعلانات، يمكنك التواصل مباشرة مع إدارة التطبيق (إبراهيم عمر):</p>
+                <div style="margin-top: 8px; font-size: 13px; display: flex; flex-direction: column; gap: 6px;">
+                    <a href="https://wa.me/9647765171407" target="_blank" style="color: var(--success-color); text-decoration: none; font-weight: bold;">📱 واتساب الإدارة: 07765171407</a>
+                    <a href="https://instagram.com/aecdhdy" target="_blank" style="color: var(--instagram-color); text-decoration: none; font-weight: bold;">📸 انستغرام الإدارة: @aecdhdy (إبراهيم عمر)</a>
+                </div>
+            </div>
+
+            <div class="section-title">تصفح حسب الأقسام</div>
+            <div class="categories-bar">
+                <button class="cat-btn active" onclick="filterCategory('الكل', this)">الكل</button>
+                <button class="cat-btn" onclick="filterCategory('حلويات', this)">🍰 حلويات</button>
+                <button class="cat-btn" onclick="filterCategory('ألبان', this)">🥛 ألبان وأجبان</button>
+                <button class="cat-btn" onclick="filterCategory('منظفات', this)">✨ منظفات</button>
+                <button class="cat-btn" onclick="filterCategory('لحوم', this)">🥩 لحوم ودواجن</button>
+                <button class="cat-btn" onclick="filterCategory('كوزمتك', this)">💄 كوزمتك والعناية</button>
+                <button class="cat-btn" onclick="filterCategory('ألبسة', this)">👕 ألبسة وموضة</button>
+                <button class="cat-btn" onclick="filterCategory('أخرى', this)">🛒 أخرى</button>
+            </div>
+
+            <!-- خانة البحث الفوري الجديدة -->
+            <div class="form-group" style="margin-bottom: 15px;">
+                <input type="text" id="searchInput" class="form-control" placeholder="🔍 ابحث عن اسم محل، منطقة (مثل حي سكر)، أو منتج..." oninput="handleSearch()">
+            </div>
+
+            <div class="section-title">المحلات والأسواق المعتمدة</div>
+            <div id="approvedStoresList"></div>
+
+            <!-- استمارة إضافة محل -->
+            <div class="section-title">أضف مشروعك أو محلك معنا</div>
+            <div class="card add-ad-card">
+                <h3>📢 تقديم طلب إعلان جديد</h3>
+                <p>املأ تفاصيل محلك وضع رقمك العراقي أو رابط صفحتك للتواصل:</p>
+                
+                <form id="adForm" onsubmit="submitAd(event)">
+                    <div class="form-group">
+                        <input type="text" id="storeName" class="form-control" placeholder="اسم المحل أو المتجر (مثال: متجر السعادة)" required>
+                    </div>
+                    <div class="form-group">
+                        <select id="storeCategory" class="form-control" required>
+                            <option value="">-- اختر القسم المناسب لمحلك --</option>
+                            <option value="حلويات">🍰 حلويات</option>
+                            <option value="ألبان">🥛 ألبان وأجبان</option>
+                            <option value="منظفات">✨ منظفات</option>
+                            <option value="لحوم">🥩 لحوم ودواجن</option>
+                            <option value="كوزمتك">💄 كوزمتك والعناية</option>
+                            <option value="ألبسة">👕 ألبسة وموضة</option>
+                            <option value="أخرى">🛒 أخرى</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="font-size: 12px; color: var(--primary-color); font-weight: bold; display: block; margin-bottom: 5px;">👤 صورة البروفايل أو الشعار:</label>
+                        <input type="file" id="storeAvatarFile" class="form-control" accept="image/*" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="font-size: 12px; color: var(--primary-color); font-weight: bold; display: block; margin-bottom: 5px;">🖼️ صورة واجهة المحل أو الغلاف:</label>
+                        <input type="file" id="storeImageFile" class="form-control" accept="image/*" required>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" id="storeAddress" class="form-control" placeholder="العنوان / الحي (مثال: الموصل - حي سكر قرب السوق)" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="storeNotes" class="form-control" placeholder="نبذة عن المحل أو الخدمات المقدمة..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="storeProducts" class="form-control" placeholder="أدخل المنتجات الجديدة (كل منتج مع سعره)..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="storeContact" class="form-control" placeholder="رقم عراقي محلي (مثال: 07701234567) أو رابط فيسبوك/انستغرام" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">إرسال الطلب للإدارة 📤</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- صفحة تفاصيل المحل والمنتجات -->
+        <div id="storeDetailView">
+            <button onclick="backToHome()" class="btn btn-primary" style="margin-bottom: 15px; width: auto; padding: 8px 15px;">⬅️ عودة إلى الرئيسية</button>
+            <div id="storeDetailContent"></div>
+        </div>
+
+        <!-- الفوتر السري -->
+        <footer onclick="handleSecretAdminTrigger()">
+            <p>جميع الحقوق محفوظة © سهل الوصول 2026 | القيارة - الموصل</p>
+            <p style="margin-top: 3px; font-size: 10px; opacity: 0.5;">دليلك المحلي المتكامل</p>
+        </footer>
+    </div>
+
+    <script>
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installAppCard').style.display = 'block';
+        });
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('تم تثبيت التطبيق بنجاح');
+                    }
+                    deferredPrompt = null;
+                    document.getElementById('installAppCard').style.display = 'none';
+                });
+            }
+        }
+
+        let isAdmin = localStorage.getItem('sahl_admin_logged') === 'true';
+        let currentFilter = 'الكل';
+        let searchQuery = '';
+        let clickCount = 0;
+        let clickTimer = null;
+
+        function handleSecretAdminTrigger() {
+            clickCount++;
+            if (clickTimer) clearTimeout(clickTimer);
+            
+            clickTimer = setTimeout(() => { clickCount = 0; }, 600);
+
+            if (clickCount >= 3) {
+                clickCount = 0;
+                if (isAdmin) {
+                    document.getElementById('adminPanel').style.display = 'block';
+                    renderPendingStores();
+                } else {
+                    document.getElementById('adminLoginBox').style.display = 'block';
+                }
+            }
+        }
+
+        function hideAdminLogin() {
+            document.getElementById('adminLoginBox').style.display = 'none';
+        }
+
+        function getStoredData(key) {
+            let data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : [];
+        }
+
+        function saveData(key, data) {
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+
+        function filterCategory(cat, btnElement) {
+            currentFilter = cat;
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+            renderApprovedStores();
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+            renderApprovedStores();
+        }
+
+        function renderApprovedStores() {
+            let list = document.getElementById('approvedStoresList');
+            let stores = getStoredData('approvedStores');
+
+            // ترتيب المتاجر بحيث تظهر المتاجر المميزة (VIP) في البداية تلقائياً
+            stores.sort((a, b) => {
+                let aVip = a.isVip ? 1 : 0;
+                let bVip = b.isVip ? 1 : 0;
+                return bVip - aVip;
+            });
+
+            // تصفية المحلات حسب القسم المختار وحسب نص البحث الفوري
+            let filteredStores = stores.filter(store => {
+                let matchesCategory = (currentFilter === 'الكل' || store.category === currentFilter);
+                if (!matchesCategory) return false;
+
+                if (!searchQuery) return true;
+
+                let nameMatch = store.name.toLowerCase().includes(searchQuery);
+                let addressMatch = store.address.toLowerCase().includes(searchQuery);
+                let notesMatch = store.notes.toLowerCase().includes(searchQuery);
+                let productsMatch = store.products.toLowerCase().includes(searchQuery);
+                let categoryMatch = store.category.toLowerCase().includes(searchQuery);
+
+                return nameMatch || addressMatch || notesMatch || productsMatch || categoryMatch;
+            });
+
+            if (filteredStores.length === 0) {
+                list.innerHTML = `
+                    <div class="card" style="text-align: center; padding: 20px;">
+                        <p style="color: var(--gray-text);">عذراً، لم نجد نتائج مطابقة لبحثك أو في هذا القسم.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = '';
+            filteredStores.forEach((store) => {
+                let originalIndex = stores.findIndex(s => s === store);
+                let views = store.views || 0;
+                let likes = store.likes || 0;
+                let catName = store.category || 'عام';
+                let avatarSrc = store.avatar || 'https://img.icons8.com/color/96/000000/user.png';
+                let imgSrc = store.image || 'https://img.icons8.com/color/192/000000/shop.png';
+
+                let cardClass = store.isVip ? "card vip-card" : "card";
+                let vipBadgeHTML = store.isVip ? `<span class="vip-badge">⭐ متجر مميز VIP</span>` : `<span class="badge">📂 ${catName}</span>`;
+
+                let adminSecretDiv = isAdmin ? `
+                    <div class="admin-secret-info">
+                        🔒 <strong>معلومات الإدارة الخاصة:</strong><br>
+                        - حالة الاشتراك: <strong>${store.subStatus || 'نشط'}</strong><br>
+                        - ملاحظات مالية: ${store.subNotes || 'لا توجد ملاحظات'}
+                    </div>
+                ` : '';
+
+                let adminButtonsHTML = isAdmin ? `
+                    <div class="admin-actions">
+                        <button onclick="event.stopPropagation(); editApprovedStore(${originalIndex})" class="btn btn-primary" style="padding: 6px; font-size: 12px;">✏️ تعديل المحل والاشتراك</button>
+                        <button onclick="event.stopPropagation(); deleteApprovedStore(${originalIndex})" class="btn btn-danger" style="padding: 6px; font-size: 12px;">🗑️ حذف المحل</button>
+                    </div>
+                ` : '';
+
+                list.innerHTML += `
+                    <div class="${cardClass}" onclick="openStoreDetails(${originalIndex})" style="cursor: pointer;">
+                        <div class="store-header-row">
+                            <img src="${avatarSrc}" class="store-avatar" alt="بروفايل">
+                            <div class="store-title-area">
+                                <h3>🏪 ${store.name}</h3>
+                                <p>📍 ${store.address}</p>
+                            </div>
+                        </div>
+                        <img src="${imgSrc}" class="store-img" alt="${store.name}">
+                        <p style="margin-top: 5px;">📝 ${store.notes}</p>
+                        ${vipBadgeHTML}
+                        <div style="margin-top: 8px;">
+                            <span class="stats-badge">👁️ ${views} مشاهدة</span>
+                            <span class="stats-badge">❤️ ${likes} إعجاب</span>
+                        </div>
+                        ${adminSecretDiv}
+                        ${adminButtonsHTML}
+                    </div>
+                `;
+            });
+        }
+
+        function openStoreDetails(index) {
+            let stores = getStoredData('approvedStores');
+            let store = stores[index];
+
+            store.views = (store.views || 0) + 1;
+            saveData('approvedStores', stores);
+
+            displayStoreView(store, index);
+        }
+
+        function displayStoreView(store, index) {
+            document.getElementById('mainHomeView').style.display = 'none';
+            let detailView = document.getElementById('storeDetailView');
+            detailView.style.display = 'block';
+
+            let avatarSrc = store.avatar || 'https://img.icons8.com/color/96/000000/user.png';
+            let imgSrc = store.image || 'https://img.icons8.com/color/192/000000/shop.png';
+            let productLines = store.products ? store.products.split('\n') : [];
+            let productsHTML = '';
+            
+            if (productLines.length > 0 && productLines[0].trim() !== "") {
+                productsHTML = `<div class="products-grid">`;
+                productLines.forEach(item => {
+                    let parts = item.split('-');
+                    let pName = parts[0] ? parts[0].trim() : item;
+                    let pPrice = parts[1] ? parts[1].trim() : 'السعر عند الطلب';
+                    productsHTML += `
+                        <div class="product-item-card">
+                            <h4>🛍️ ${pName}</h4>
+                            <p>💰 ${pPrice}</p>
+                        </div>
+                    `;
+                });
+                productsHTML += `</div>`;
+            } else {
+                productsHTML = `<p style="text-align:center; color:#7f8c8d; margin-top:15px;">لا توجد منتجات مضافة حالياً.</p>`;
+            }
+
+            let vipBadgeHTML = store.isVip ? `<span class="vip-badge" style="margin-bottom:8px; display:inline-block;">⭐ متجر مميز VIP</span>` : '';
+
+            let contactInfo = store.contact || '';
+            let contactButtonHTML = '';
+            if (contactInfo.includes('http') || contactInfo.includes('instagram.com') || contactInfo.includes('facebook.com') || contactInfo.includes('facebook') || contactInfo.includes('instagram')) {
+                contactButtonHTML = `<a href="${contactInfo}" target="_blank" class="btn btn-warning" style="display:inline-block; text-decoration:none; padding: 12px; font-size:15px; color:white;">🔗 زيارة صفحة التواصل (فيسبوك/انستغرام)</a>`;
+            } else {
+                let cleanPhone = contactInfo.replace(/^0/, '');
+                contactButtonHTML = `<a href="https://wa.me/964${cleanPhone}" target="_blank" class="btn btn-success" style="display:inline-block; text-decoration:none; padding: 12px; font-size:15px;">💬 تواصل مع صاحب المحل عبر الواتساب</a>`;
+            }
+
+            let content = document.getElementById('storeDetailContent');
+            content.innerHTML = `
+                <div class="card" style="border-right: 5px solid var(--success-color);">
+                    <div class="store-header-row">
+                        <img src="${avatarSrc}" class="store-avatar" alt="بروفايل">
+                        <div class="store-title-area">
+                            <h2>🏪 ${store.name}</h2>
+                            <p>📂 القسم: ${store.category || 'عام'}</p>
+                        </div>
+                    </div>
+                    ${vipBadgeHTML}
+                    <img src="${imgSrc}" class="store-img" alt="${store.name}">
+                    <p>📍 <strong>العنوان:</strong> ${store.address}</p>
+                    <p>📝 <strong>التفاصيل:</strong> ${store.notes}</p>
+                    <div style="margin: 10px 0;">
+                        <span class="stats-badge" id="viewCountBadge">👁️ ${store.views || 1} مشاهدة</span>
+                        <span class="stats-badge" id="likeCountBadge">❤️ ${store.likes || 0} إعجاب</span>
+                    </div>
+                    <button onclick="likeStore(${index})" class="btn btn-warning" style="margin-top: 5px; padding: 8px; font-size: 13px;">❤️ إعجاب بهذا المحل (لايك)</button>
+                </div>
+
+                <div class="section-title">قائمة المنتجات والعروض</div>
+                ${productsHTML}
+
+                <div style="margin-top: 20px; text-align: center;">
+                    ${contactButtonHTML}
+                </div>
+            `;
+            window.scrollTo(0, 0);
+        }
+
+        function likeStore(index) {
+            let stores = getStoredData('approvedStores');
+            stores[index].likes = (stores[index].likes || 0) + 1;
+            saveData('approvedStores', stores);
+            
+            document.getElementById('likeCountBadge').innerText = `❤️ ${stores[index].likes} إعجاب`;
+            alert('❤️ شكراً لك! تم تسجيل إعجابك بالمحل.');
+        }
+
+        function backToHome() {
+            document.getElementById('storeDetailView').style.display = 'none';
+            document.getElementById('mainHomeView').style.display = 'block';
+            renderApprovedStores();
+        }
+
+        function submitAd(event) {
+            event.preventDefault();
+            let avatarFile = document.getElementById('storeAvatarFile').files[0];
+            let imageFile = document.getElementById('storeImageFile').files[0];
+
+            if (!avatarFile || !imageFile) {
+                alert('الرجاء اختيار صورة البروفايل وصورة واجهة المحل.');
+                return;
+            }
+
+            let readerAvatar = new FileReader();
+            readerAvatar.onload = function(eAvatar) {
+                let avatarData = eAvatar.target.result;
+
+                let readerImage = new FileReader();
+                readerImage.onload = function(eImage) {
+                    let imageData = eImage.target.result;
+
+                    let newStore = {
+                        name: document.getElementById('storeName').value.trim(),
+                        category: document.getElementById('storeCategory').value,
+                        avatar: avatarData,
+                        image: imageData,
+                        address: document.getElementById('storeAddress').value.trim(),
+                        notes: document.getElementById('storeNotes').value,
+                        products: document.getElementById('storeProducts').value,
+                        contact: document.getElementById('storeContact').value.trim(),
+                        isVip: false,
+                        subStatus: 'نشط',
+                        subNotes: 'اشتراك جديد',
+                        views: 0,
+                        likes: 0
+                    };
+
+                    let pending = getStoredData('pendingStores');
+                    pending.push(newStore);
+                    saveData('pendingStores', pending);
+
+                    alert('✅ تم إرسال طلبك بنجاح! هو الآن معلق بانتظار مراجعته والموافقة عليه من قبل الإدارة.');
+                    document.getElementById('adForm').reset();
+                };
+                readerImage.readAsDataURL(imageFile);
+            };
+            readerAvatar.readAsDataURL(avatarFile);
+        }
+
+        function checkAdmin() {
+            let pin = document.getElementById('adminPin').value;
+            if (pin === '334455ff') {
+                isAdmin = true;
+                localStorage.setItem('sahl_admin_logged', 'true');
+                document.getElementById('adminLoginBox').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                renderPendingStores();
+                renderApprovedStores();
+                alert('🔓 تم تسجيل الدخول بنجاح كمدير!');
+            } else {
+                alert('❌ رمز السر غير صحيح!');
+            }
+        }
+
+        function closeAdminPanel() {
+            if (confirm('هل تريد تسجيل الخروج وإغلاق لوحة الإدارة؟')) {
+                isAdmin = false;
+                localStorage.setItem('sahl_admin_logged', 'false');
+                document.getElementById('adminPanel').style.display = 'none';
+                renderApprovedStores();
+            }
+        }
+
+        function renderPendingStores() {
+            let list = document.getElementById('pendingList');
+            let pending = getStoredData('pendingStores');
+
+            if (pending.length === 0) {
+                list.innerHTML = '<p>لا توجد طلبات إعلان معلقة حالياً.</p>';
+                return;
+            }
+
+            list.innerHTML = '';
+            pending.forEach((store, index) => {
+                list.innerHTML += `
+                    <div class="pending-item">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                            <img src="${store.avatar}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+                            <strong>${store.name}</strong> (${store.category})
+                        </div>
+                        <img src="${store.image}" style="width:100%; height:110px; object-fit:cover; border-radius:6px; margin-bottom:8px;">
+                        <span style="font-size: 12px; color: #666;">📍 ${store.address} | 🔗 للتواصل: ${store.contact}</span><br>
+                        <p style="margin: 5px 0; font-size: 12px;">${store.notes}</p>
+                        <div style="display: flex; gap: 5px; margin-top: 8px;">
+                            <button onclick="approveStore(${index})" class="btn btn-success" style="padding: 6px; font-size: 11px;">✅ موافقة ونشر (دمج ذكي)</button>
+                            <button onclick="rejectStore(${index})" class="btn btn-danger" style="padding: 6px; font-size: 11px;">❌ رفض</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function approveStore(index) {
+            let pending = getStoredData('pendingStores');
+            let approved = getStoredData('approvedStores');
+
+            let storeToApprove = pending.splice(index, 1)[0];
+
+            let existingStoreIndex = approved.findIndex(s => 
+                s.name.toLowerCase() === storeToApprove.name.toLowerCase() || 
+                s.contact === storeToApprove.contact
+            );
+
+            if (existingStoreIndex !== -1) {
+                approved[existingStoreIndex].products = approved[existingStoreIndex].products + '\n' + storeToApprove.products;
+                approved[existingStoreIndex].notes = storeToApprove.notes || approved[existingStoreIndex].notes;
+                approved[existingStoreIndex].contact = storeToApprove.contact || approved[existingStoreIndex].contact;
+                alert('🔄 تم التعرف على المحل مسبقاً! تم دمج المنتجات الجديدة تلقائياً.');
+            } else {
+                approved.push(storeToApprove);
+                alert('🚀 تمت الموافقة ونشر المحل الجديد بنجاح!');
+            }
+
+            saveData('pendingStores', pending);
+            saveData('approvedStores', approved);
+
+            renderPendingStores();
+            renderApprovedStores();
+
+            let contactVal = storeToApprove.contact;
+            if (!contactVal.includes('http') && !contactVal.includes('instagram') && !contactVal.includes('facebook')) {
+                let cleanPhone = contactVal.replace(/^0/, '');
+                let message = `مرحباً ${storeToApprove.name} 🎉%0Aأبشرك، تمت الموافقة من قبل إدارة "سهل الوصول" وتم تحديث/نشر منتجاتك رسمياً في التطبيق!%0Aرابط التطبيق:%0Ahttps://akrmm4604-a11y.github.io/sahl-alwusool/`;
+                let whatsappUrl = `https://wa.me/964${cleanPhone}?text=${message}`;
+                window.open(whatsappUrl, '_blank');
+            }
+        }
+
+        function rejectStore(index) {
+            let pending = getStoredData('pendingStores');
+            pending.splice(index, 1);
+            saveData('pendingStores', pending);
+            renderPendingStores();
+            alert('🗑️ تم رفض الطلب.');
+        }
+
+        function deleteApprovedStore(index) {
+            if (confirm('هل أنت متأكد من حذف هذا المحل نهائياً من الدليل؟')) {
+                let stores = getStoredData('approvedStores');
+                stores.splice(index, 1);
+                saveData('approvedStores', stores);
+                renderApprovedStores();
+                alert('🗑️ تم حذف المحل بنجاح.');
+            }
+        }
+
+        function editApprovedStore(index) {
+            let stores = getStoredData('approvedStores');
+            let store = stores[index];
+
+            let newName = prompt('تعديل اسم المحل:', store.name);
+            if (newName === null) return;
+            let newCat = prompt('تعديل القسم (حلويات، ألبان، منظفات، لحوم، كوزمتك، ألبسة، أخرى):', store.category);
+            if (newCat === null) return;
+            
+            let vipPrompt = prompt('هل ترغب بجعل هذا المحل مميزاً VIP ويظهر في بداية التطبيق؟ (اكتب: نعم أو لا):', store.isVip ? 'نعم' : 'لا');
+            let isVipVal = vipPrompt && vipPrompt.trim() === 'نعم';
+
+            let newSubStatus = prompt('حالة الاشتراك (مثال: نشط، منتهي، قيد الانتظار):', store.subStatus || 'نشط');
+            if (newSubStatus === null) return;
+            let newSubNotes = prompt('ملاحظات مالية سرية (مثال: تم دفع الاشتراك نقداً لشهر 6):', store.subNotes || '');
+            if (newSubNotes === null) return;
+
+            let newAddress = prompt('تعديل العنوان أو الحي:', store.address);
+            if (newAddress === null) return;
+            let newNotes = prompt('تعديل التفاصيل:', store.notes);
+            if (newNotes === null) return;
+            let newProducts = prompt('تعديل المنتجات:', store.products);
+            if, (newProducts === null) return;
+            let newContact = prompt('تعديل رقم الواتساب أو رابط التواصل:', store.contact);
+            if (newContact === null) return;
+
+            stores[index] = {
+                name: newName,
+                category: newCat || 'أخرى',
+                avatar: store.avatar,
+                image: store.image,
+                address: newAddress,
+                notes: newNotes,
+                products: newProducts,
+                contact: newContact,
+                isVip: isVipVal,
+                subStatus: newSubStatus,
+                subNotes: newSubNotes,
+                views: store.views || 0,
+                likes: store.likes || 0
+            };
+
+            saveData('approvedStores', stores);
+            renderApprovedStores();
+            alert('✏️ تم تحديث بيانات المحل وحالة الاشتراك والـ VIP بنجاح!');
+        }
+
+        window.onload = function() {
+            renderApprovedStores();
+        };
+    </script>
 </body>
 </html>
