@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>سهل الوصول - الدليل المحلي الشامل في القيارة والموصل</title>
     
-    <!-- وسوم المعاينة الاحترافية لفيسبوك ومسنجر -->
+    <!-- وسوم المعاينة الاحترافية لفيسبوك ومسنجر (تظهر اسم التطبيق، الشعار، والوصف وزر التثبيت) -->
     <meta property="og:title" content="سهل الوصول - الدليل المحلي في القيارة والموصل">
     <meta property="og:description" content="دليلك المحلي الشامل للمحلات والمشاريع وخدمات التوصيل. اضغط لتثبيت التطبيق الآن!">
     <meta property="og:image" content="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600">
@@ -42,7 +42,6 @@
             max-width: 600px;
             margin: auto;
         }
-        /* هيدر التطبيق باللون البرتقالي الفخم */
         header {
             background: linear-gradient(135deg, #d35400, #e67e22, #f39c12);
             color: white;
@@ -63,7 +62,6 @@
             color: #fdebd0;
             opacity: 0.95;
         }
-        /* خانة الإدارة المصغرة بلمسات برتقالية */
         .admin-card {
             background: linear-gradient(135deg, #ffffff, #fef9e7);
             border: 1.5px solid #f8c471;
@@ -167,7 +165,6 @@
             border-color: var(--accent-color);
             box-shadow: 0 0 8px rgba(230, 126, 34, 0.25);
         }
-        /* زر إضافة إعلان برتقالي متألق */
         .add-toggle-card {
             background: linear-gradient(135deg, #d35400, #e67e22, #f39c12);
             color: white;
@@ -331,10 +328,14 @@
                 <option>منظفات وكوزمتك</option>
                 <option>مطاعم ومشاريع منزلية</option>
             </select>
-            <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">👤 صورة البروفايل أو الشعار:</label>
-            <input type="file">
+            
+            <!-- تم تعديل حقول رفع الصور لتفتح الاستوديو والكاميرا مباشرة -->
+            <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">👤 صورة البروفايل أو الشعار (الاستوديو / الكاميرا):</label>
+            <input type="file" accept="image/*">
+            
             <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">🖼️ صور استعراضية للمنتجات:</label>
-            <input type="file" multiple>
+            <input type="file" accept="image/*" multiple>
+            
             <input type="text" placeholder="العنوان / الحي (مثال: الموصل - حي سكر قرب السوق)">
             <textarea placeholder="نبذة عن المحل أو الخدمات المقدمة..." rows="2"></textarea>
             <textarea placeholder="أدخل المنتجات الجديدة (كل منتج مع سعره)..." rows="2"></textarea>
@@ -369,7 +370,6 @@
                 </div>
                 <p class="card-desc">ألبان وأجبان ومواد غذائية طازجة - حي سكر (تتوفر توصيل سريع)</p>
                 
-                <!-- معرض الصور الاستعراضية الإضافية الغنية -->
                 <div class="product-gallery">
                     <img src="https://images.unsplash.com/photo-1563245372-f21724e3856d?w=150" class="product-thumb" alt="منتج 1">
                     <img src="https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=150" class="product-thumb" alt="منتج 2">
@@ -435,8 +435,6 @@
                 }
             });
         }
-
-        changeColor = () => {}; // Helper placeholder
 
         function handleSearch() {
             let query = document.getElementById('searchInput').value.toLowerCase();
