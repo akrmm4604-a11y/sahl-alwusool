@@ -164,6 +164,7 @@
         .card-title { font-size: 14px; font-weight: bold; color: var(--primary-color); margin: 0; }
         .vip-badge { background: var(--vip-color); color: #7d6608; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
         .card-desc { font-size: 11px; color: var(--gray-text); margin: 0 0 6px 0; }
+        .offer-tag { background: #fadbd8; color: #900c3f; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; display: inline-block; margin-bottom: 5px; }
         .product-gallery { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 6px; padding-bottom: 4px; }
         .product-thumb { width: 65px; height: 65px; border-radius: 6px; object-fit: cover; border: 1px solid #f8c471; }
         .card-footer { display: flex; gap: 6px; margin-top: 6px; }
@@ -182,6 +183,10 @@
         .profile-logo { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-color); }
         .profile-title-area h2 { margin: 0 0 3px 0; font-size: 16px; color: var(--primary-color); }
         .profile-title-area p { margin: 0; font-size: 11px; color: var(--gray-text); }
+        .social-links { display: flex; gap: 8px; margin-top: 10px; }
+        .social-badge { padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; text-decoration: none; color: white; display: inline-flex; align-items: center; gap: 4px; }
+        .fb-badge { background: #3b5998; }
+        .insta-badge { background: #e1306c; }
         
         .footer { text-align: center; margin-top: 15px; padding: 10px; font-size: 11px; color: var(--gray-text); }
         .admin-modal {
@@ -224,16 +229,22 @@
                     <option value="أشياء أخرى">أشياء أخرى</option>
                 </select>
 
-                <!-- فتح الاستوديو مباشرة للشعار -->
                 <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">👤 اختر صورة الشعار (من الاستوديو/الكاميرا):</label>
                 <input type="file" id="reqLogoFile" accept="image/*">
                 
-                <!-- فتح الاستوديو مباشرة لصور المنتجات المتعددة -->
                 <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">🖼️ اختر صور المنتجات والاستعراض:</label>
                 <input type="file" id="reqImagesFiles" accept="image/*" multiple>
 
                 <input type="text" id="reqAddress" placeholder="العنوان / الحي (مثال: القيارة - السوق الكبير)">
                 <textarea id="reqDesc" placeholder="نبذة عن المحل أو الخدمات المقدمة..." rows="2"></textarea>
+                
+                <!-- خانة التخفيضات والعروض الاختيارية -->
+                <input type="text" id="reqOffer" placeholder="🔥 التخفيضات والعروض (اختياري، مثلاً: خصم 20% على جميع المواد)">
+
+                <!-- خانات روابط الفيسبوك وانستغرام -->
+                <input type="text" id="reqFb" placeholder="🔵 رابط صفحة الفيسبوك (اختياري)">
+                <input type="text" id="reqInsta" placeholder="📸 رابط أو معرف حساب الإنستغرام (اختياري)">
+
                 <input type="text" id="reqPhone" placeholder="رقم هاتف عراقي محلي (مثال: 07701234567)">
                 <button class="submit-btn" onclick="submitNewListing(event)">إرسال الطلب للإدارة</button>
             </div>
@@ -262,7 +273,6 @@
         <div id="storeProfileView">
             <button class="back-main-btn" onclick="goBackToCatalog()">⬅ العودة إلى القائمة الرئيسية</button>
             <div id="storeProfileContent"></div>
-            <!-- أزرار الحذف والتعديل المباشر تظهر هنا فقط للمدير -->
             <div id="adminStoreActions" style="display: none; margin-top: 20px; padding-top: 10px; border-top: 1px dashed #f8c471; gap: 8px;"></div>
         </div>
 
@@ -290,7 +300,7 @@
 
     <script>
         let deferredPrompt;
-        let isAdminLoggedIn = false; // متغير لتتبع هل أنت مسجل دخول كمدير أم لا
+        let isAdminLoggedIn = false;
         const installBtn = document.getElementById('installBtn');
 
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -319,11 +329,11 @@
         function checkAdminPin() {
             let pin = document.getElementById('adminPinInput').value;
             if (pin === "334455ff") {
-                isAdminLoggedIn = true; // تم تفعيل صلاحية المدير لك وحدك
+                isAdminLoggedIn = true;
                 document.getElementById('adminLoginView').style.display = 'none';
                 document.getElementById('adminDashboardView').style.display = 'block';
                 loadAdminListings();
-                loadApprovedListings(); // تحديث لعرض أزرار الحذف والتعديل للمدير
+                loadApprovedListings();
             } else {
                 alert("الرمز السري غير صحيح!");
             }
@@ -334,7 +344,6 @@
             form.style.display = (form.style.display === 'block') ? 'none' : 'block';
         }
 
-        // دالة تحويل ملفات الاستوديو إلى روابط Base64 لتعمل بدون مشاكل في التخزين
         function convertFileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -350,6 +359,9 @@
             const cat = document.getElementById('reqCat').value;
             const address = document.getElementById('reqAddress').value;
             const desc = document.getElementById('reqDesc').value;
+            const offer = document.getElementById('reqOffer').value;
+            const fb = document.getElementById('reqFb').value;
+            const insta = document.getElementById('reqInsta').value;
             const phone = document.getElementById('reqPhone').value;
             
             const logoFile = document.getElementById('reqLogoFile').files[0];
@@ -361,13 +373,11 @@
             }
 
             try {
-                // تحويل الشعار المختار من الاستوديو
                 let logoUrl = "";
                 if (logoFile) {
                     logoUrl = await convertFileToBase64(logoFile);
                 }
 
-                // تحويل صور المنتجات المختارة من الاستوديو
                 let imageUrls = [];
                 for (let i = 0; i < imageFiles.length; i++) {
                     let base64Img = await convertFileToBase64(imageFiles[i]);
@@ -375,19 +385,23 @@
                 }
 
                 await window.addDoc(window.collection(window.db, "listings"), {
-                    name, category: cat, address, desc, phone, logo: logoUrl, images: imageUrls, status: 'pending', vip: false
+                    name, category: cat, address, desc, offer, fb, insta, phone, logo: logoUrl, images: imageUrls, status: 'approved', vip: false
                 });
 
-                alert('تم إرسال طلبك بنجاح إلى الإدارة وسيتم مراجعته قريباً!');
+                alert('تم إضافة إعلانك بنجاح وعرضه في التطبيق!');
                 document.getElementById('addFormContainer').style.display = 'none';
                 document.getElementById('reqName').value = '';
                 document.getElementById('reqAddress').value = '';
                 document.getElementById('reqDesc').value = '';
+                document.getElementById('reqOffer').value = '';
+                document.getElementById('reqFb').value = '';
+                document.getElementById('reqInsta').value = '';
                 document.getElementById('reqPhone').value = '';
                 document.getElementById('reqLogoFile').value = '';
                 document.getElementById('reqImagesFiles').value = '';
+                loadApprovedListings();
             } catch (error) {
-                alert('حدث خطأ أثناء رفع الصور أو الإرسال.');
+                alert('حدث خطأ أثناء الإرسال.');
             }
         }
 
@@ -401,6 +415,56 @@
                     window.allListings.push({ id: docSnap.id, ...docSnap.data() });
                 });
                 
+                if (window.allListings.length === 0) {
+                    window.allListings = [
+                        {
+                            id: 'demo1',
+                            name: 'سوبرماركت البركة',
+                            category: 'غذائية وحلويات',
+                            address: 'القيارة - قرب السوق الكبير',
+                            desc: 'ألبان، أجبان، ومواد غذائية طازجة يومياً مع خدمة توصيل سريعة.',
+                            offer: '🔥 خصم 15% على جميع المواد الغذائية اليوم!',
+                            fb: 'https://facebook.com',
+                            insta: 'https://instagram.com',
+                            phone: '07700000000',
+                            logo: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=150',
+                            images: ['https://images.unsplash.com/photo-1563245372-f21724e3856d?w=300', 'https://images.unsplash.com/photo-1550989460-0adf9ea622e2?w=300'],
+                            status: 'approved',
+                            vip: true
+                        },
+                        {
+                            id: 'demo2',
+                            name: 'متجر الأناقة للملابس',
+                            category: 'ملابس وكوزمتك',
+                            address: 'الموصل - حي سكر',
+                            desc: 'أحدث أزياء الشباب والعطور العالمية ومستحضرات التجميل الأصلية.',
+                            offer: '⭐ اشتري قطعتين واحصل على الثالثة مجاناً',
+                            fb: 'https://facebook.com',
+                            insta: 'https://instagram.com',
+                            phone: '07711111111',
+                            logo: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=150',
+                            images: ['https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=300'],
+                            status: 'approved',
+                            vip: false
+                        },
+                        {
+                            id: 'demo3',
+                            name: 'خضار الفواكه الطازجة',
+                            category: 'خضار وفواكه',
+                            address: 'القيارة - الشارع العام',
+                            desc: 'أجود أنواع الخضار والفواكه المحلية والمستوردة طازجة يومياً.',
+                            offer: '🍅 أسعار خاصة للجملة وتوصيل مجاني للبيت',
+                            fb: '',
+                            insta: '',
+                            phone: '07722222222',
+                            logo: 'https://images.unsplash.com/photo-1610348725531-843dff563e2c?w=150',
+                            images: ['https://images.unsplash.com/photo-1557844357-76f23ef39675?w=300'],
+                            status: 'approved',
+                            vip: false
+                        }
+                    ];
+                }
+
                 window.allListings.sort((a, b) => (b.vip === true) - (a.vip === true));
                 renderListings(window.allListings.filter(item => item.status === 'approved' || !item.status));
             } catch (err) {
@@ -423,6 +487,8 @@
                     </div>
                     <p class="card-desc">${item.desc || ''} - ${item.address || ''}</p>
                     
+                    ${item.offer ? `<span class="offer-tag">${item.offer}</span>` : ''}
+
                     ${item.images && item.images.length > 0 ? `
                         <div class="product-gallery">
                             ${item.images.map(img => `<img src="${img}" class="product-thumb" alt="صورة">`).join('')}
@@ -432,7 +498,6 @@
                     <div class="card-footer" onclick="event.stopPropagation()">
                         <a href="tel:${item.phone}" class="action-btn call-btn">📞 ${item.phone}</a>
                         <a href="https://maps.google.com/?q=${encodeURIComponent(item.address || '')}" target="_blank" class="action-btn map-btn">📍 الموقع</a>
-                        <!-- أزرار التعديل والحذف تظهر لك أنت وحدك هنا أو داخل صفحة المحل إذا كنت مسجل دخول -->
                         ${isAdminLoggedIn ? `
                             <button onclick="editListingData('${item.id}', '${item.name}', '${item.phone}', '${item.address || ''}')" style="background:var(--accent-color); color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">✏️ تعديل</button>
                             <button onclick="deleteListingFromMain('${item.id}')" style="background:var(--danger-color); color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">🗑️ حذف</button>
@@ -460,9 +525,15 @@
                         <p>القسم: <b>${store.category}</b></p>
                     </div>
                 </div>
+                ${store.offer ? `<div style="background:#fadbd8; color:#900c3f; padding:8px 10px; border-radius:6px; font-size:12px; font-weight:bold; margin-bottom:10px;">${store.offer}</div>` : ''}
                 <p style="font-size:12px; line-height:1.6; margin-bottom:10px;"><b>نبذة عن المحل:</b><br>${store.desc || 'لا توجد نبذة مضافة حالياً.'}</p>
                 <p style="font-size:12px; margin-bottom:12px;"><b>العنوان:</b> ${store.address || 'غير محدد'}</p>
                 
+                <div class="social-links">
+                    ${store.fb ? `<a href="${store.fb}" target="_blank" class="social-badge fb-badge">🔵 فيسبوك</a>` : ''}
+                    ${store.insta ? `<a href="${store.insta}" target="_blank" class="social-badge insta-badge">📸 انستغرام</a>` : ''}
+                </div>
+
                 <h4 style="font-size:13px; color:var(--primary-color); margin:12px 0 6px 0;">🖼️ معرض الصور والمنتجات:</h4>
                 ${store.images && store.images.length > 0 ? `
                     <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px; margin-bottom:15px;">
@@ -476,7 +547,6 @@
                 </div>
             `;
 
-            // إظهار أزرار الحذف والتعديل داخل صفحة المحل لك أنت وحدك (إذا كنت مسجل دخول)
             const adminActionsDiv = document.getElementById('adminStoreActions');
             if (isAdminLoggedIn) {
                 adminActionsDiv.style.display = 'flex';
@@ -548,11 +618,7 @@
             const adminContainer = document.getElementById('adminPendingList');
             adminContainer.innerHTML = '<p style="font-size:11px; color:var(--gray-text);">جاري التحميل...</p>';
             try {
-                const querySnapshot = await window.getDocs(window.collection(window.db, "listings"));
-                let items = [];
-                querySnapshot.forEach((docSnap) => {
-                    items.push({ id: docSnap.id, ...docSnap.data() });
-                });
+                let items = window.allListings;
 
                 if (items.length === 0) {
                     adminContainer.innerHTML = '<p style="font-size:11px; color:var(--gray-text);">لا توجد إعلانات حالياً.</p>';
@@ -577,14 +643,24 @@
         }
 
         async function updateStatus(id, status) {
-            await window.updateDoc(window.doc(window.db, "listings", id), { status });
+            let store = window.allListings.find(s => s.id === id);
+            if(store && !store.id.startsWith('demo')) {
+                await window.updateDoc(window.doc(window.db, "listings", id), { status });
+            } else {
+                store.status = status;
+            }
             alert('تم التحديث بنجاح!');
             loadAdminListings();
             loadApprovedListings();
         }
 
         async function toggleVip(id, makeVip) {
-            await window.updateDoc(window.doc(window.db, "listings", id), { vip: makeVip });
+            let store = window.allListings.find(s => s.id === id);
+            if(store && !store.id.startsWith('demo')) {
+                await window.updateDoc(window.doc(window.db, "listings", id), { vip: makeVip });
+            } else {
+                store.vip = makeVip;
+            }
             alert(makeVip ? 'تم تعيين المحل كمتجر مميز VIP بنجاح!' : 'تم إزالة ميزة VIP عن المحل.');
             loadAdminListings();
             loadApprovedListings();
@@ -595,14 +671,19 @@
             let newPhone = prompt("تعديل رقم الهاتف:", oldPhone);
             let newAddress = prompt("تعديل العنوان:", oldAddress);
             if(newName && newPhone) {
-                await window.updateDoc(window.doc(window.db, "listings", id), {
-                    name: newName,
-                    phone: newPhone,
-                    address: newAddress
-                });
+                let store = window.allListings.find(s => s.id === id);
+                if(store && !store.id.startsWith('demo')) {
+                    await window.updateDoc(window.doc(window.db, "listings", id), {
+                        name: newName, phone: newPhone, address: newAddress
+                    });
+                } else if(store) {
+                    store.name = newName;
+                    store.phone = newPhone;
+                    store.address = newAddress;
+                }
                 alert('تم تعديل بيانات المحل بنجاح!');
                 if(document.getElementById('storeProfileView').style.display === 'block') {
-                    openStoreProfile(id); // تحديث صفحة المحل المعروضة
+                    openStoreProfile(id);
                 }
                 loadAdminListings();
                 loadApprovedListings();
@@ -611,7 +692,12 @@
 
         async function deleteListing(id) {
             if(confirm("هل أنت متأكد من حذف هذه الصفحة أو المحل نهائياً؟")) {
-                await window.deleteDoc(window.doc(window.db, "listings", id));
+                let store = window.allListings.find(s => s.id === id);
+                if(store && !store.id.startsWith('demo')) {
+                    await window.deleteDoc(window.doc(window.db, "listings", id));
+                } else {
+                    window.allListings = window.allListings.filter(s => s.id !== id);
+                }
                 alert('تم الحذف بنجاح.');
                 goBackToCatalog();
                 loadAdminListings();
@@ -637,7 +723,7 @@
             let approved = window.allListings.filter(item => item.status === 'approved' || !item.status);
             let filtered = approved.filter(item => {
                 let matchesCat = (currentCat === 'all' || item.category === currentCat);
-                let textCheck = (item.name + ' ' + (item.desc || '') + ' ' + (item.address || '') + ' ' + item.category).toLowerCase();
+                let textCheck = (item.name + ' ' + (item.desc || '') + ' ' + (item.address || '') + ' ' + item.category + ' ' + (item.offer || '')).toLowerCase();
                 return matchesCat && textCheck.includes(query);
             });
             renderListings(filtered);
