@@ -31,6 +31,7 @@
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
       import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+      // ⚠️ تأكد من وضع إعدادات مشروعك الحقيقي في Firebase هنا إذا لزم الأمر
       const firebaseConfig = {
         apiKey: "AIzaSyB7riqtl...",
         authDomain: "sahlalwusool.firebaseapp.com",
@@ -287,7 +288,7 @@
                 <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">📞 رقم الهاتف (اختياري):</label>
                 <input type="text" id="reqPhone" placeholder="07701234567">
 
-                <button class="submit-btn" onclick="submitNewListing(event)">إرسال الطلب للإدارة</button>
+                <button class="submit-btn" id="submitBtn" onclick="submitNewListing(event)">إرسال الطلب للإدارة</button>
             </div>
 
             <div class="section-title">تصفح حسب الأقسام</div>
@@ -423,6 +424,10 @@
                 return;
             }
 
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'جاري إرسال الطلب... ⏳';
+
             try {
                 let logoUrl = "";
                 if (logoFile) {
@@ -452,7 +457,11 @@
                 document.getElementById('reqImagesFiles').value = '';
                 loadApprovedListings();
             } catch (error) {
-                alert('حدث خطأ أثناء الإرسال.');
+                console.error(error);
+                alert('حدث خطأ أثناء الاتصال بقاعدة البيانات. تأكد من إعدادات Firebase الخاصة بك.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'إرسال الطلب للإدارة';
             }
         }
 
@@ -519,7 +528,8 @@
                 window.allListings.sort((a, b) => (b.vip === true) - (a.vip === true));
                 renderListings(window.allListings.filter(item => item.status === 'approved' || !item.status));
             } catch (err) {
-                container.innerHTML = '<p style="text-align: center; color: red; font-size: 11px;">فشل تحميل المحلات.</p>';
+                console.error(err);
+                container.innerHTML = '<p style="text-align: center; color: red; font-size: 11px;">فشل تحميل المحلات من قاعدة البيانات.</p>';
             }
         }
 
@@ -693,7 +703,6 @@
             }
         }
 
-        // ميزة ذكية لإشعار صاحب المحل عبر الواتساب أو نسخ الرسالة وفتح الفيسبوك/انستغرام
         function notifyOwner(phone, fb, insta, storeName) {
             let msg = `مرحباً بك يا ${storeName}، تم قبول ونشر إعلانك بنجاح في دليل "سهل الوصول" الشامل في القيارة والموصل. مبارك لكم! 🎉`;
             
@@ -732,75 +741,4 @@
             } else {
                 store.vip = makeVip;
             }
-            alert(makeVip ? 'تم تعيين المحل كمتجر مميز VIP بنجاح!' : 'تم إزالة ميزة VIP عن المحل.');
-            loadAdminListings();
-            loadApprovedListings();
-        }
-
-        async function editListingData(id, oldName, oldPhone, oldAddress) {
-            let newName = prompt("تعديل اسم المحل:", oldName);
-            let newPhone = prompt("تعديل رقم الهاتف:", oldPhone);
-            let newAddress = prompt("تعديل العنوان:", oldAddress);
-            if(newName && newPhone) {
-                let store = window.allListings.find(s => s.id === id);
-                if(store && !store.id.startsWith('demo')) {
-                    await window.updateDoc(window.doc(window.db, "listings", id), {
-                        name: newName, phone: newPhone, address: newAddress
-                    });
-                } else if(store) {
-                    store.name = newName;
-                    store.phone = newPhone;
-                    store.address = newAddress;
-                }
-                alert('تم تعديل بيانات المحل بنجاح!');
-                if(document.getElementById('storeProfileView').style.display === 'block') {
-                    openStoreProfile(id);
-                }
-                loadAdminListings();
-                loadApprovedListings();
-            }
-        }
-
-        async function deleteListing(id) {
-            if(confirm("هل أنت متأكد من حذف هذه الصفحة أو المحل نهائياً؟")) {
-                let store = window.allListings.find(s => s.id === id);
-                if(store && !store.id.startsWith('demo')) {
-                    await window.deleteDoc(window.doc(window.db, "listings", id));
-                } else {
-                    window.allListings = window.allListings.filter(s => s.id !== id);
-                }
-                alert('تم الحذف بنجاح.');
-                goBackToCatalog();
-                loadAdminListings();
-                loadApprovedListings();
-            }
-        }
-
-        function deleteListingFromMain(id) {
-            event.stopPropagation();
-            deleteListing(id);
-        }
-
-        let currentCat = 'all';
-        function filterCat(cat, btn) {
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            currentCat = cat;
-            applyFilters();
-        }
-
-        function applyFilters() {
-            let query = document.getElementById('searchInput').value.toLowerCase();
-            let approved = window.allListings.filter(item => item.status === 'approved' || !item.status);
-            let filtered = approved.filter(item => {
-                let matchesCat = (currentCat === 'all' || item.category === currentCat);
-                let textCheck = (item.name + ' ' + (item.desc || '') + ' ' + (item.address || '') + ' ' + item.category + ' ' + (item.offer || '')).toLowerCase();
-                return matchesCat && textCheck.includes(query);
-            });
-            renderListings(filtered);
-        }
-
-        window.onload = function() { loadApprovedListings(); };
-    </script>
-</body>
-</html>
+            alert(makeV
