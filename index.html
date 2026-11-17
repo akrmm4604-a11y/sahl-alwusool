@@ -504,12 +504,12 @@
                     phone, 
                     logo: logoUrl, 
                     images: imageUrls, 
-                    status: 'approved',
+                    status: 'pending', // التعديل الجديد: جعل الإعلان معلقاً بانتظار موافقة المشرف
                     vip: false,
                     createdAt: new Date().toISOString()
                 });
 
-                alert('تم إضافة إعلانك بنجاح وعرضه في التطبيق!');
+                alert('تم إرسال طلب إعلانك بنجاح! سيتم مراجعته ونشره قريباً.');
                 document.getElementById('addFormContainer').style.display = 'none';
                 document.getElementById('reqName').value = '';
                 document.getElementById('reqAddress').value = '';
@@ -576,7 +576,8 @@
                 }
 
                 window.allListings.sort((a, b) => (b.vip === true) - (a.vip === true));
-                renderListings(window.allListings.filter(item => item.status === 'approved' || !item.status));
+                // التعديل الجديد: عرض فقط المحلات المعتمدة (approved) للزوار
+                renderListings(window.allListings.filter(item => item.status === 'approved'));
             } catch (err) {
                 container.innerHTML = '<p style="text-align: center; color: red; font-size: 11px;">فشل تحميل المحلات.</p>';
             }
@@ -688,7 +689,7 @@
                 return;
             }
 
-            let approved = window.allListings.filter(item => item.status === 'approved' || !item.status);
+            let approved = window.allListings.filter(item => item.status === 'approved');
             let matches = approved.filter(item => {
                 let textCheck = (item.name + ' ' + (item.desc || '') + ' ' + (item.address || '') + ' ' + item.category).toLowerCase();
                 return textCheck.includes(query);
@@ -736,10 +737,11 @@
 
                 adminContainer.innerHTML = items.map(item => `
                     <div style="background:#fdfefe; padding:8px; border-radius:6px; margin-bottom:8px; border:1px solid #f8c471; font-size:11px;">
-                        <b>${item.name}</b> (${item.category}) - الحالة: <b>${item.status || 'approved'}</b> ${item.vip ? ' | <span style="color:#d35400;font-weight:bold;">⭐ مميز VIP</span>' : ''}<br>
+                        <b>${item.name}</b> (${item.category}) - الحالة: <b>${item.status === 'pending' ? '⏳ بانتظار الموافقة' : '✅ معتمد'}</b> ${item.vip ? ' | <span style="color:#d35400;font-weight:bold;">⭐ مميز VIP</span>' : ''}<br>
                         📞 ${item.phone} | 📍 ${item.address || 'بلا عنوان'}<br>
                         <div style="margin-top:6px; display:flex; gap:4px; flex-wrap:wrap;">
-                            <button onclick="toggleVip('${item.id}', ${!item.vip})" style="background:${item.vip ? '#f39c12' : '#2980b9'}; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">${item.vip ? '⭐ إلغاء التمییز' : '⭐ جعلـه VIP'}</button>
+                            ${item.status === 'pending' ? `<button onclick="approveListing('${item.id}')" style="background:#27ae60; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">✅ قبول ونشر</button>` : `<button onclick="pendListing('${item.id}')" style="background:#e67e22; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">⏸️ إخفاء مؤقت</button>`}
+                            <button onclick="toggleVip('${item.id}', ${!item.vip})" style="background:${item.vip ? '#f39c12' : '#2980b9'}; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">${item.vip ? '⭐ إلغاء التميز' : '⭐ جعله VIP'}</button>
                             <button onclick="editListingData('${item.id}', '${item.name}', '${item.phone}', '${item.address || ''}')" style="background:var(--accent-color); color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">✏️ تعديل</button>
                             <button onclick="notifyOwner('${item.phone}', '${item.fb}', '${item.insta}', '${item.name}')" style="background:#27ae60; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">📢 إشعار صاحب المحل</button>
                             <button onclick="deleteListing('${item.id}')" style="background:var(--danger-color); color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">🗑️ حذف</button>
@@ -749,6 +751,28 @@
             } catch(e) {
                 adminContainer.innerHTML = '<p style="font-size:11px; color:red;">خطأ في جلب البيانات.</p>';
             }
+        }
+
+        async function approveListing(id) {
+            let store = window.allListings.find(s => s.id === id);
+            if(store && !store.id.startsWith('demo')) {
+                await window.updateDoc(window.doc(window.db, "listings", id), { status: 'approved' });
+            }
+            store.status = 'approved';
+            alert('تم اعتماد ونشر الإعلان في التطبيق بنجاح! 🎉');
+            loadAdminListings();
+            loadApprovedListings();
+        }
+
+        async function pendListing(id) {
+            let store = window.allListings.find(s => s.id === id);
+            if(store && !store.id.startsWith('demo')) {
+                await window.updateDoc(window.doc(window.db, "listings", id), { status: 'pending' });
+            }
+            store.status = 'pending';
+            alert('تم إخفاء الإعلان وجعله معلقاً.');
+            loadAdminListings();
+            loadApprovedListings();
         }
 
         function notifyOwner(phone, fb, insta, storeName) {
@@ -836,7 +860,7 @@
 
         function applyFilters() {
             let query = document.getElementById('searchInput').value.toLowerCase();
-            let approved = window.allListings.filter(item => item.status === 'approved' || !item.status);
+            let approved = window.allListings.filter(item => item.status === 'approved');
             let filtered = approved.filter(item => {
                 let matchesCat = (currentCat === 'all' || item.category === currentCat);
                 let textCheck = (item.name + ' ' + (item.desc || '') + ' ' + (item.address || '') + ' ' + item.category + ' ' + (item.offer || '')).toLowerCase();
