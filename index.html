@@ -232,7 +232,8 @@
             <p>دليلك المحلي الشامل في القيارة والموصل للمحلات والمشاريع</p>
         </header>
 
-        <div class="install-app-banner" onclick="showInstallGuide()">
+        <!-- زر التثبيت الذي يفتح نافذة الإرشاد المخصصة بدلاً من رسائل المتصفح المزعجة -->
+        <div class="install-app-banner" onclick="openCustomInstallGuide()">
             <span>📥</span> <span>اضغط هنا لتثبيت تطبيق "سهل الوصول" على شاشة هاتفك بكل سهولة</span>
         </div>
 
@@ -307,7 +308,7 @@
         <div class="footer">جميع الحقوق محفوظة © سهل الوصول 2026</div>
     </div>
 
-    <!-- نافذة إرشاد التثبيت الآمنة والواضحة للزبون بدون أي رسائل مزعجة -->
+    <!-- نافذة الإرشاد النظيفة والمخصصة لتثبيت التطبيق بأمان تام -->
     <div class="install-guide-modal" id="installGuideModal">
         <div class="install-guide-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -315,12 +316,12 @@
                 <button onclick="closeInstallGuide()" style="background:none; border:none; font-size:16px; cursor:pointer;">✕</button>
             </div>
             <p style="font-size:11px; line-height:1.6; color:var(--text-color); margin-bottom:12px;">
-                لإضافة التطبيق إلى شاشة هاتفك الرئيسية واستخدامه بسرعة كأي تطبيق رسمي، اتبع الخطوات التالية:
+                لتنزيل التطبيق على شاشة هاتفك واستخدامه بكل سرعة وسهولة كأي تطبيق رسمي، اتبع الخطوات البسيطة التالية:
             </p>
             <div style="background:#fef9e7; padding:10px; border-radius:8px; border:1px solid #f8c471; font-size:11px; margin-bottom:12px; line-height:1.8;">
-                1️⃣ اضغط على **النقاط الثلاث (⋮)** في أعلى المتصفح.<br>
+                1️⃣ اضغط على **النقاط الثلاث (⋮)** في أعلى يسار أو يمين المتصفح.<br>
                 2️⃣ اختر من القائمة **"إضافة إلى الشاشة الرئيسية"** أو **"إنشاء اختصار"**.<br>
-                3️⃣ اضغط **"إضافة"** وسيظهر التطبيق فوراً على شاشة هاتفك!
+                3️⃣ اضغط **"إضافة"** وسيظهر التطبيق على شاشة هاتفك فوراً!
             </div>
             <button class="submit-btn" onclick="closeInstallGuide()">فهمت، شكراً لك</button>
         </div>
@@ -347,8 +348,8 @@
     <script>
         let isAdminLoggedIn = false;
 
-        // تم إلغاء أمر التثبيت التلقائي للاتصال بمتصفح كروم وإظهار نافذة خطأ، وأصبح الزر يفتح نافذة الإرشاد الآمنة مباشرة
-        function showInstallGuide() {
+        // فتح نافذة الإرشاد المخصصة بدلاً من تمرير الأمر لمتصفح كروم
+        function openCustomInstallGuide() {
             document.getElementById('installGuideModal').style.display = 'flex';
         }
 
