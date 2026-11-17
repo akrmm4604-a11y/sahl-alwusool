@@ -206,7 +206,6 @@
         
         .footer { text-align: center; margin-top: 15px; padding: 10px; font-size: 11px; color: var(--gray-text); }
         
-        /* نافذة عرض الصورة مكبرة بدقة عالية (Lightbox) */
         .image-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); z-index: 3000; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;
@@ -220,7 +219,6 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* معاينة الصور قبل الإرسال مع زر الحذف */
         .preview-container { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
         .preview-thumb-box { position: relative; width: 60px; height: 60px; }
         .preview-thumb-box img { width: 100%; height: 100%; border-radius: 6px; object-fit: cover; border: 1px solid #f8c471; }
@@ -289,7 +287,7 @@
                 <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">👤 صورة الشعار (اختياري):</label>
                 <input type="file" id="reqLogoFile" accept="image/*">
                 
-                <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">🖼️ صور البضائع أو المنتجات (دقة عالية جداً):</label>
+                <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">🖼️ صور البضائع أو المنتجات (دقة عالية وآمنة):</label>
                 <input type="file" id="reqImagesFiles" accept="image/*" multiple onchange="handleImageSelection(event)">
                 
                 <div id="selectedImagesPreview" class="preview-container"></div>
@@ -342,10 +340,10 @@
         <div class="footer">جميع الحقوق محفوظة © سهل الوصول 2026</div>
     </div>
 
-    <!-- نافذة عرض الصورة المكبرة بدقة عالية -->
+    <!-- نافذة عرض الصورة المكبرة -->
     <div class="image-modal" id="imageModal" onclick="closeImageModal()">
         <button class="image-modal-close" onclick="closeImageModal()">✕</button>
-        <img id="modalFullImage" src="" alt="صورة مكبرة عالية الدقة">
+        <img id="modalFullImage" src="" alt="صورة مكبرة">
     </div>
 
     <div class="install-guide-modal" id="installGuideModal">
@@ -467,7 +465,7 @@
             });
         }
 
-        // تحسين دقة الصور لتصبح عالية الوضوح (أبعاد أكبر وجودة 90%)
+        // تحسين دقة الصور مع ضغط ذكي يمنع تجاوز الحد الأقصى لقاعدة البيانات (أقل من 1 ميجابايت للمستند)
         function resizeAndCompressImage(file) {
             return new Promise((resolve) => {
                 const safetyTimer = setTimeout(() => {
@@ -481,7 +479,7 @@
                         img.onload = () => {
                             try {
                                 const canvas = document.createElement('canvas');
-                                const MAX_SIZE = 1200; // أبعاد أكبر لضمان صفاء ووضوح تفاصيل الصورة
+                                const MAX_SIZE = 700; // أبعاد مثالية تحافظ على الوضوح وتمنع تضخم حجم الملف
                                 let width = img.width;
                                 let height = img.height;
 
@@ -504,7 +502,7 @@
                                 ctx.imageSmoothingQuality = 'high';
                                 ctx.drawImage(img, 0, 0, width, height);
                                 clearTimeout(safetyTimer);
-                                resolve(canvas.toDataURL('image/jpeg', 0.9)); // جودة عالية جداً 90%
+                                resolve(canvas.toDataURL('image/jpeg', 0.75)); // جودة عالية وواضحة بحجم آمن
                             } catch (e) {
                                 clearTimeout(safetyTimer);
                                 resolve("");
@@ -543,7 +541,7 @@
 
             const submitBtn = document.getElementById('submitListingBtn');
             submitBtn.disabled = true;
-            submitBtn.textContent = 'جاري معالجة الصور بدقة عالية...';
+            submitBtn.textContent = 'جاري معالجة الصور والحفظ بأمان...';
 
             try {
                 let logoUrl = "";
@@ -561,7 +559,7 @@
                     }
                 }
 
-                submitBtn.textContent = 'جاري الحفظ في القاعدة...';
+                submitBtn.textContent = 'جاري الدمج والتحديث في القاعدة...';
 
                 let existingStore = window.allListings.find(item => 
                     item.name.trim().toLowerCase() === name.toLowerCase() && 
@@ -569,7 +567,12 @@
                 );
 
                 if (existingStore && !existingStore.id.startsWith('demo')) {
+                    // دمج الصور الجديدة مع الاحتفاظ بعدد صور لا يتجاوز الحد الأقصى الآمن لقاعدة البيانات
                     let updatedImages = [...(existingStore.images || []), ...newImagesUrls];
+                    if (updatedImages.length > 12) {
+                        updatedImages = updatedImages.slice(-12); // الاحتفاظ بآخر 12 صورة كحد أقصى لمنع امتلاء المستند
+                    }
+                    
                     let updateData = { images: updatedImages };
                     if (logoUrl) updateData.logo = logoUrl;
                     if (desc) updateData.desc = desc;
@@ -612,7 +615,7 @@
                 loadApprovedListings();
             } catch (error) {
                 console.error("خطأ إرسال الإعلان: ", error);
-                alert('حدث خطأ أثناء الحفظ: ' + (error.message || 'تأكد من حجم الصور أو الإنترنت'));
+                alert('حدث خطأ أثناء الحفظ (ربما حجم الصور كبير جداً، حاول اختيار صور أقل): ' + (error.message || ''));
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'إرسال الطلب للإدارة';
@@ -717,7 +720,7 @@
                     ${store.insta ? `<a href="${store.insta}" target="_blank" class="social-badge insta-badge">📸 انستغرام</a>` : ''}
                 </div>
 
-                <h4 style="font-size:13px; color:var(--primary-color); margin:12px 0 6px 0;">🖼️ معرض الصور والمنتجات (اضغط لتكبير الصورة بدقة عالية):</h4>
+                <h4 style="font-size:13px; color:var(--primary-color); margin:12px 0 6px 0;">🖼️ معرض الصور والمنتجات (اضغط لتكبير الصورة):</h4>
                 ${store.images && store.images.length > 0 ? `
                     <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px; margin-bottom:15px;">
                         ${store.images.map(img => `<img src="${img}" style="width:100%; height:130px; border-radius:8px; object-fit:cover; border:1px solid #f8c471; cursor:pointer;" alt="صورة المنتج" onclick="openImageModal('${img}')">`).join('')}
