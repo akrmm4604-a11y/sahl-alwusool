@@ -220,11 +220,12 @@
 
             <div id="addFormContainer" class="form-container">
                 <h3 style="margin-top:0; color:var(--primary-color); font-size:14px;">تقديم طلب إعلان جديد</h3>
-                <input type="text" id="reqName" placeholder="اسم المحل أو المتجر">
+                <input type="text" id="reqName" placeholder="اسم المحل أو المتجر أو المطعم">
                 <select id="reqCat">
                     <option value="">-- اختر القسم المناسب لمحلِك --</option>
                     <option value="غذائية وحلويات">غذائية وحلويات</option>
                     <option value="ملابس وكوزمتك">ملابس وكوزمتك</option>
+                    <option value="مطاعم">مطاعم</option>
                     <option value="خضار وفواكه">خضار وفواكه</option>
                     <option value="أشياء أخرى">أشياء أخرى</option>
                 </select>
@@ -239,7 +240,7 @@
                 <textarea id="reqDesc" placeholder="نبذة عن المحل أو الخدمات المقدمة..." rows="2"></textarea>
                 
                 <!-- خانة التخفيضات والعروض الاختيارية -->
-                <input type="text" id="reqOffer" placeholder="🔥 التخفيضات والعروض (اختياري، مثلاً: خصم 20% على جميع المواد)">
+                <input type="text" id="reqOffer" placeholder="🔥 التخفيضات والعروض (اختياري، مثلاً: خصم 20% على الوجبات)">
 
                 <!-- خانات روابط الفيسبوك وانستغرام -->
                 <input type="text" id="reqFb" placeholder="🔵 رابط صفحة الفيسبوك (اختياري)">
@@ -254,6 +255,7 @@
                 <button class="cat-btn active" onclick="filterCat('all', this)">الكل</button>
                 <button class="cat-btn" onclick="filterCat('غذائية وحلويات', this)">🛒 غذائية وحلويات</button>
                 <button class="cat-btn" onclick="filterCat('ملابس وكوزمتك', this)">👗 ملابس وكوزمتك</button>
+                <button class="cat-btn" onclick="filterCat('مطاعم', this)">🍽️ مطاعم</button>
                 <button class="cat-btn" onclick="filterCat('خضار وفواكه', this)">🍎 خضار وفواكه</button>
                 <button class="cat-btn" onclick="filterCat('أشياء أخرى', this)">📦 أشياء أخرى</button>
             </div>
@@ -434,6 +436,21 @@
                         },
                         {
                             id: 'demo2',
+                            name: 'مطعم وكيفت الشيف',
+                            category: 'مطاعم',
+                            address: 'القيارة - الشارع العام',
+                            desc: 'أشهى المأكولات العراقية، المشاوي الغربية والشرقية، وخدمة التوصيل السريع.',
+                            offer: '🍔 اشتري وجبتين واحصل على المشروب مجاناً',
+                            fb: 'https://facebook.com',
+                            insta: 'https://instagram.com',
+                            phone: '07733333333',
+                            logo: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=150',
+                            images: ['https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=300'],
+                            status: 'approved',
+                            vip: true
+                        },
+                        {
+                            id: 'demo3',
                             name: 'متجر الأناقة للملابس',
                             category: 'ملابس وكوزمتك',
                             address: 'الموصل - حي سكر',
@@ -444,21 +461,6 @@
                             phone: '07711111111',
                             logo: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=150',
                             images: ['https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=300'],
-                            status: 'approved',
-                            vip: false
-                        },
-                        {
-                            id: 'demo3',
-                            name: 'خضار الفواكه الطازجة',
-                            category: 'خضار وفواكه',
-                            address: 'القيارة - الشارع العام',
-                            desc: 'أجود أنواع الخضار والفواكه المحلية والمستوردة طازجة يومياً.',
-                            offer: '🍅 أسعار خاصة للجملة وتوصيل مجاني للبيت',
-                            fb: '',
-                            insta: '',
-                            phone: '07722222222',
-                            logo: 'https://images.unsplash.com/photo-1610348725531-843dff563e2c?w=150',
-                            images: ['https://images.unsplash.com/photo-1557844357-76f23ef39675?w=300'],
                             status: 'approved',
                             vip: false
                         }
