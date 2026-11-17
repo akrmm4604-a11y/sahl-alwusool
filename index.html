@@ -250,7 +250,6 @@
             <div id="addFormContainer" class="form-container">
                 <h3 style="margin-top:0; color:var(--primary-color); font-size:14px;">تقديم طلب إعلان جديد</h3>
                 
-                <!-- الحقل الأول الواضح تماماً لاسم المحل -->
                 <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px; color:var(--primary-color);">🏷️ اسم المحل أو المتجر (إجباري):</label>
                 <input type="text" id="reqName" placeholder="أدخل اسم المحل هنا...">
 
@@ -419,7 +418,6 @@
             const logoFile = document.getElementById('reqLogoFile').files[0];
             const imageFiles = document.getElementById('reqImagesFiles').files;
 
-            // التحقق النهائي الصارم: حقل الاسم فقط هو الإجباري
             if(!name) {
                 alert('يرجى إدخال اسم المحل أو المتجر في الحقل الأول.');
                 return;
@@ -685,12 +683,33 @@
                             ${item.status === 'pending' ? `<button onclick="updateStatus('${item.id}', 'approved')" style="background:var(--success-color); color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">موافقة ونشر</button>` : ''}
                             <button onclick="toggleVip('${item.id}', ${!item.vip})" style="background:${item.vip ? '#f39c12' : '#2980b9'}; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">${item.vip ? '⭐ إلغاء التمییز' : '⭐ جعلـه VIP'}</button>
                             <button onclick="editListingData('${item.id}', '${item.name}', '${item.phone}', '${item.address || ''}')" style="background:var(--accent-color); color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">✏️ تعديل</button>
+                            <button onclick="notifyOwner('${item.phone}', '${item.fb}', '${item.insta}', '${item.name}')" style="background:#27ae60; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">📢 إشعار صاحب المحل</button>
                             <button onclick="deleteListing('${item.id}')" style="background:var(--danger-color); color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">🗑️ حذف</button>
                         </div>
                     </div>
                 `).join('');
             } catch(e) {
                 adminContainer.innerHTML = '<p style="font-size:11px; color:red;">خطأ في جلب البيانات.</p>';
+            }
+        }
+
+        // ميزة ذكية لإشعار صاحب المحل عبر الواتساب أو نسخ الرسالة وفتح الفيسبوك/انستغرام
+        function notifyOwner(phone, fb, insta, storeName) {
+            let msg = `مرحباً بك يا ${storeName}، تم قبول ونشر إعلانك بنجاح في دليل "سهل الوصول" الشامل في القيارة والموصل. مبارك لكم! 🎉`;
+            
+            if (phone && phone !== 'لا يوجد' && phone.length >= 10) {
+                let cleanPhone = phone.startsWith('0') ? '964' + phone.substring(1) : phone;
+                window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+            } else if (fb && fb.startsWith('http')) {
+                navigator.clipboard.writeText(msg);
+                alert('تم نسخ رسالة القبول إلى الحافظة تلقائياً! سيتم فتح رابط الفيسبوك، فقط قم بلصقها وإرسالها.');
+                window.open(fb, '_blank');
+            } else if (insta && insta.startsWith('http')) {
+                navigator.clipboard.writeText(msg);
+                alert('تم نسخ رسالة القبول إلى الحافظة تلقائياً! سيتم فتح رابط انستغرام، فقط قم بلصقها وإرسالها.');
+                window.open(insta, '_blank');
+            } else {
+                alert('هذا المحل لم يضف رقم هاتف أو رابط تواصل، لكن تم قبول إعلانه وعرضه بنجاح!');
             }
         }
 
