@@ -128,33 +128,17 @@
         }
         .cat-btn.active { background: linear-gradient(135deg, #d35400, #e67e22); color: white; border-color: transparent; }
         
-        /* تصميم خانة البحث الذكي والاقتراحات المنسدلة */
         .search-wrapper { position: relative; margin-bottom: 12px; }
         .search-box {
             width: 100%; padding: 9px 12px; border: 1.5px solid #f8c471; border-radius: 10px; font-size: 12px; outline: none; background: #ffffff; box-sizing: border-box;
         }
         .search-suggestions {
-            display: none;
-            position: absolute;
-            top: 100%; left: 0; right: 0;
-            background: #ffffff;
-            border: 1.5px solid #f8c471;
-            border-top: none;
-            border-radius: 0 0 10px 10px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            z-index: 99;
-            max-height: 200px;
-            overflow-y: auto;
+            display: none; position: absolute; top: 100%; left: 0; right: 0;
+            background: #ffffff; border: 1.5px solid #f8c471; border-top: none;
+            border-radius: 0 0 10px 10px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); z-index: 99; max-height: 200px; overflow-y: auto;
         }
         .suggestion-item {
-            padding: 8px 12px;
-            font-size: 11px;
-            border-bottom: 1px solid #fef5e7;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.15s;
+            padding: 8px 12px; font-size: 11px; border-bottom: 1px solid #fef5e7; cursor: pointer; display: flex; align-items: center; gap: 8px;
         }
         .suggestion-item:hover { background: #fef9e7; color: var(--primary-color); }
 
@@ -189,12 +173,7 @@
         
         /* صفحة تفاصيل المحل المستقلة */
         #storeProfileView {
-            display: none;
-            background: var(--card-bg);
-            border-radius: 14px;
-            padding: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            border: 2px solid var(--accent-color);
+            display: none; background: var(--card-bg); border-radius: 14px; padding: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border: 2px solid var(--accent-color);
         }
         .back-main-btn {
             background: #f39c12; color: white; border: none; padding: 7px 14px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; margin-bottom: 12px; display: inline-flex; align-items: center; gap: 5px;
@@ -244,11 +223,14 @@
                     <option value="خضار وفواكه">خضار وفواكه</option>
                     <option value="أشياء أخرى">أشياء أخرى</option>
                 </select>
-                <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">👤 رابط صورة الشعار:</label>
-                <input type="text" id="reqLogo" placeholder="ضع رابط صورة الشعار هنا">
+
+                <!-- فتح الاستوديو مباشرة للشعار -->
+                <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">👤 اختر صورة الشعار (من الاستوديو/الكاميرا):</label>
+                <input type="file" id="reqLogoFile" accept="image/*">
                 
-                <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">🖼️ روابط الصور الاستعراضية (افصل بينها بفواصل):</label>
-                <input type="text" id="reqImages" placeholder="رابط صورة 1, رابط صورة 2">
+                <!-- فتح الاستوديو مباشرة لصور المنتجات المتعددة -->
+                <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">🖼️ اختر صور المنتجات والاستعراض:</label>
+                <input type="file" id="reqImagesFiles" accept="image/*" multiple>
 
                 <input type="text" id="reqAddress" placeholder="العنوان / الحي (مثال: القيارة - السوق الكبير)">
                 <textarea id="reqDesc" placeholder="نبذة عن المحل أو الخدمات المقدمة..." rows="2"></textarea>
@@ -265,7 +247,6 @@
                 <button class="cat-btn" onclick="filterCat('أشياء أخرى', this)">📦 أشياء أخرى</button>
             </div>
 
-            <!-- خانة البحث الذكي مع صندوق الاقتراحات المنسدل -->
             <div class="search-wrapper">
                 <input type="text" id="searchInput" class="search-box" placeholder="بحث ذكي: ابحث عن محل، سلعة، أو منطقة..." oninput="handleSearch()" autocomplete="off">
                 <div id="searchSuggestions" class="search-suggestions"></div>
@@ -281,6 +262,8 @@
         <div id="storeProfileView">
             <button class="back-main-btn" onclick="goBackToCatalog()">⬅ العودة إلى القائمة الرئيسية</button>
             <div id="storeProfileContent"></div>
+            <!-- أزرار الحذف والتعديل المباشر تظهر هنا فقط للمدير -->
+            <div id="adminStoreActions" style="display: none; margin-top: 20px; padding-top: 10px; border-top: 1px dashed #f8c471; gap: 8px;"></div>
         </div>
 
         <div class="footer">جميع الحقوق محفوظة © سهل الوصول 2026</div>
@@ -298,7 +281,7 @@
                 <button class="submit-btn" onclick="checkAdminPin()">تسجيل الدخول</button>
             </div>
             <div id="adminDashboardView" style="display: none;">
-                <p style="color: var(--success-color); font-weight: bold; font-size: 12px; margin-bottom: 10px;">تم تسجيل الدخول بنجاح ✅</p>
+                <p style="color: var(--success-color); font-weight: bold; font-size: 12px; margin-bottom: 10px;">تم تسجيل الدخول بنجاح ✅ (أنت المشرف الآن)</p>
                 <h4 style="font-size: 13px; margin: 0 0 8px 0; color: var(--text-color);">إدارة جميع المحلات والإعلانات:</h4>
                 <div id="adminPendingList" style="max-height: 320px; overflow-y: auto;"></div>
             </div>
@@ -307,7 +290,9 @@
 
     <script>
         let deferredPrompt;
+        let isAdminLoggedIn = false; // متغير لتتبع هل أنت مسجل دخول كمدير أم لا
         const installBtn = document.getElementById('installBtn');
+
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
@@ -334,9 +319,11 @@
         function checkAdminPin() {
             let pin = document.getElementById('adminPinInput').value;
             if (pin === "334455ff") {
+                isAdminLoggedIn = true; // تم تفعيل صلاحية المدير لك وحدك
                 document.getElementById('adminLoginView').style.display = 'none';
                 document.getElementById('adminDashboardView').style.display = 'block';
                 loadAdminListings();
+                loadApprovedListings(); // تحديث لعرض أزرار الحذف والتعديل للمدير
             } else {
                 alert("الرمز السري غير صحيح!");
             }
@@ -347,6 +334,16 @@
             form.style.display = (form.style.display === 'block') ? 'none' : 'block';
         }
 
+        // دالة تحويل ملفات الاستوديو إلى روابط Base64 لتعمل بدون مشاكل في التخزين
+        function convertFileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
         async function submitNewListing(e) {
             e.preventDefault();
             const name = document.getElementById('reqName').value;
@@ -354,29 +351,43 @@
             const address = document.getElementById('reqAddress').value;
             const desc = document.getElementById('reqDesc').value;
             const phone = document.getElementById('reqPhone').value;
-            const logo = document.getElementById('reqLogo').value;
-            const imagesStr = document.getElementById('reqImages').value;
-            const images = imagesStr ? imagesStr.split(',').map(s => s.trim()) : [];
             
+            const logoFile = document.getElementById('reqLogoFile').files[0];
+            const imageFiles = document.getElementById('reqImagesFiles').files;
+
             if(!name || !cat || !phone) {
                 alert('يرجى ملء الحقول الإجبارية (الاسم، القسم، ورقم الهاتف).');
                 return;
             }
 
             try {
+                // تحويل الشعار المختار من الاستوديو
+                let logoUrl = "";
+                if (logoFile) {
+                    logoUrl = await convertFileToBase64(logoFile);
+                }
+
+                // تحويل صور المنتجات المختارة من الاستوديو
+                let imageUrls = [];
+                for (let i = 0; i < imageFiles.length; i++) {
+                    let base64Img = await convertFileToBase64(imageFiles[i]);
+                    imageUrls.push(base64Img);
+                }
+
                 await window.addDoc(window.collection(window.db, "listings"), {
-                    name, category: cat, address, desc, phone, logo, images, status: 'pending', vip: false
+                    name, category: cat, address, desc, phone, logo: logoUrl, images: imageUrls, status: 'pending', vip: false
                 });
+
                 alert('تم إرسال طلبك بنجاح إلى الإدارة وسيتم مراجعته قريباً!');
                 document.getElementById('addFormContainer').style.display = 'none';
                 document.getElementById('reqName').value = '';
                 document.getElementById('reqAddress').value = '';
                 document.getElementById('reqDesc').value = '';
                 document.getElementById('reqPhone').value = '';
-                document.getElementById('reqLogo').value = '';
-                document.getElementById('reqImages').value = '';
+                document.getElementById('reqLogoFile').value = '';
+                document.getElementById('reqImagesFiles').value = '';
             } catch (error) {
-                alert('حدث خطأ أثناء الإرسال.');
+                alert('حدث خطأ أثناء رفع الصور أو الإرسال.');
             }
         }
 
@@ -421,6 +432,11 @@
                     <div class="card-footer" onclick="event.stopPropagation()">
                         <a href="tel:${item.phone}" class="action-btn call-btn">📞 ${item.phone}</a>
                         <a href="https://maps.google.com/?q=${encodeURIComponent(item.address || '')}" target="_blank" class="action-btn map-btn">📍 الموقع</a>
+                        <!-- أزرار التعديل والحذف تظهر لك أنت وحدك هنا أو داخل صفحة المحل إذا كنت مسجل دخول -->
+                        ${isAdminLoggedIn ? `
+                            <button onclick="editListingData('${item.id}', '${item.name}', '${item.phone}', '${item.address || ''}')" style="background:var(--accent-color); color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">✏️ تعديل</button>
+                            <button onclick="deleteListingFromMain('${item.id}')" style="background:var(--danger-color); color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">🗑️ حذف</button>
+                        ` : ''}
                     </div>
                 </div>
             `).join('');
@@ -459,6 +475,20 @@
                     <a href="https://maps.google.com/?q=${encodeURIComponent(store.address || '')}" target="_blank" class="action-btn map-btn" style="padding:9px; font-size:12px;">📍 فتح الخريطة</a>
                 </div>
             `;
+
+            // إظهار أزرار الحذف والتعديل داخل صفحة المحل لك أنت وحدك (إذا كنت مسجل دخول)
+            const adminActionsDiv = document.getElementById('adminStoreActions');
+            if (isAdminLoggedIn) {
+                adminActionsDiv.style.display = 'flex';
+                adminActionsDiv.innerHTML = `
+                    <span style="font-size:11px; color:var(--primary-color); font-weight:bold; align-self:center;">لوحة تحكم المدير:</span>
+                    <button onclick="editListingData('${store.id}', '${store.name}', '${store.phone}', '${store.address || ''}')" style="background:var(--accent-color); color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px; font-weight:bold;">✏️ تعديل هذا المحل</button>
+                    <button onclick="deleteListing('${store.id}')" style="background:var(--danger-color); color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px; font-weight:bold;">🗑️ حذف هذه الصفحة نهائياً</button>
+                `;
+            } else {
+                adminActionsDiv.style.display = 'none';
+            }
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -468,7 +498,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // نظام البحث الذكي والتفاعلي مع الاقتراحات المنسدلة
         function handleSearch() {
             let query = document.getElementById('searchInput').value.toLowerCase().trim();
             let suggestionsBox = document.getElementById('searchSuggestions');
@@ -572,18 +601,27 @@
                     address: newAddress
                 });
                 alert('تم تعديل بيانات المحل بنجاح!');
+                if(document.getElementById('storeProfileView').style.display === 'block') {
+                    openStoreProfile(id); // تحديث صفحة المحل المعروضة
+                }
                 loadAdminListings();
                 loadApprovedListings();
             }
         }
 
         async function deleteListing(id) {
-            if(confirm("هل أنت متأكد من حذف هذا الإعلان نهائياً؟")) {
+            if(confirm("هل أنت متأكد من حذف هذه الصفحة أو المحل نهائياً؟")) {
                 await window.deleteDoc(window.doc(window.db, "listings", id));
-                alert('تم الحذف.');
+                alert('تم الحذف بنجاح.');
+                goBackToCatalog();
                 loadAdminListings();
                 loadApprovedListings();
             }
+        }
+
+        function deleteListingFromMain(id) {
+            event.stopPropagation();
+            deleteListing(id);
         }
 
         let currentCat = 'all';
