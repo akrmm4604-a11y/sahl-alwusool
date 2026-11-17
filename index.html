@@ -416,7 +416,7 @@
             });
         }
 
-        // ربط زر إرسال الطلب بحدث برمجي آمن وسريع
+        // ربط زر إرسال الطلب بحدث برمجي آمن وسريع ومعالجة آمنة للصور والحقول
         document.getElementById('submitListingBtn').addEventListener('click', async function(e) {
             e.preventDefault();
             const name = document.getElementById('reqName').value.trim();
@@ -433,23 +433,50 @@
 
             if(!name) {
                 alert('يرجى إدخال اسم المحل أو المتجر في الحقل الأول.');
+                document.getElementById('reqName').focus();
                 return;
             }
+
+            const submitBtn = document.getElementById('submitListingBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'جاري الإرسال...';
 
             try {
                 let logoUrl = "";
                 if (logoFile) {
-                    logoUrl = await convertFileToBase64(logoFile);
+                    try {
+                        logoUrl = await convertFileToBase64(logoFile);
+                    } catch (err) {
+                        console.log("فشل تحويل الشعار، سيتم تخطيه");
+                    }
                 }
 
                 let imageUrls = [];
-                for (let i = 0; i < imageFiles.length; i++) {
-                    let base64Img = await convertFileToBase64(imageFiles[i]);
-                    imageUrls.push(base64Img);
+                if (imageFiles && imageFiles.length > 0) {
+                    for (let i = 0; i < imageFiles.length; i++) {
+                        try {
+                            let base64Img = await convertFileToBase64(imageFiles[i]);
+                            imageUrls.push(base64Img);
+                        } catch (err) {
+                            console.log("فشل تحويل إحدى صور المنتجات");
+                        }
+                    }
                 }
 
                 await window.addDoc(window.collection(window.db, "listings"), {
-                    name, category: cat, address, desc, offer, fb, insta, phone, logo: logoUrl, images: imageUrls, status: 'approved', vip: false
+                    name, 
+                    category: cat, 
+                    address, 
+                    desc, 
+                    offer, 
+                    fb, 
+                    insta, 
+                    phone, 
+                    logo: logoUrl, 
+                    images: imageUrls, 
+                    status: 'approved', 
+                    vip: false,
+                    createdAt: new Date().toISOString()
                 });
 
                 alert('تم إضافة إعلانك بنجاح وعرضه في التطبيق!');
@@ -465,7 +492,11 @@
                 document.getElementById('reqImagesFiles').value = '';
                 loadApprovedListings();
             } catch (error) {
-                alert('حدث خطأ أثناء الإرسال.');
+                console.error("خطأ إرسال الإعلان: ", error);
+                alert('حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'إرسال الطلب للإدارة';
             }
         });
 
@@ -510,21 +541,6 @@
                             images: ['https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=300'],
                             status: 'approved',
                             vip: true
-                        },
-                        {
-                            id: 'demo3',
-                            name: 'متجر الأناقة للملابس',
-                            category: 'ملابس وكوزمتك',
-                            address: 'الموصل - حي سكر',
-                            desc: 'أحدث أزياء الشباب والعطور العالمية ومستحضرات التجميل الأصلية.',
-                            offer: '⭐ اشتري قطعتين واحصل على الثالثة مجاناً',
-                            fb: 'https://facebook.com',
-                            insta: 'https://instagram.com',
-                            phone: '07711111111',
-                            logo: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=150',
-                            images: ['https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=300'],
-                            status: 'approved',
-                            vip: false
                         }
                     ];
                 }
