@@ -104,12 +104,11 @@
         header h1 { margin: 0 0 4px 0; font-size: 20px; }
         header p { margin: 0 0 10px 0; font-size: 11px; color: #fdebd0; }
         
-        /* زر تثبيت التطبيق البارز في الواجهة */
         .install-app-banner {
             background: #ffffff;
             border: 2px dashed var(--primary-color);
             color: var(--primary-color);
-            padding: 10px;
+            padding: 12px;
             border-radius: 10px;
             text-align: center;
             font-weight: bold;
@@ -190,7 +189,6 @@
         .call-btn { background: #e8f8f5; color: var(--success-color); }
         .map-btn { background: #fef5e7; color: var(--primary-color); border: 1px solid #f8c471; }
         
-        /* صفحة تفاصيل المحل المستقلة */
         #storeProfileView {
             display: none; background: var(--card-bg); border-radius: 14px; padding: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border: 2px solid var(--accent-color);
         }
@@ -207,6 +205,14 @@
         .insta-badge { background: #e1306c; }
         
         .footer { text-align: center; margin-top: 15px; padding: 10px; font-size: 11px; color: var(--gray-text); }
+        
+        .install-guide-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;
+        }
+        .install-guide-content {
+            background: #fff; width: 100%; max-width: 380px; border-radius: 14px; padding: 20px; box-sizing: border-box; direction: rtl; text-align: right; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 2px solid var(--primary-color);
+        }
+
         .admin-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;
         }
@@ -223,12 +229,10 @@
             <p>دليلك المحلي الشامل في القيارة والموصل للمحلات والمشاريع</p>
         </header>
 
-        <!-- زر تثبيت التطبيق البارز والمباشر في الواجهة -->
-        <div class="install-app-banner" onclick="installApp()">
-            <span>📥</span> <span>اضغط هنا لتثبيت تطبيق "سهل الوصول" على شاشة هاتفك</span>
+        <div class="install-app-banner" onclick="showInstallGuide()">
+            <span>📥</span> <span>اضغط هنا لتثبيت تطبيق "سهل الوصول" على شاشة هاتفك بكل سهولة</span>
         </div>
 
-        <!-- واجهة الدليل الرئيسي -->
         <div id="mainCatalogView">
             <div class="admin-card">
                 <div class="admin-info">
@@ -291,7 +295,6 @@
             </div>
         </div>
 
-        <!-- صفحة تفاصيل المحل المستقلة -->
         <div id="storeProfileView">
             <button class="back-main-btn" onclick="goBackToCatalog()">⬅ العودة إلى القائمة الرئيسية</button>
             <div id="storeProfileContent"></div>
@@ -301,7 +304,24 @@
         <div class="footer">جميع الحقوق محفوظة © سهل الوصول 2026</div>
     </div>
 
-    <!-- لوحة تحكم المشرف -->
+    <div class="install-guide-modal" id="installGuideModal">
+        <div class="install-guide-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h3 style="margin:0; color:var(--primary-color); font-size:15px;">📱 طريقة تثبيت التطبيق بدقة</h3>
+                <button onclick="closeInstallGuide()" style="background:none; border:none; font-size:16px; cursor:pointer;">✕</button>
+            </div>
+            <p style="font-size:11px; line-height:1.6; color:var(--text-color); margin-bottom:12px;">
+                لإضافة تطبيق **"سهل الوصول"** لشاشة هاتفك بمظهر تطبيقي احترافي وسريع، اتبع الخطوات البسيطة التالية:
+            </p>
+            <div style="background:#fef9e7; padding:10px; border-radius:8px; border:1px solid #f8c471; font-size:11px; margin-bottom:12px; line-height:1.8;">
+                1️⃣ اضغط على **النقاط الثلاث (⋮)** أعلى يسار أو يمين المتصفح.<br>
+                2️⃣ اختر من القائمة **"إضافة إلى الشاشة الرئيسية"** أو **"إنشاء اختصار"**.<br>
+                3️⃣ اضغط على **"إضافة" (Add)** وسيظهر التطبيق فوراً على شاشة هاتفك!
+            </div>
+            <button class="submit-btn" onclick="closeInstallGuide()">فهمت، شكراً لك</button>
+        </div>
+    </div>
+
     <div class="admin-modal" id="adminModal">
         <div class="admin-modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
@@ -329,18 +349,19 @@
             deferredPrompt = e;
         });
 
-        function installApp() {
+        function showInstallGuide() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('تم قبول التثبيت');
-                    }
                     deferredPrompt = null;
                 });
             } else {
-                alert('لتثبيت التطبيق على هاتفك بكل سهولة:\n1. اضغط على قائمة المتصفح (النقاط الثلاث بالأعلى).\n2. اختر "الإضافة إلى الشاشة الرئيسية" أو "تثبيت التطبيق".');
+                document.getElementById('installGuideModal').style.display = 'flex';
             }
+        }
+
+        function closeInstallGuide() {
+            document.getElementById('installGuideModal').style.display = 'none';
         }
 
         function openAdmin() { document.getElementById('adminModal').style.display = 'flex'; }
@@ -459,7 +480,7 @@
                         },
                         {
                             id: 'demo2',
-                            name: 'مطعم وكيفت الشيف',
+                            name: 'مطعم وكيف الشيف',
                             category: 'مطاعم',
                             address: 'القيارة - الشارع العام',
                             desc: 'أشهى المأكولات العراقية، المشاوي الغربية والشرقية، وخدمة التوصيل السريع.',
@@ -532,7 +553,6 @@
             `).join('');
         }
 
-        // صفحة تفاصيل المحل المستقلة
         function openStoreProfile(id) {
             const store = window.allListings.find(s => s.id === id);
             if (!store) return;
