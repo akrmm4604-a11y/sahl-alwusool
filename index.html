@@ -232,7 +232,6 @@
             <p>دليلك المحلي الشامل في القيارة والموصل للمحلات والمشاريع</p>
         </header>
 
-        <!-- زر التثبيت الذي يفتح نافذة الإرشاد المخصصة بدلاً من رسائل المتصفح المزعجة -->
         <div class="install-app-banner" onclick="openCustomInstallGuide()">
             <span>📥</span> <span>اضغط هنا لتثبيت تطبيق "سهل الوصول" على شاشة هاتفك بكل سهولة</span>
         </div>
@@ -250,9 +249,9 @@
 
             <div id="addFormContainer" class="form-container">
                 <h3 style="margin-top:0; color:var(--primary-color); font-size:14px;">تقديم طلب إعلان جديد</h3>
-                <input type="text" id="reqName" placeholder="اسم المحل أو المتجر أو المطعم">
+                <input type="text" id="reqName" placeholder="اسم المحل أو المتجر أو المطعم (إجباري)">
                 <select id="reqCat">
-                    <option value="">-- اختر القسم المناسب لمحلِك --</option>
+                    <option value="أشياء أخرى">-- اختر القسم المناسب لمحلِك (اختياري) --</option>
                     <option value="غذائية وحلويات">غذائية وحلويات</option>
                     <option value="ملابس وكوزمتك">ملابس وكوزمتك</option>
                     <option value="مطاعم">مطاعم</option>
@@ -260,21 +259,21 @@
                     <option value="أشياء أخرى">أشياء أخرى</option>
                 </select>
 
-                <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">👤 اختر صورة الشعار (من الاستوديو/الكاميرا):</label>
+                <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">👤 اختر صورة الشعار (اختياري):</label>
                 <input type="file" id="reqLogoFile" accept="image/*">
                 
-                <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">🖼️ اختر صور المنتجات والاستعراض:</label>
+                <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">🖼️ اختر صور المنتجات والاستعراض (اختياري):</label>
                 <input type="file" id="reqImagesFiles" accept="image/*" multiple>
 
-                <input type="text" id="reqAddress" placeholder="العنوان / الحي (مثال: القيارة - السوق الكبير)">
-                <textarea id="reqDesc" placeholder="نبذة عن المحل أو الخدمات المقدمة..." rows="2"></textarea>
+                <input type="text" id="reqAddress" placeholder="العنوان / الحي (اختياري)">
+                <textarea id="reqDesc" placeholder="نبذة عن المحل أو الخدمات المقدمة (اختياري)..." rows="2"></textarea>
                 
-                <input type="text" id="reqOffer" placeholder="🔥 التخفيضات والعروض (اختياري، مثلاً: خصم 20% على الوجبات)">
+                <input type="text" id="reqOffer" placeholder="🔥 التخفيضات والعروض (اختياري)">
 
                 <input type="text" id="reqFb" placeholder="🔵 رابط صفحة الفيسبوك (اختياري)">
                 <input type="text" id="reqInsta" placeholder="📸 رابط أو معرف حساب الإنستغرام (اختياري)">
 
-                <input type="text" id="reqPhone" placeholder="رقم هاتف عراقي محلي (مثال: 07701234567)">
+                <input type="text" id="reqPhone" placeholder="رقم هاتف عراقي محلي (اختياري)">
                 <button class="submit-btn" onclick="submitNewListing(event)">إرسال الطلب للإدارة</button>
             </div>
 
@@ -308,7 +307,7 @@
         <div class="footer">جميع الحقوق محفوظة © سهل الوصول 2026</div>
     </div>
 
-    <!-- نافذة الإرشاد النظيفة والمخصصة لتثبيت التطبيق بأمان تام -->
+    <!-- نافذة الإرشاد للتثبيت -->
     <div class="install-guide-modal" id="installGuideModal">
         <div class="install-guide-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -327,6 +326,7 @@
         </div>
     </div>
 
+    <!-- لوحة تحكم المشرف -->
     <div class="admin-modal" id="adminModal">
         <div class="admin-modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
@@ -348,7 +348,6 @@
     <script>
         let isAdminLoggedIn = false;
 
-        // فتح نافذة الإرشاد المخصصة بدلاً من تمرير الأمر لمتصفح كروم
         function openCustomInstallGuide() {
             document.getElementById('installGuideModal').style.display = 'flex';
         }
@@ -394,20 +393,21 @@
 
         async function submitNewListing(e) {
             e.preventDefault();
-            const name = document.getElementById('reqName').value;
-            const cat = document.getElementById('reqCat').value;
-            const address = document.getElementById('reqAddress').value;
-            const desc = document.getElementById('reqDesc').value;
-            const offer = document.getElementById('reqOffer').value;
-            const fb = document.getElementById('reqFb').value;
-            const insta = document.getElementById('reqInsta').value;
-            const phone = document.getElementById('reqPhone').value;
+            const name = document.getElementById('reqName').value.trim();
+            const cat = document.getElementById('reqCat').value || 'أشياء أخرى';
+            const address = document.getElementById('reqAddress').value.trim() || 'غير محدد';
+            const desc = document.getElementById('reqDesc').value.trim() || '';
+            const offer = document.getElementById('reqOffer').value.trim() || '';
+            const fb = document.getElementById('reqFb').value.trim() || '';
+            const insta = document.getElementById('reqInsta').value.trim() || '';
+            const phone = document.getElementById('reqPhone').value.trim() || 'لا يوجد';
             
             const logoFile = document.getElementById('reqLogoFile').files[0];
             const imageFiles = document.getElementById('reqImagesFiles').files;
 
-            if(!name || !cat || !phone) {
-                alert('يرجى ملء الحقول الإجبارية (الاسم، القسم، ورقم الهاتف).');
+            // حقل الاسم فقط هو الإجباري الآن
+            if(!name) {
+                alert('يرجى كتابة اسم المحل أو المتجر على الأقل.');
                 return;
             }
 
