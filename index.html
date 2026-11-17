@@ -11,7 +11,6 @@
     <meta property="og:url" content="https://akrmm4604-a11y.github.io/sahl-alwusool/">
     <meta property="og:type" content="website">
 
-    <!-- روابط أيقونات التطبيق الملونة المباشرة لتظهر على الشاشة الرئيسية بشكل احترافي -->
     <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1542838132-92c53300491e?w=192">
     <link rel="icon" type="image/png" href="https://images.unsplash.com/photo-1542838132-92c53300491e?w=192">
 
@@ -308,19 +307,20 @@
         <div class="footer">جميع الحقوق محفوظة © سهل الوصول 2026</div>
     </div>
 
+    <!-- نافذة إرشاد التثبيت الآمنة والواضحة للزبون بدون أي رسائل مزعجة -->
     <div class="install-guide-modal" id="installGuideModal">
         <div class="install-guide-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <h3 style="margin:0; color:var(--primary-color); font-size:15px;">📱 طريقة تثبيت التطبيق بدقة</h3>
+                <h3 style="margin:0; color:var(--primary-color); font-size:15px;">📱 تثبيت تطبيق "سهل الوصول"</h3>
                 <button onclick="closeInstallGuide()" style="background:none; border:none; font-size:16px; cursor:pointer;">✕</button>
             </div>
             <p style="font-size:11px; line-height:1.6; color:var(--text-color); margin-bottom:12px;">
-                لإضافة تطبيق **"سهل الوصول"** لشاشة هاتفك بمظهر تطبيقي احترافي وسريع، اتبع الخطوات البسيطة التالية:
+                لإضافة التطبيق إلى شاشة هاتفك الرئيسية واستخدامه بسرعة كأي تطبيق رسمي، اتبع الخطوات التالية:
             </p>
             <div style="background:#fef9e7; padding:10px; border-radius:8px; border:1px solid #f8c471; font-size:11px; margin-bottom:12px; line-height:1.8;">
-                1️⃣ اضغط على **النقاط الثلاث (⋮)** أعلى يسار أو يمين المتصفح.<br>
+                1️⃣ اضغط على **النقاط الثلاث (⋮)** في أعلى المتصفح.<br>
                 2️⃣ اختر من القائمة **"إضافة إلى الشاشة الرئيسية"** أو **"إنشاء اختصار"**.<br>
-                3️⃣ اضغط على **"إضافة" (Add)** وسيظهر التطبيق فوراً على شاشة هاتفك بأيقونته الجميلة!
+                3️⃣ اضغط **"إضافة"** وسيظهر التطبيق فوراً على شاشة هاتفك!
             </div>
             <button class="submit-btn" onclick="closeInstallGuide()">فهمت، شكراً لك</button>
         </div>
@@ -345,23 +345,11 @@
     </div>
 
     <script>
-        let deferredPrompt;
         let isAdminLoggedIn = false;
 
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-        });
-
+        // تم إلغاء أمر التثبيت التلقائي للاتصال بمتصفح كروم وإظهار نافذة خطأ، وأصبح الزر يفتح نافذة الإرشاد الآمنة مباشرة
         function showInstallGuide() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    deferredPrompt = null;
-                });
-            } else {
-                document.getElementById('installGuideModal').style.display = 'flex';
-            }
+            document.getElementById('installGuideModal').style.display = 'flex';
         }
 
         function closeInstallGuide() {
