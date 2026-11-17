@@ -103,10 +103,28 @@
         }
         header h1 { margin: 0 0 4px 0; font-size: 20px; }
         header p { margin: 0 0 10px 0; font-size: 11px; color: #fdebd0; }
-        .install-app-btn {
-            background: #ffffff; color: var(--primary-color); border: none; padding: 7px 16px;
-            border-radius: 20px; font-weight: bold; font-size: 12px; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        
+        /* زر تثبيت التطبيق البارز في الواجهة */
+        .install-app-banner {
+            background: #ffffff;
+            border: 2px dashed var(--primary-color);
+            color: var(--primary-color);
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            margin-bottom: 12px;
+            box-shadow: 0 3px 10px rgba(211, 84, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: 0.2s;
         }
+        .install-app-banner:hover { background: #fef9e7; }
+
         .admin-card {
             background: linear-gradient(135deg, #ffffff, #fef9e7); border: 1.5px solid #f8c471;
             border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
@@ -123,8 +141,8 @@
         }
         .categories-bar { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 10px; }
         .cat-btn {
-            background: #ffffff; border: 1px solid #f5cba7; padding: 5px 12px; border-radius: 20px;
-            font-size: 11px; font-weight: bold; color: var(--primary-color); cursor: pointer; white-space: nowrap;
+            background: #ffffff; border: 1px solid #f5cba7; padding: 6px 14px; border-radius: 20px;
+            font-size: 11px; font-weight: bold; color: var(--primary-color); cursor: pointer; white-space: nowrap; flex-shrink: 0;
         }
         .cat-btn.active { background: linear-gradient(135deg, #d35400, #e67e22); color: white; border-color: transparent; }
         
@@ -203,8 +221,12 @@
             <button class="admin-gear-btn" onclick="openAdmin()" title="لوحة الإدارة">⚙️</button>
             <h1>سهل الوصول</h1>
             <p>دليلك المحلي الشامل في القيارة والموصل للمحلات والمشاريع</p>
-            <button id="installBtn" class="install-app-btn" style="display: none;" onclick="installApp()">📥 ثبت التطبيق على هاتفك</button>
         </header>
+
+        <!-- زر تثبيت التطبيق البارز والمباشر في الواجهة -->
+        <div class="install-app-banner" onclick="installApp()">
+            <span>📥</span> <span>اضغط هنا لتثبيت تطبيق "سهل الوصول" على شاشة هاتفك</span>
+        </div>
 
         <!-- واجهة الدليل الرئيسي -->
         <div id="mainCatalogView">
@@ -239,10 +261,8 @@
                 <input type="text" id="reqAddress" placeholder="العنوان / الحي (مثال: القيارة - السوق الكبير)">
                 <textarea id="reqDesc" placeholder="نبذة عن المحل أو الخدمات المقدمة..." rows="2"></textarea>
                 
-                <!-- خانة التخفيضات والعروض الاختيارية -->
                 <input type="text" id="reqOffer" placeholder="🔥 التخفيضات والعروض (اختياري، مثلاً: خصم 20% على الوجبات)">
 
-                <!-- خانات روابط الفيسبوك وانستغرام -->
                 <input type="text" id="reqFb" placeholder="🔵 رابط صفحة الفيسبوك (اختياري)">
                 <input type="text" id="reqInsta" placeholder="📸 رابط أو معرف حساب الإنستغرام (اختياري)">
 
@@ -303,20 +323,23 @@
     <script>
         let deferredPrompt;
         let isAdminLoggedIn = false;
-        const installBtn = document.getElementById('installBtn');
 
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            installBtn.style.display = 'inline-flex';
         });
 
         function installApp() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
-                deferredPrompt.userChoice.then(() => { deferredPrompt = null; installBtn.style.display = 'none'; });
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('تم قبول التثبيت');
+                    }
+                    deferredPrompt = null;
+                });
             } else {
-                alert('لتثبيت التطبيق:\n1. افتح خيارات المتصفح.\n2. اختر "إضافة إلى الشاشة الرئيسية".');
+                alert('لتثبيت التطبيق على هاتفك بكل سهولة:\n1. اضغط على قائمة المتصفح (النقاط الثلاث بالأعلى).\n2. اختر "الإضافة إلى الشاشة الرئيسية" أو "تثبيت التطبيق".');
             }
         }
 
@@ -509,7 +532,7 @@
             `).join('');
         }
 
-        // فتح صفحة المحل المستقلة
+        // صفحة تفاصيل المحل المستقلة
         function openStoreProfile(id) {
             const store = window.allListings.find(s => s.id === id);
             if (!store) return;
