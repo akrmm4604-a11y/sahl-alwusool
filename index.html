@@ -8,7 +8,7 @@
     <meta property="og:title" content="سهل الوصول - الدليل المحلي الشامل في القيارة والموصل">
     <meta property="og:description" content="دليلك المحلي الأول للمحلات، الأسواق، وخدمات التوصيل. اضغط هنا لتصفح التطبيق الآن!">
     <meta property="og:image" content="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600">
-    <meta property="og:url" content="https://akrmm4604-a11y.github.io/sahl-alwusool/">
+    <meta property="og:url" content="https://akrmm4604-a11y.github.io/">
     <meta property="og:type" content="website">
 
     <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1542838132-92c53300491e?w=192">
@@ -397,42 +397,56 @@
             }
         });
 
-        // دالة آمنة لضغط وتصغير الصور قبل رفعها لكي لا تحدث أي تعليق
+        // دالة ضغط الصور السريعة مع مؤقت أمان لمنع تعليق المتصفح نهائياً
         function resizeAndCompressImage(file) {
             return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (event) => {
-                    const img = new Image();
-                    img.src = event.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 500;
-                        const MAX_HEIGHT = 500;
-                        let width = img.width;
-                        let height = img.height;
+                const safetyTimer = setTimeout(() => {
+                    resolve("");
+                }, 4000);
 
-                        if (width > height) {
-                            if (width > MAX_WIDTH) {
-                                height *= MAX_WIDTH / width;
-                                width = MAX_WIDTH;
-                            }
-                        } else {
-                            if (height > MAX_HEIGHT) {
-                                width *= MAX_HEIGHT / height;
-                                height = MAX_HEIGHT;
-                            }
-                        }
+                try {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            try {
+                                const canvas = document.createElement('canvas');
+                                const MAX_SIZE = 320;
+                                let width = img.width;
+                                let height = img.height;
 
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.7));
+                                if (width > height) {
+                                    if (width > MAX_SIZE) {
+                                        height *= MAX_SIZE / width;
+                                        width = MAX_SIZE;
+                                    }
+                                } else {
+                                    if (height > MAX_SIZE) {
+                                        width *= MAX_SIZE / height;
+                                        height = MAX_SIZE;
+                                    }
+                                }
+
+                                canvas.width = width;
+                                canvas.height = height;
+                                const ctx = canvas.getContext('2d');
+                                ctx.drawImage(img, 0, 0, width, height);
+                                clearTimeout(safetyTimer);
+                                resolve(canvas.toDataURL('image/jpeg', 0.5));
+                            } catch (e) {
+                                clearTimeout(safetyTimer);
+                                resolve("");
+                            }
+                        };
+                        img.onerror = () => { clearTimeout(safetyTimer); resolve(""); };
+                        img.src = event.target.result;
                     };
-                    img.onerror = () => resolve("");
-                };
-                reader.onerror = () => resolve("");
+                    reader.onerror = () => { clearTimeout(safetyTimer); resolve(""); };
+                    reader.readAsDataURL(file);
+                } catch (err) {
+                    clearTimeout(safetyTimer);
+                    resolve("");
+                }
             });
         }
 
@@ -458,7 +472,7 @@
 
             const submitBtn = document.getElementById('submitListingBtn');
             submitBtn.disabled = true;
-            submitBtn.textContent = 'جاري المعالجة والإرسال...';
+            submitBtn.textContent = 'جاري تجهيز الصور والإرسال...';
 
             try {
                 let logoUrl = "";
@@ -468,13 +482,16 @@
 
                 let imageUrls = [];
                 if (imageFiles && imageFiles.length > 0) {
-                    for (let i = 0; i < imageFiles.length; i++) {
+                    const maxPhotos = Math.min(imageFiles.length, 3);
+                    for (let i = 0; i < maxPhotos; i++) {
                         let compressedImg = await resizeAndCompressImage(imageFiles[i]);
                         if (compressedImg) {
                             imageUrls.push(compressedImg);
                         }
                     }
                 }
+
+                submitBtn.textContent = 'جاري الحفظ في القاعدة...';
 
                 await window.addDoc(window.collection(window.db, "listings"), {
                     name, 
@@ -487,14 +504,13 @@
                     phone, 
                     logo: logoUrl, 
                     images: imageUrls, 
-                    status: 'approved', 
+                    status: 'approved', // جعل الإعلان معتمداً ومباشراً لكي يظهر دون تعقيد
                     vip: false,
                     createdAt: new Date().toISOString()
                 });
 
                 alert('تم إضافة إعلانك بنجاح وعرضه في التطبيق!');
                 document.getElementById('addFormContainer').style.display = 'none';
-                document.getElementById('listingForm']?.reset();
                 document.getElementById('reqName').value = '';
                 document.getElementById('reqAddress').value = '';
                 document.getElementById('reqDesc').value = '';
@@ -507,7 +523,7 @@
                 loadApprovedListings();
             } catch (error) {
                 console.error("خطأ إرسال الإعلان: ", error);
-                alert('حدث خطأ أثناء الإرسال، تأكد من الاتصال بالإنترنت.');
+                alert('حدث خطأ أثناء الحفظ: ' + (error.message || 'تأكد من حجم الصور أو الإنترنت'));
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'إرسال الطلب للإدارة';
@@ -723,7 +739,6 @@
                         <b>${item.name}</b> (${item.category}) - الحالة: <b>${item.status || 'approved'}</b> ${item.vip ? ' | <span style="color:#d35400;font-weight:bold;">⭐ مميز VIP</span>' : ''}<br>
                         📞 ${item.phone} | 📍 ${item.address || 'بلا عنوان'}<br>
                         <div style="margin-top:6px; display:flex; gap:4px; flex-wrap:wrap;">
-                            ${item.status === 'pending' ? `<button onclick="updateStatus('${item.id}', 'approved')" style="background:var(--success-color); color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">موافقة ونشر</button>` : ''}
                             <button onclick="toggleVip('${item.id}', ${!item.vip})" style="background:${item.vip ? '#f39c12' : '#2980b9'}; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">${item.vip ? '⭐ إلغاء التمییز' : '⭐ جعلـه VIP'}</button>
                             <button onclick="editListingData('${item.id}', '${item.name}', '${item.phone}', '${item.address || ''}')" style="background:var(--accent-color); color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">✏️ تعديل</button>
                             <button onclick="notifyOwner('${item.phone}', '${item.fb}', '${item.insta}', '${item.name}')" style="background:#27ae60; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">📢 إشعار صاحب المحل</button>
@@ -753,18 +768,6 @@
             } else {
                 alert('هذا المحل لم يضف رقم هاتف أو رابط تواصل، لكن تم قبول إعلانه وعرضه بنجاح!');
             }
-        }
-
-        async function updateStatus(id, status) {
-            let store = window.allListings.find(s => s.id === id);
-            if(store && !store.id.startsWith('demo')) {
-                await window.updateDoc(window.doc(window.db, "listings", id), { status });
-            } else {
-                store.status = status;
-            }
-            alert('تم التحديث بنجاح!');
-            loadAdminListings();
-            loadApprovedListings();
         }
 
         async function toggleVip(id, makeVip) {
