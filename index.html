@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>سهل الوصول - الدليل المحلي الشامل في القيارة والموصل</title>
     
-    <!-- وسوم المعاينة الاحترافية لفيسبوك ومسنجر -->
-    <meta property="og:title" content="سهل الوصول - الدليل المحلي في القيارة والموصل">
-    <meta property="og:description" content="دليلك المحلي الشامل للمحلات والمشاريع وخدمات التوصيل. اضغط لتثبيت التطبيق الآن!">
+    <!-- وسوم المعاينة الاحترافية لفيسبوك ومسنجر وواتساب -->
+    <meta property="og:title" content="سهل الوصول - الدليل المحلي الشامل في القيارة والموصل">
+    <meta property="og:description" content="دليلك المحلي الأول للمحلات، الأسواق، وخدمات التوصيل. اضغط هنا لتصفح التطبيق الآن!">
     <meta property="og:image" content="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600">
     <meta property="og:url" content="https://akrmm4604-a11y.github.io/sahl-alwusool/">
     <meta property="og:type" content="website">
@@ -51,7 +51,6 @@
             margin-bottom: 12px;
             position: relative;
         }
-        /* زر الإدارة السريع في أعلى الشاشة */
         .admin-gear-btn {
             position: absolute;
             top: 12px;
@@ -78,10 +77,29 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         header p {
-            margin: 0;
+            margin: 0 0 10px 0;
             font-size: 11px;
             color: #fdebd0;
             opacity: 0.95;
+        }
+        /* زر تثبيت التطبيق باللون الأبيض البارز */
+        .install-app-btn {
+            background: #ffffff;
+            color: var(--primary-color);
+            border: none;
+            padding: 7px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .install-app-btn:active {
+            transform: scale(0.96);
         }
         .admin-card {
             background: linear-gradient(135deg, #ffffff, #fef9e7);
@@ -309,10 +327,14 @@
 <body>
     <div class="container">
         <header>
-            <!-- زر الإدارة السريع في أعلى اليسار -->
             <button class="admin-gear-btn" onclick="openAdmin()" title="لوحة الإدارة">⚙️</button>
             <h1>سهل الوصول</h1>
             <p>دليلك المحلي الشامل في القيارة والموصل للمحلات والمشاريع</p>
+            
+            <!-- زر تثبيت التطبيق باللون الأبيض -->
+            <button id="installBtn" class="install-app-btn" style="display: none;" onclick="installApp()">
+                📥 ثبت التطبيق على هاتفك
+            </button>
         </header>
 
         <div class="admin-card">
@@ -402,7 +424,31 @@
     </div>
 
     <script>
-        // دالة فتح لوحة الإدارة عبر زر الترس (⚙️) في الأعلى
+        // برمجة زر تثبيت التطبيق
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'inline-flex'; // إظهار الزر إذا كان الجهاز يدعم التثبيت
+        });
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('تم قبول تثبيت التطبيق');
+                    }
+                    deferredPrompt = null;
+                    installBtn.style.display = 'none';
+                });
+            } else {
+                alert('لتثبيت التطبيق على هاتفك:\n1. افتح خيارات المتصفح (النقاط الثلاث).\n2. اختر "إضافة إلى الشاشة الرئيسية" (Add to Home screen).');
+            }
+        }
+
         function openAdmin() {
             let pin = prompt("أدخل الرمز السري للوحة الإدارة:");
             if (pin === "334455ff") {
