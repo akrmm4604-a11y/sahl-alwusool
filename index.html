@@ -11,24 +11,23 @@
 
     <title>سهل الوصول - الدليل المحلي الشامل في القيارة والموصل</title>
     
-    <!-- وسوم المعاينة الاحترافية وشعار التطبيق المرئي -->
     <meta property="og:title" content="سهل الوصول - الدليل المحلي الشامل في القيارة والموصل">
     <meta property="og:description" content="دليلك المحلي الأول للمحلات، الأسواق، وخدمات التوصيل. اضغط هنا لتصفح التطبيق الآن وتثبيته على شاشتك!">
     <meta property="og:image" content="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600">
     <meta property="og:url" content="https://akrmm4604-a11y.github.io/sahl-alwusool/">
     <meta property="og:type" content="website">
 
-    <!-- أيقونات الشاشة الرئيسية لتفادي ظهور صورة بيضاء -->
     <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1542838132-92c53300491e?w=192">
     <link rel="icon" type="image/png" href="https://images.unsplash.com/photo-1542838132-92c53300491e?w=192">
 
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#d35400">
 
-    <!-- تضمين مكتبات Firebase SDK -->
+    <!-- تضمين مكتبات Firebase SDK (مع حزم المراسلة والإشعارات) -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
       import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+      import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
 
       const firebaseConfig = {
         apiKey: "AIzaSyB7riqtl...",
@@ -42,6 +41,7 @@
 
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
+      const messaging = getMessaging(app);
 
       window.db = db;
       window.collection = collection;
@@ -51,6 +51,9 @@
       window.doc = doc;
       window.updateDoc = updateDoc;
       window.increment = increment;
+      window.messaging = messaging;
+      window.getToken = getToken;
+      window.onMessage = onMessage;
     </script>
 
     <style>
@@ -127,7 +130,6 @@
         }
         .install-app-banner:hover { background: #fef9e7; }
 
-        /* شريط الطلبات ورف الخير باللون الأزرق البارز */
         .interactive-strips { display: flex; gap: 8px; margin-bottom: 12px; }
         .strip-card {
             flex: 1; background: linear-gradient(135deg, #2980b9, #3498db);
@@ -284,7 +286,6 @@
             <span>📥</span> <span>اضغط هنا لتثبيت تطبيق "سهل الوصول" على شاشة هاتفك بكل سهولة</span>
         </div>
 
-        <!-- شريط الطلبات ورف الخير باللون الأزرق البارز -->
         <div class="interactive-strips">
             <div class="strip-card" onclick="openQuickRequestsModal()">
                 <h4>⚡ شريط الطلبات (24 ساعة)</h4>
@@ -303,6 +304,11 @@
                     <p>للتواصل واستفسارات الإعلانات:</p>
                 </div>
                 <a href="https://wa.me/9647765171407" class="admin-btn whatsapp-btn" target="_blank">📱 07765171407</a>
+            </div>
+
+            <!-- زر تفعيل الإشعارات الفورية -->
+            <div class="add-toggle-card" onclick="requestNotificationPermission()" style="background: linear-gradient(135deg, #27ae60, #2ecc71); margin-bottom: 8px;">
+                🔔 اضغط هنا لتفعيل الإشعارات والتنبيهات الفورية
             </div>
 
             <div class="add-toggle-card" id="toggleFormBtn">📢 اضغط هنا لتقديم طلب إضافة إعلان أو بضاعة جديدة</div>
@@ -467,6 +473,33 @@
     <script>
         let isAdminLoggedIn = false;
         let selectedFilesArray = [];
+
+        // دالة طلب إذن الإشعارات وحفظ رمز الجهاز في القاعدة
+        async function requestNotificationPermission() {
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    const currentToken = await window.getToken(window.messaging, {
+                        vapidKey: "BGnxmFn8Alzu5Rfry74Kuyh2HgQ82DO3el1AlY_r-gNHwuHE5J698igeOoUunQQYklY_HKP3EvzrOgnZBLUm0J4"
+                    });
+                    if (currentToken) {
+                        // حفظ الرمز في قاعدة البيانات لتتمكن من مراسلته لاحقاً
+                        await window.addDoc(window.collection(window.db, "fcm_tokens"), {
+                            token: currentToken,
+                            timestamp: new Date().getTime()
+                        });
+                        alert('تم تفعيل الإشعارات بنجاح! 🎉 سيتم تنبيهك بكل جديد.');
+                    } else {
+                        alert('لم يتم العثور على رمز الجهاز.');
+                    }
+                } else {
+                    alert('تم رفض إذن الإشعارات من المتصفح.');
+                }
+            } catch (error) {
+                console.error('خطأ في تفعيل الإشعارات:', error);
+                alert('حدث خطأ أثناء تفعيل الإشعارات.');
+            }
+        }
 
         function updateLogoFileName(input) {
             const display = document.getElementById('logoFileNameDisplay');
