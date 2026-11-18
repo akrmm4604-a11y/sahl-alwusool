@@ -12,7 +12,7 @@
     <title>سهل الوصول - الدليل المحلي الشامل في القيارة والموصل</title>
     
     <meta property="og:title" content="سهل الوصول - الدليل المحلي الشامل في القيارة والموصل">
-    <meta property="og:description" content="دليلك المحلي الأول للمحلات، الأسواق، وخدمات التوصيل. اضغط هنا لتصفح التطبيق الآن وتثبيته على شاشتك!">
+    <meta property="og:description" content="دليلك المحلي الأول للمحلات، الأسواق، وخدمات التوصيل، وقسم شغل بيوت للأسر المنتجة. اضغط هنا لتصفح التطبيق الآن!">
     <meta property="og:image" content="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600">
     <meta property="og:url" content="https://akrmm4604-a11y.github.io/sahl-alwusool/">
     <meta property="og:type" content="website">
@@ -23,7 +23,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#d35400">
 
-    <!-- تضمين مكتبات Firebase SDK (مع حزم المراسلة والإشعارات) -->
+    <!-- تضمين مكتبات Firebase SDK -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
       import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -157,12 +157,26 @@
             font-size: 15px; font-weight: bold; margin: 12px 0 6px 5px; color: var(--primary-color);
             border-right: 4px solid var(--accent-color); padding-right: 8px;
         }
-        .categories-bar { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 10px; }
+        
+        /* شريط التصنيفات بخط كبير وواضح جداً */
+        .categories-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 10px; }
         .cat-btn {
-            background: #ffffff; border: 1px solid #f5cba7; padding: 6px 14px; border-radius: 20px;
-            font-size: 11px; font-weight: bold; color: var(--primary-color); cursor: pointer; white-space: nowrap; flex-shrink: 0;
+            background: #ffffff; border: 1.5px solid #f5cba7; padding: 10px 18px; border-radius: 22px;
+            font-size: 14px; font-weight: bold; color: var(--primary-color); cursor: pointer; white-space: nowrap; flex-shrink: 0;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.05); transition: 0.2s;
         }
         .cat-btn.active { background: linear-gradient(135deg, #d35400, #e67e22); color: white; border-color: transparent; }
+        
+        /* تصميم بارز لزر شغل بيوت بخط كبير وترتيب ثاني */
+        .cat-btn-homejobs {
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+            color: white;
+            border: 1.5px solid #7d3c98;
+        }
+        .cat-btn-homejobs.active {
+            background: linear-gradient(135deg, #6c3483, #8e44ad);
+            color: white;
+        }
         
         .search-wrapper { position: relative; margin-bottom: 12px; }
         .search-box {
@@ -316,15 +330,16 @@
             <div id="addFormContainer" class="form-container">
                 <h3 style="margin-top:0; color:var(--primary-color); font-size:14px;">تقديم طلب إضافة إعلان أو بضاعة</h3>
                 
-                <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px; color:var(--primary-color);">🏷️ اسم المحل أو المتجر (إجباري):</label>
-                <input type="text" id="reqName" placeholder="أدخل اسم المحل هنا...">
+                <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px; color:var(--primary-color);">🏷️ اسم المحل أو صاحب المشروع (إجباري):</label>
+                <input type="text" id="reqName" placeholder="أدخل اسم المحل أو اسمك هنا...">
 
-                <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">📞 رقم الهاتف (لتجميع الإعلانات تحت نفس المحل):</label>
+                <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">📞 رقم الهاتف للتواصل:</label>
                 <input type="text" id="reqPhone" placeholder="07701234567">
 
                 <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">📂 القسم:</label>
                 <select id="reqCat">
                     <option value="أشياء أخرى">-- اختر القسم المناسب --</option>
+                    <option value="شغل بيوت">🏠 شغل بيوت (أسر منتجة ومعجنات)</option>
                     <option value="غذائية وحلويات">غذائية وحلويات</option>
                     <option value="ملابس وكوزمتك">ملابس وكوزمتك</option>
                     <option value="مطاعم">مطاعم</option>
@@ -333,21 +348,21 @@
                 </select>
 
                 <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">👤 اختر صورة الصفحة الشخصية (الشعار):</label>
-                <label for="reqLogoFile" class="custom-file-upload">📷 اضغط هنا لاختيار صورة الصفحة الشخصية</label>
+                <label for="reqLogoFile" class="custom-file-upload">📷 اضغط هنا لاختيار صورة الشعار</label>
                 <input type="file" id="reqLogoFile" accept="image/*" style="display:none;" onchange="updateLogoFileName(this)">
                 <div id="logoFileNameDisplay" class="file-name-display">لم يتم اختيار أي صورة</div>
                 
-                <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">🖼️ اختر صور المنتج (دقة عالية وآمنة):</label>
-                <label for="reqImagesFiles" class="custom-file-upload">🖼️ اضغط هنا لاختيار صور المنتج (يمكنك اختيار أكثر من صورة)</label>
+                <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">🖼️ اختر صور المنتج أو العمل اليدوي:</label>
+                <label for="reqImagesFiles" class="custom-file-upload">🖼️ اضغط هنا لاختيار صور المنتجات</label>
                 <input type="file" id="reqImagesFiles" accept="image/*" multiple style="display:none;" onchange="handleImageSelection(event)">
                 
                 <div id="selectedImagesPreview" class="preview-container"></div>
 
-                <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">📍 العنوان / الحي:</label>
-                <input type="text" id="reqAddress" placeholder="مثال: القيارة - السوق الكبير">
+                <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">📍 العنوان / الحي (أو توصيل متوفر):</label>
+                <input type="text" id="reqAddress" placeholder="مثال: القيارة - حي الحيالي (يوجد توصيل)">
 
                 <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">💰 السعر مع الملاحظات (اختياري):</label>
-                <input type="text" id="reqPrice" placeholder="مثال: 5,000 دينار - (متوفر توصيل لكل المناطق)">
+                <input type="text" id="reqPrice" placeholder="مثال: حسب الطلب أو السعر مع التفاصيل">
 
                 <label style="font-size:11px; font-weight:bold; display:block; margin-bottom:3px;">🔵 رابط فيسبوك (اختياري):</label>
                 <input type="text" id="reqFb" placeholder="https://facebook.com/...">
@@ -359,8 +374,10 @@
             </div>
 
             <div class="section-title">تصفح حسب الأقسام</div>
+            <!-- شريط التصنيفات بخطوط مكبرة وواضحة -->
             <div class="categories-bar">
                 <button class="cat-btn active" onclick="filterCat('all', this)">الكل</button>
+                <button class="cat-btn cat-btn-homejobs" onclick="filterCat('شغل بيوت', this)">🏠 شغل بيوت</button>
                 <button class="cat-btn" onclick="filterCat('غذائية وحلويات', this)">🛒 غذائية وحلويات</button>
                 <button class="cat-btn" onclick="filterCat('ملابس وكوزمتك', this)">👗 ملابس وكوزمتك</button>
                 <button class="cat-btn" onclick="filterCat('مطاعم', this)">🍽️ مطاعم</button>
@@ -369,7 +386,7 @@
             </div>
 
             <div class="search-wrapper">
-                <input type="text" id="searchInput" class="search-box" placeholder="بحث ذكي: ابحث عن محل، سلعة، أو منطقة..." oninput="handleSearch()" autocomplete="off">
+                <input type="text" id="searchInput" class="search-box" placeholder="بحث ذكي: ابحث عن محل، أكلات منزلية، أو منطقة..." oninput="handleSearch()" autocomplete="off">
                 <div id="searchSuggestions" class="search-suggestions"></div>
             </div>
 
@@ -474,7 +491,6 @@
         let isAdminLoggedIn = false;
         let selectedFilesArray = [];
 
-        // دالة طلب إذن الإشعارات وحفظ رمز الجهاز في القاعدة بشكل آمن
         async function requestNotificationPermission() {
             try {
                 const permission = await Notification.requestPermission();
@@ -487,7 +503,7 @@
                             token: currentToken,
                             timestamp: new Date().getTime()
                         });
-                        alert('تم تفعيل الإشعارات بنجاح! 🎉 سيتم تنبيهك بكل جديد.');
+                        alert('تم تفعيل الإشعارات بنجاح! 🎉');
                     } else {
                         alert('لم يتم العثور على رمز الجهاز.');
                     }
@@ -496,7 +512,7 @@
                 }
             } catch (error) {
                 console.error('خطأ في تفعيل الإشعارات:', error);
-                alert('تطبيق "سهل الوصول" يعمل بكفاءة تالية. (تأكد من السماح بالاتصال الآمن)');
+                alert('تطبيق "سهل الوصول" يعمل بكفاءة تامة.');
             }
         }
 
@@ -627,7 +643,7 @@
             const logoFile = document.getElementById('reqLogoFile').files[0];
 
             if(!name) {
-                alert('يرجى إدخال اسم المحل أو المتجر في الحقل الأول.');
+                alert('يرجى إدخال اسم المحل أو صاحب المشروع.');
                 document.getElementById('reqName').focus();
                 return;
             }
@@ -648,7 +664,7 @@
                     }
                 }
 
-                submitBtn.textContent = 'جاري الدمج والتحديث في القاعدة...';
+                submitBtn.textContent = 'جاري الحفظ في القاعدة...';
 
                 let existingStore = window.allListings.find(item => 
                     item.name.trim().toLowerCase() === name.toLowerCase() && 
@@ -664,7 +680,7 @@
                     if (price) updateData.price = price;
 
                     await window.updateDoc(window.doc(window.db, "listings", existingStore.id), updateData);
-                    alert('تم إضافة الصور والبضائع الجديدة بداخل صفحة المحل بنجاح! 🎉');
+                    alert('تم إضافة الصور والبضائع الجديدة بنجاح! 🎉');
                 } else {
                     await window.addDoc(window.collection(window.db, "listings"), {
                         name, category: cat, address, price, fb, insta, phone, 
@@ -690,7 +706,7 @@
                 loadApprovedListings();
             } catch (error) {
                 console.error("خطأ إرسال الإعلان: ", error);
-                alert('حدث خطأ أثناء الحفظ: ' + (error.message || ''));
+                alert('حدث خطأ أثناء الحفظ.');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'إرسال الطلب للإدارة';
@@ -707,7 +723,7 @@
                 });
                 document.getElementById('qrText').value = '';
                 document.getElementById('qrPhone').value = '';
-                alert('تم نشر طلبك في الشريط السري بنجاح!');
+                alert('تم نشر طلبك بنجاح!');
                 loadQuickRequests();
             } catch(e) { alert('خطأ في إرسال الطلب.'); }
         }
@@ -759,7 +775,7 @@
                 document.getElementById('csTitle').value = '';
                 document.getElementById('csDetails').value = '';
                 document.getElementById('csPhone').value = '';
-                alert('تم إضافة الغرض إلى رف الخير بنجاح! جزاك الله خيراً.');
+                alert('تم إضافة الغرض إلى رف الخير بنجاح!');
                 loadCharityItems();
             } catch(e) { alert('خطأ في الإضافة.'); }
         }
@@ -814,18 +830,18 @@
                     window.allListings = [
                         {
                             id: 'demo1',
-                            name: 'سوبرماركت البركة',
-                            category: 'غذائية وحلويات',
-                            address: 'القيارة - قرب السوق الكبير',
-                            price: '5,000 دينار - (توصيل مجاني)',
+                            name: 'أم محمد للمعجنات والحلويات البيئية',
+                            category: 'شغل بيوت',
+                            address: 'القيارة - حي المعلمين (توصيل متوفر)',
+                            price: 'حسب الطلب - (معجنات منزلية طازجة)',
                             fb: 'https://facebook.com',
-                            insta: 'https://instagram.com',
+                            insta: '',
                             phone: '07700000000',
-                            logo: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=150',
-                            images: ['https://images.unsplash.com/photo-1563245372-f21724e3856d?w=300', 'https://images.unsplash.com/photo-1550989460-0adf9ea622e2?w=300'],
+                            logo: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=150',
+                            images: ['https://images.unsplash.com/photo-1509440159596-0249088772ff?w=300'],
                             status: 'approved',
                             vip: true,
-                            likes: 3
+                            likes: 5
                         }
                     ];
                 }
@@ -850,7 +866,7 @@
         function renderListings(items) {
             const container = document.getElementById('vendorsList');
             if (items.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: var(--gray-text); font-size: 11px; margin-top: 20px;">لا توجد محلات مضافة حتى الآن.</p>';
+                container.innerHTML = '<p style="text-align: center; color: var(--gray-text); font-size: 11px; margin-top: 20px;">لا توجد إعلانات مضافة حتى الآن في هذا القسم.</p>';
                 return;
             }
 
@@ -858,9 +874,9 @@
                 <div class="card ${item.vip ? 'vip' : ''}" onclick="openStoreProfile('${item.id}')">
                     <div class="card-header">
                         <h3 class="card-title">${item.logo ? `<img src="${item.logo}" style="width:20px;height:20px;border-radius:50%;vertical-align:middle;margin-left:5px;cursor:pointer;" onclick="event.stopPropagation(); openImageModal('${item.logo}')">` : ''}${item.name}</h3>
-                        ${item.vip ? '<span class="vip-badge">⭐ متجر مميز VIP</span>' : ''}
+                        ${item.vip ? '<span class="vip-badge">⭐ مميز VIP</span>' : ''}
                     </div>
-                    <p class="card-desc">📍 ${item.address || 'غير محدد'}</p>
+                    <p class="card-desc">📍 ${item.address || 'غير محدد'} | 📂 <b style="color:var(--primary-color);">${item.category}</b></p>
                     
                     <div class="card-stats">
                         <button class="like-btn" onclick="event.stopPropagation(); addLike('${item.id}')">❤️ ${item.likes || 0} إعجاب</button>
@@ -929,7 +945,7 @@
                     <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px; margin-bottom:15px;">
                         ${store.images.map(img => `<img src="${img}" style="width:100%; height:130px; border-radius:8px; object-fit:cover; border:1px solid #f8c471; cursor:pointer;" alt="صورة المنتج" onclick="openImageModal('${img}')">`).join('')}
                     </div>
-                ` : '<p style="font-size:11px; color:var(--gray-text);">لا توجد صور مضافة لهذا المحل.</p>'}
+                ` : '<p style="font-size:11px; color:var(--gray-text);">لا توجد صور مضافة.</p>'}
 
                 <div style="display:flex; gap:8px; margin-top:15px;">
                     <a href="tel:${store.phone}" class="action-btn call-btn" style="padding:9px; font-size:12px;">📞 اتصال هاتفي (${store.phone})</a>
@@ -1042,13 +1058,13 @@
         }
 
         function notifyOwner(phone, fb, insta, storeName) {
-            let msg = `مرحباً بك يا ${storeName}، تم قبول ونشر إعلانك بنجاح في دليل "سهل الوصول" الشامل في القيارة والموصل. مبارك لكم! 🎉`;
+            let msg = `مرحباً بك يا ${storeName}، تم قبول ونشر إعلانك بنجاح في دليل "سهل الوصول". مبارك لكم! 🎉`;
             if (phone && phone !== 'لا يوجد' && phone.length >= 10) {
                 let cleanPhone = phone.startsWith('0') ? '964' + phone.substring(1) : phone;
                 window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
             } else if (fb && fb.startsWith('http')) {
                 navigator.clipboard.writeText(msg);
-                alert('تم نسخ رسالة القبول! سيتم فتح رابط الفيسبوك.');
+                alert('تم نسخ رسالة القبول!');
                 window.open(fb, '_blank');
             } else {
                 alert('تم قبول الإعلان.');
@@ -1068,7 +1084,7 @@
         }
 
         async function editListingData(id, oldName, oldPhone, oldAddress) {
-            let newName = prompt("تعديل اسم المحل:", oldName);
+            let newName = prompt("تعديل اسم المحل أو صاحب المشروع:", oldName);
             let newPhone = prompt("تعديل رقم الهاتف:", oldPhone);
             let newAddress = prompt("تعديل العنوان:", oldAddress);
             if(newName && newPhone) {
@@ -1108,7 +1124,7 @@
         let currentCat = 'all';
         function filterCat(cat, btn) {
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+            if(btn) btn.classList.add('active');
             currentCat = cat;
             applyFilters();
         }
