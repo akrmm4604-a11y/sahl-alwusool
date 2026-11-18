@@ -20,7 +20,7 @@
     <!-- تضمين مكتبات Firebase SDK -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-      import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+      import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
       const firebaseConfig = {
         apiKey: "AIzaSyB7riqtl...",
@@ -42,6 +42,7 @@
       window.deleteDoc = deleteDoc;
       window.doc = doc;
       window.updateDoc = updateDoc;
+      window.increment = increment;
     </script>
 
     <style>
@@ -118,6 +119,18 @@
         }
         .install-app-banner:hover { background: #fef9e7; }
 
+        /* شريط الطلبات السريعة ورف الخير */
+        .interactive-strips { display: flex; gap: 8px; margin-bottom: 12px; }
+        .strip-card {
+            flex: 1; background: linear-gradient(135deg, #ffffff, #fef9e7);
+            border: 1.5px solid #f8c471; border-radius: 10px; padding: 10px;
+            text-align: center; cursor: pointer; transition: 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .strip-card:hover { transform: translateY(-2px); border-color: var(--primary-color); }
+        .strip-card h4 { margin: 0 0 4px 0; font-size: 12px; color: var(--primary-color); }
+        .strip-card p { margin: 0; font-size: 10px; color: var(--gray-text); }
+
         .admin-card {
             background: linear-gradient(135deg, #ffffff, #fef9e7); border: 1.5px solid #f8c471;
             border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
@@ -192,6 +205,10 @@
         .vip-badge { background: var(--vip-color); color: #7d6608; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
         .card-desc { font-size: 11px; color: var(--gray-text); margin: 0 0 6px 0; }
         .price-tag { background: #e8f8f5; color: var(--success-color); font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: bold; display: inline-block; margin-bottom: 5px; border: 1px solid #a3e4d7; }
+        
+        .card-stats { display: flex; gap: 10px; font-size: 10px; color: var(--gray-text); margin-bottom: 6px; }
+        .like-btn { background: #fdf2e9; border: 1px solid #f8c471; border-radius: 6px; padding: 3px 8px; cursor: pointer; color: var(--primary-color); font-weight: bold; display: inline-flex; align-items: center; gap: 3px; font-size: 11px; }
+
         .product-gallery { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 6px; padding-bottom: 4px; }
         .product-thumb { width: 65px; height: 65px; border-radius: 6px; object-fit: cover; border: 1px solid #f8c471; cursor: pointer; }
         .card-footer { display: flex; gap: 6px; margin-top: 6px; }
@@ -237,18 +254,11 @@
             width: 20px; height: 20px; border-radius: 50%; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold;
         }
 
-        .install-guide-modal {
+        .custom-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;
         }
-        .install-guide-content {
-            background: #fff; width: 100%; max-width: 380px; border-radius: 14px; padding: 20px; box-sizing: border-box; direction: rtl; text-align: right; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 2px solid var(--primary-color);
-        }
-
-        .admin-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;
-        }
-        .admin-modal-content {
-            background: #fff; width: 100%; max-width: 420px; border-radius: 12px; padding: 20px; box-sizing: border-box; max-height: 90vh; overflow-y: auto; direction: rtl; text-align: right;
+        .custom-modal-content {
+            background: #fff; width: 100%; max-width: 380px; border-radius: 14px; padding: 20px; box-sizing: border-box; direction: rtl; text-align: right; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 2px solid var(--primary-color); max-height: 90vh; overflow-y: auto;
         }
     </style>
 </head>
@@ -262,6 +272,18 @@
 
         <div class="install-app-banner" onclick="openCustomInstallGuide()">
             <span>📥</span> <span>اضغط هنا لتثبيت تطبيق "سهل الوصول" على شاشة هاتفك بكل سهولة</span>
+        </div>
+
+        <!-- شريط الطلبات السريعة ورف الخير والتكافل -->
+        <div class="interactive-strips">
+            <div class="strip-card" onclick="openQuickRequestsModal()">
+                <h4>⚡ شريط الطلبات (24 ساعة)</h4>
+                <p>ابحث عن غرض أو خدمة مستعجلة بسهولة</p>
+            </div>
+            <div class="strip-card" onclick="openCharityShelfModal()">
+                <h4>🤝 رفّ الخير والمستعمل</h4>
+                <p>أغراض للتبديل أو التبرع بين الأهالي</p>
+            </div>
         </div>
 
         <div id="mainCatalogView">
@@ -356,11 +378,12 @@
         <img id="modalFullImage" src="" alt="صورة مكبرة">
     </div>
 
-    <div class="install-guide-modal" id="installGuideModal">
-        <div class="install-guide-content">
+    <!-- نافذة دليل التثبيت -->
+    <div class="custom-modal" id="installGuideModal">
+        <div class="custom-modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <h3 style="margin:0; color:var(--primary-color); font-size:15px;">📱 تثبيت تطبيق "سهل الوصول"</h3>
-                <button onclick="closeInstallGuide()" style="background:none; border:none; font-size:16px; cursor:pointer;">✕</button>
+                <button onclick="closeModal('installGuideModal')" style="background:none; border:none; font-size:16px; cursor:pointer;">✕</button>
             </div>
             <p style="font-size:11px; line-height:1.6; color:var(--text-color); margin-bottom:12px;">
                 لتنزيل التطبيق على شاشة هاتفك واستخدامه بكل سرعة وسهولة كأي تطبيق رسمي، اتبع الخطوات البسيطة التالية:
@@ -370,12 +393,56 @@
                 2️⃣ اختر من القائمة **"إضافة إلى الشاشة الرئيسية"** أو **"إنشاء اختصار"**.<br>
                 3️⃣ اضغط **"إضافة"** وسيظهر التطبيق على شاشة هاتفك فوراً!
             </div>
-            <button class="submit-btn" onclick="closeInstallGuide()">فهمت، شكراً لك</button>
+            <button class="submit-btn" onclick="closeModal('installGuideModal')">فهمت، شكراً لك</button>
         </div>
     </div>
 
-    <div class="admin-modal" id="adminModal">
-        <div class="admin-modal-content">
+    <!-- نافذة شريط الطلبات السريعة (24 ساعة) -->
+    <div class="custom-modal" id="quickRequestsModal">
+        <div class="custom-modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h3 style="margin:0; color:var(--primary-color); font-size:15px;">⚡ شريط الطلبات السريعة (24 ساعة)</h3>
+                <button onclick="closeModal('quickRequestsModal')" style="background:none; border:none; font-size:16px; cursor:pointer;">✕</button>
+            </div>
+            <p style="font-size:11px; color:var(--gray-text); margin-bottom:10px;">هل تبحث عن سلعة معينة أو خدمة مستعجلة ولم تجدها؟ أضف طلبك هنا ليراه الجميع ويتواصلوا معك (يختفي الطلب تلقائياً بعد 24 ساعة).</p>
+            
+            <input type="text" id="qrText" placeholder="مثال: محتاج شاحنة أصلية آيفون..." style="width:100%; padding:8px; font-size:11px; border:1px solid #f8c471; border-radius:6px; margin-bottom:8px; box-sizing:border-box;">
+            <input type="text" id="qrPhone" placeholder="رقم هاتفك للتواصل (مثال: 0770...)" style="width:100%; padding:8px; font-size:11px; border:1px solid #f8c471; border-radius:6px; margin-bottom:10px; box-sizing:border-box;">
+            <button class="submit-btn" onclick="submitQuickRequest()" style="margin-bottom:15px;">نشر الطلب فوراً</button>
+
+            <hr style="border:0; border-top:1px solid #f8c471; margin-bottom:10px;">
+            <h4 style="font-size:12px; color:var(--primary-color); margin:0 0 8px 0;">الطلبات الحالية (خلال 24 ساعة):</h4>
+            <div id="quickRequestsList" style="max-height: 200px; overflow-y: auto;">
+                <p style="font-size:10px; color:var(--gray-text); text-align:center;">جاري تحميل الطلبات...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة رف الخير والمستعمل -->
+    <div class="custom-modal" id="charityShelfModal">
+        <div class="custom-modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h3 style="margin:0; color:var(--primary-color); font-size:15px;">🤝 رفّ الخير والمستعمل</h3>
+                <button onclick="closeModal('charityShelfModal')" style="background:none; border:none; font-size:16px; cursor:pointer;">✕</button>
+            </div>
+            <p style="font-size:11px; color:var(--gray-text); margin-bottom:10px;">قسم التكافل الاجتماعي لعرض الأغراض المستعملة النظيفة أو التبرعات (كتب، أثاث، أجهزة) لتستفيد منها عائلة أخرى.</p>
+            
+            <input type="text" id="csTitle" placeholder="اسم الغرض أو المتبرع به..." style="width:100%; padding:8px; font-size:11px; border:1px solid #f8c471; border-radius:6px; margin-bottom:8px; box-sizing:border-box;">
+            <input type="text" id="csDetails" placeholder="التفاصيل أو السعر الرمزي/مجاني..." style="width:100%; padding:8px; font-size:11px; border:1px solid #f8c471; border-radius:6px; margin-bottom:8px; box-sizing:border-box;">
+            <input type="text" id="csPhone" placeholder="رقم الهاتف للتواصل..." style="width:100%; padding:8px; font-size:11px; border:1px solid #f8c471; border-radius:6px; margin-bottom:10px; box-sizing:border-box;">
+            <button class="submit-btn" onclick="submitCharityItem()" style="margin-bottom:15px;">إضافة للرف الخيري</button>
+
+            <hr style="border:0; border-top:1px solid #f8c471; margin-bottom:10px;">
+            <h4 style="font-size:12px; color:var(--primary-color); margin:0 0 8px 0;">الأغراض المتوفرة حالياً:</h4>
+            <div id="charityItemsList" style="max-height: 200px; overflow-y: auto;">
+                <p style="font-size:10px; color:var(--gray-text); text-align:center;">جاري تحميل الأغراض...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- لوحة التحكم الإدارية -->
+    <div class="custom-modal" id="adminModal">
+        <div class="custom-modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <h3 style="margin:0; color:var(--primary-color); font-size:15px;">لوحة تحكم المشرف</h3>
                 <button onclick="closeAdminModal()" style="background:none; border:none; font-size:16px; cursor:pointer;">✕</button>
@@ -385,8 +452,8 @@
                 <button class="submit-btn" onclick="checkAdminPin()">تسجيل الدخول</button>
             </div>
             <div id="adminDashboardView" style="display: none;">
-                <p style="color: var(--success-color); font-weight: bold; font-size: 12px; margin-bottom: 10px;">تم تسجيل الدخول بنجاح ✅ (أنت المشرف الآن)</p>
-                <h4 style="font-size: 13px; margin: 0 0 8px 0; color: var(--text-color);">إدارة جميع المحلات والإعلانات:</h4>
+                <p style="color: var(--success-color); font-weight: bold; font-size: 12px; margin-bottom: 10px;">تم تسجيل الدخول بنجاح ✅</p>
+                <h4 style="font-size: 13px; margin: 0 0 8px 0; color: var(--text-color);">إدارة المحلات والإعلانات:</h4>
                 <div id="adminPendingList" style="max-height: 320px; overflow-y: auto;"></div>
             </div>
         </div>
@@ -407,13 +474,11 @@
             }
         }
 
-        function openCustomInstallGuide() {
-            document.getElementById('installGuideModal').style.display = 'flex';
-        }
-
-        function closeInstallGuide() {
-            document.getElementById('installGuideModal').style.display = 'none';
-        }
+        function openCustomInstallGuide() { document.getElementById('installGuideModal').style.display = 'flex'; }
+        function openQuickRequestsModal() { loadQuickRequests(); document.getElementById('quickRequestsModal').style.display = 'flex'; }
+        function openCharityShelfModal() { loadCharityItems(); document.getElementById('charityShelfModal').style.display = 'flex'; }
+        
+        function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
 
         function openAdmin() { document.getElementById('adminModal').style.display = 'flex'; }
         function closeAdminModal() {
@@ -450,16 +515,11 @@
             document.getElementById('modalFullImage').src = imgSrc;
             document.getElementById('imageModal').style.display = 'flex';
         }
-
-        function closeImageModal() {
-            document.getElementById('imageModal').style.display = 'none';
-        }
+        function closeImageModal() { document.getElementById('imageModal').style.display = 'none'; }
 
         function handleImageSelection(event) {
             const files = event.target.files;
-            for (let i = 0; i < files.length; i++) {
-                selectedFilesArray.push(files[i]);
-            }
+            for (let i = 0; i < files.length; i++) { selectedFilesArray.push(files[i]); }
             renderImagePreviews();
         }
 
@@ -476,10 +536,7 @@
                 reader.onload = function(e) {
                     const box = document.createElement('div');
                     box.className = 'preview-thumb-box';
-                    box.innerHTML = `
-                        <img src="${e.target.result}" alt="معاينة">
-                        <button type="button" class="remove-img-btn" onclick="removeSelectedImage(${index})">✕</button>
-                    `;
+                    box.innerHTML = `<img src="${e.target.result}" alt="معاينة"><button type="button" class="remove-img-btn" onclick="removeSelectedImage(${index})">✕</button>`;
                     previewContainer.appendChild(box);
                 };
                 reader.readAsDataURL(file);
@@ -488,10 +545,7 @@
 
         function resizeAndCompressImage(file) {
             return new Promise((resolve) => {
-                const safetyTimer = setTimeout(() => {
-                    resolve("");
-                }, 6000);
-
+                const safetyTimer = setTimeout(() => { resolve(""); }, 6000);
                 try {
                     const reader = new FileReader();
                     reader.onload = (event) => {
@@ -500,43 +554,27 @@
                             try {
                                 const canvas = document.createElement('canvas');
                                 const MAX_SIZE = 700;
-                                let width = img.width;
-                                let height = img.height;
-
+                                let width = img.width; let height = img.height;
                                 if (width > height) {
-                                    if (width > MAX_SIZE) {
-                                        height *= MAX_SIZE / width;
-                                        width = MAX_SIZE;
-                                    }
+                                    if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
                                 } else {
-                                    if (height > MAX_SIZE) {
-                                        width *= MAX_SIZE / height;
-                                        height = MAX_SIZE;
-                                    }
+                                    if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
                                 }
-
-                                canvas.width = width;
-                                canvas.height = height;
+                                canvas.width = width; canvas.height = height;
                                 const ctx = canvas.getContext('2d');
                                 ctx.imageSmoothingEnabled = true;
                                 ctx.imageSmoothingQuality = 'high';
                                 ctx.drawImage(img, 0, 0, width, height);
                                 clearTimeout(safetyTimer);
                                 resolve(canvas.toDataURL('image/jpeg', 0.75));
-                            } catch (e) {
-                                clearTimeout(safetyTimer);
-                                resolve("");
-                            }
+                            } catch (e) { clearTimeout(safetyTimer); resolve(""); }
                         };
                         img.onerror = () => { clearTimeout(safetyTimer); resolve(""); };
                         img.src = event.target.result;
                     };
                     reader.onerror = () => { clearTimeout(safetyTimer); resolve(""); };
                     reader.readAsDataURL(file);
-                } catch (err) {
-                    clearTimeout(safetyTimer);
-                    resolve("");
-                }
+                } catch (err) { clearTimeout(safetyTimer); resolve(""); }
             });
         }
 
@@ -549,7 +587,6 @@
             const price = document.getElementById('reqPrice').value.trim() || '';
             const fb = document.getElementById('reqFb').value.trim() || '';
             const insta = document.getElementById('reqInsta').value.trim() || '';
-            
             const logoFile = document.getElementById('reqLogoFile').files[0];
 
             if(!name) {
@@ -564,17 +601,13 @@
 
             try {
                 let logoUrl = "";
-                if (logoFile) {
-                    logoUrl = await resizeAndCompressImage(logoFile);
-                }
+                if (logoFile) { logoUrl = await resizeAndCompressImage(logoFile); }
 
                 let newImagesUrls = [];
                 if (selectedFilesArray.length > 0) {
                     for (let i = 0; i < selectedFilesArray.length; i++) {
                         let compressedImg = await resizeAndCompressImage(selectedFilesArray[i]);
-                        if (compressedImg) {
-                            newImagesUrls.push(compressedImg);
-                        }
+                        if (compressedImg) { newImagesUrls.push(compressedImg); }
                     }
                 }
 
@@ -587,9 +620,7 @@
 
                 if (existingStore && !existingStore.id.startsWith('demo')) {
                     let updatedImages = [...(existingStore.images || []), ...newImagesUrls];
-                    if (updatedImages.length > 12) {
-                        updatedImages = updatedImages.slice(-12);
-                    }
+                    if (updatedImages.length > 12) { updatedImages = updatedImages.slice(-12); }
                     
                     let updateData = { images: updatedImages };
                     if (logoUrl) updateData.logo = logoUrl;
@@ -599,18 +630,9 @@
                     alert('تم إضافة الصور والبضائع الجديدة بداخل صفحة المحل بنجاح! 🎉');
                 } else {
                     await window.addDoc(window.collection(window.db, "listings"), {
-                        name, 
-                        category: cat, 
-                        address, 
-                        price, 
-                        fb, 
-                        insta, 
-                        phone, 
-                        logo: logoUrl, 
-                        images: newImagesUrls, 
-                        status: 'pending',
-                        vip: false,
-                        createdAt: new Date().toISOString()
+                        name, category: cat, address, price, fb, insta, phone, 
+                        logo: logoUrl, images: newImagesUrls, status: 'pending', vip: false,
+                        views: 0, likes: 0, createdAt: new Date().toISOString()
                     });
                     alert('تم إرسال طلب إعلانك بنجاح! سيتم مراجعته ونشره قريباً.');
                 }
@@ -628,7 +650,6 @@
                 document.getElementById('logoFileNameDisplay').style.color = 'var(--gray-text)';
                 selectedFilesArray = [];
                 document.getElementById('selectedImagesPreview').innerHTML = '';
-                
                 loadApprovedListings();
             } catch (error) {
                 console.error("خطأ إرسال الإعلان: ", error);
@@ -638,6 +659,113 @@
                 submitBtn.textContent = 'إرسال الطلب للإدارة';
             }
         });
+
+        // دوظة شريط الطلبات السريعة (24 ساعة)
+        async function submitQuickRequest() {
+            let text = document.getElementById('qrText').value.trim();
+            let phone = document.getElementById('qrPhone').value.trim();
+            if(!text || !phone) { alert('يرجى كتابة الطلب ورقم الهاتف.'); return; }
+            try {
+                await window.addDoc(window.collection(window.db, "quick_requests"), {
+                    text, phone, timestamp: new Date().getTime()
+                });
+                document.getElementById('qrText').value = '';
+                document.getElementById('qrPhone').value = '';
+                alert('تم نشر طلبك في الشريط السري بنجاح!');
+                loadQuickRequests();
+            } catch(e) { alert('خطأ في إرسال الطلب.'); }
+        }
+
+        async function loadQuickRequests() {
+            const listDiv = document.getElementById('quickRequestsList');
+            try {
+                const snap = await window.getDocs(window.collection(window.db, "quick_requests"));
+                let now = new Date().getTime();
+                let requests = [];
+                snap.forEach(d => {
+                    let data = { id: d.id, ...d.data() };
+                    // حذف أو استبعاد ما مر عليه أكثر من 24 ساعة (86400000 ميللي ثانية)
+                    if (now - data.timestamp < 86400000) {
+                        requests.push(data);
+                    } else if (isAdminLoggedIn && !data.id.startsWith('demo')) {
+                        window.deleteDoc(window.doc(window.db, "quick_requests", data.id));
+                    }
+                });
+
+                if (requests.length === 0) {
+                    listDiv.innerHTML = '<p style="font-size:10px; color:var(--gray-text); text-align:center;">لا توجد طلبات نشطة حالياً.</p>';
+                    return;
+                }
+
+                listDiv.innerHTML = requests.map(r => `
+                    <div style="background:#fdfefe; padding:8px; border-radius:6px; margin-bottom:6px; border:1px solid #f8c471; font-size:11px;">
+                        <b>طلب:</b> ${r.text}<br>
+                        📞 <a href="tel:${r.phone}" style="color:var(--success-color); font-weight:bold;">${r.phone}</a>
+                        ${isAdminLoggedIn ? `<button onclick="deleteQuickReq('${r.id}')" style="float:left; background:var(--danger-color); color:white; border:none; padding:2px 6px; border-radius:4px; font-size:9px; cursor:pointer;">حذف</button>` : ''}
+                    </div>
+                `).join('');
+            } catch(e) { listDiv.innerHTML = '<p style="font-size:10px; color:red;">خطأ في التحميل.</p>'; }
+        }
+
+        async function deleteQuickReq(id) {
+            await window.deleteDoc(window.doc(window.db, "quick_requests", id));
+            loadQuickRequests();
+        }
+
+        // دوال رف الخير والمستعمل
+        async function submitCharityItem() {
+            let title = document.getElementById('csTitle').value.trim();
+            let details = document.getElementById('csDetails').value.trim();
+            let phone = document.getElementById('csPhone').value.trim();
+            if(!title || !phone) { alert('يرجى إدخال اسم الغرض ورقم الهاتف.'); return; }
+            try {
+                await window.addDoc(window.collection(window.db, "charity_shelf"), {
+                    title, details, phone, timestamp: new Date().getTime()
+                });
+                document.getElementById('csTitle').value = '';
+                document.getElementById('csDetails').value = '';
+                document.getElementById('csPhone').value = '';
+                alert('تم إضافة الغرض إلى رف الخير بنجاح! جزاك الله خيراً.');
+                loadCharityItems();
+            } catch(e) { alert('خطأ في الإضافة.'); }
+        }
+
+        async function loadCharityItems() {
+            const listDiv = document.getElementById('charityItemsList');
+            try {
+                const snap = await window.getDocs(window.collection(window.db, "charity_shelf"));
+                let now = new Date().getTime();
+                let items = [];
+                snap.forEach(d => {
+                    let data = { id: d.id, ...d.data() };
+                    // حذف تلقائي بعد 3 أيام (259200000 ميللي ثانية)
+                    if (now - data.timestamp < 259200000) {
+                        items.push(data);
+                    } else if (isAdminLoggedIn && !data.id.startsWith('demo')) {
+                        window.deleteDoc(window.doc(window.db, "charity_shelf", data.id));
+                    }
+                });
+
+                if (items.length === 0) {
+                    listDiv.innerHTML = '<p style="font-size:10px; color:var(--gray-text); text-align:center;">لا توجد أغراض معروضة حالياً.</p>';
+                    return;
+                }
+
+                listDiv.innerHTML = items.map(i => `
+                    <div style="background:#fdfefe; padding:8px; border-radius:6px; margin-bottom:6px; border:1px solid #f8c471; font-size:11px;">
+                        <b>🎁 ${i.title}</b><br>
+                        📝 ${i.details || 'بدون تفاصيل'}<br>
+                        📞 <a href="tel:${i.phone}" style="color:var(--success-color); font-weight:bold;">${i.phone}</a>
+                        ${isAdminLoggedIn ? `<button onclick="deleteCharity('${i.id}')" style="float:left; background:var(--danger-color); color:white; border:none; padding:2px 6px; border-radius:4px; font-size:9px; cursor:pointer;">تم التسليم/حذف</button>` : ''}
+                    </div>
+                `).join('');
+            } catch(e) { listDiv.innerHTML = '<p style="font-size:10px; color:red;">خطأ في التحميل.</p>'; }
+        }
+
+        async function deleteCharity(id) {
+            await window.deleteDoc(window.doc(window.db, "charity_shelf", id));
+            loadCharityItems();
+        }
 
         window.allListings = [];
         async function loadApprovedListings() {
@@ -663,16 +791,29 @@
                             logo: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=150',
                             images: ['https://images.unsplash.com/photo-1563245372-f21724e3856d?w=300', 'https://images.unsplash.com/photo-1550989460-0adf9ea622e2?w=300'],
                             status: 'approved',
-                            vip: true
+                            vip: true,
+                            views: 120,
+                            likes: 15
                         }
                     ];
                 }
 
-                window.allListings.sort((a, b) => (b.vip === true) - (a.vip === true));
-                renderListings(window.allListings.filter(item => item.status === 'approved'));
+                sortAndRenderListings();
             } catch (err) {
                 container.innerHTML = '<p style="text-align: center; color: red; font-size: 11px;">فشل تحميل المحلات.</p>';
             }
+        }
+
+        // خوارزمية الترتيب الذكي (VIP أولاً، ثم حسب التفاعل: إعجابات ومشاهدات، ثم البقية)
+        function sortAndRenderListings() {
+            let approved = window.allListings.filter(item => item.status === 'approved');
+            approved.sort((a, b) => {
+                if ((b.vip === true) !== (a.vip === true)) return (b.vip === true) - (a.vip === true);
+                let scoreA = (a.likes || 0) * 3 + (a.views || 0);
+                let scoreB = (b.likes || 0) * 3 + (b.views || 0);
+                return scoreB - scoreA;
+            });
+            renderListings(approved);
         }
 
         function renderListings(items) {
@@ -690,6 +831,11 @@
                     </div>
                     <p class="card-desc">📍 ${item.address || 'غير محدد'}</p>
                     
+                    <div class="card-stats">
+                        <span>👁️ ${item.views || 0} مشاهدة</span>
+                        <button class="like-btn" onclick="event.stopPropagation(); addLike('${item.id}')">❤️ ${item.likes || 0} إعجاب</button>
+                    </div>
+
                     ${item.price ? `<span class="price-tag">💰 السعر والملاحظات: ${item.price}</span>` : ''}
 
                     ${item.images && item.images.length > 0 ? `
@@ -710,9 +856,26 @@
             `).join('');
         }
 
-        function openStoreProfile(id) {
+        // إضافة إعجاب وزيادة المشاهدات
+        async function addLike(id) {
+            let store = window.allListings.find(s => s.id === id);
+            if (!store) return;
+            store.likes = (store.likes || 0) + 1;
+            if (!store.id.startsWith('demo')) {
+                await window.updateDoc(window.doc(window.db, "listings", id), { likes: window.increment(1) });
+            }
+            sortAndRenderListings();
+        }
+
+        async function openStoreProfile(id) {
             const store = window.allListings.find(s => s.id === id);
             if (!store) return;
+
+            // زيادة المشاهدات تلقائياً عند فتح البروفايل
+            store.views = (store.views || 0) + 1;
+            if (!store.id.startsWith('demo')) {
+                window.updateDoc(window.doc(window.db, "listings", id), { views: window.increment(1) });
+            }
 
             document.getElementById('mainCatalogView').style.display = 'none';
             const profileView = document.getElementById('storeProfileView');
@@ -724,8 +887,11 @@
                     <img src="${store.logo || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=150'}" class="profile-logo" alt="شعار" onclick="openImageModal('${store.logo || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=150'}')">
                     <div class="profile-title-area">
                         <h2>${store.name} ${store.vip ? '⭐' : ''}</h2>
-                        <p>القسم: <b>${store.category}</b></p>
+                        <p>القسم: <b>${store.category}</b> | 👁️ ${store.views} مشاهدة</p>
                     </div>
+                </div>
+                <div style="margin-bottom:10px;">
+                    <button class="like-btn" onclick="addLike('${store.id}'); openStoreProfile('${store.id}');">❤️ أعجبني (${store.likes || 0})</button>
                 </div>
                 ${store.price ? `<div style="background:#e8f8f5; color:var(--success-color); padding:8px 10px; border-radius:6px; font-size:12px; font-weight:bold; margin-bottom:10px; border:1px solid #a3e4d7;">💰 السعر والملاحظات: ${store.price}</div>` : ''}
                 <p style="font-size:12px; margin-bottom:12px;"><b>العنوان:</b> ${store.address || 'غير محدد'}</p>
@@ -753,8 +919,8 @@
                 adminActionsDiv.style.display = 'flex';
                 adminActionsDiv.innerHTML = `
                     <span style="font-size:11px; color:var(--primary-color); font-weight:bold; align-self:center;">لوحة تحكم المدير:</span>
-                    <button onclick="editListingData('${store.id}', '${store.name}', '${store.phone}', '${store.address || ''}')" style="background:var(--accent-color); color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px; font-weight:bold;">✏️ تعديل هذا المحل</button>
-                    <button onclick="deleteListing('${store.id}')" style="background:var(--danger-color); color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px; font-weight:bold;">🗑️ حذف هذه الصفحة نهائياً</button>
+                    <button onclick="editListingData('${store.id}', '${store.name}', '${store.phone}', '${store.address || ''}')" style="background:var(--accent-color); color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px; font-weight:bold;">✏️ تعديل</button>
+                    <button onclick="deleteListing('${store.id}')" style="background:var(--danger-color); color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:11px; font-weight:bold;">🗑️ حذف</button>
                 `;
             } else {
                 adminActionsDiv.style.display = 'none';
@@ -772,13 +938,8 @@
         function handleSearch() {
             let query = document.getElementById('searchInput').value.toLowerCase().trim();
             let suggestionsBox = document.getElementById('searchSuggestions');
-            
             applyFilters();
-
-            if (query === "") {
-                suggestionsBox.style.display = 'none';
-                return;
-            }
+            if (query === "") { suggestionsBox.style.display = 'none'; return; }
 
             let approved = window.allListings.filter(item => item.status === 'approved');
             let matches = approved.filter(item => {
@@ -786,10 +947,7 @@
                 return textCheck.includes(query);
             });
 
-            if (matches.length === 0) {
-                suggestionsBox.style.display = 'none';
-                return;
-            }
+            if (matches.length === 0) { suggestionsBox.style.display = 'none'; return; }
 
             suggestionsBox.style.display = 'block';
             suggestionsBox.innerHTML = matches.map(item => `
@@ -820,28 +978,22 @@
             adminContainer.innerHTML = '<p style="font-size:11px; color:var(--gray-text);">جاري التحميل...</p>';
             try {
                 let items = window.allListings;
-
-                if (items.length === 0) {
-                    adminContainer.innerHTML = '<p style="font-size:11px; color:var(--gray-text);">لا توجد إعلانات حالياً.</p>';
-                    return;
-                }
+                if (items.length === 0) { adminContainer.innerHTML = '<p style="font-size:11px; color:var(--gray-text);">لا توجد إعلانات حالياً.</p>'; return; }
 
                 adminContainer.innerHTML = items.map(item => `
                     <div style="background:#fdfefe; padding:8px; border-radius:6px; margin-bottom:8px; border:1px solid #f8c471; font-size:11px;">
                         <b>${item.name}</b> (${item.category}) - الحالة: <b>${item.status === 'pending' ? '⏳ بانتظار الموافقة' : '✅ معتمد'}</b> ${item.vip ? ' | <span style="color:#d35400;font-weight:bold;">⭐ مميز VIP</span>' : ''}<br>
                         📞 ${item.phone} | 📍 ${item.address || 'بلا عنوان'}<br>
                         <div style="margin-top:6px; display:flex; gap:4px; flex-wrap:wrap;">
-                            ${item.status === 'pending' ? `<button onclick="approveListing('${item.id}')" style="background:#27ae60; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">✅ قبول ونشر</button>` : `<button onclick="pendListing('${item.id}')" style="background:#e67e22; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">⏸️ إخفاء مؤقت</button>`}
-                            <button onclick="toggleVip('${item.id}', ${!item.vip})" style="background:${item.vip ? '#f39c12' : '#2980b9'}; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">${item.vip ? '⭐ إلغاء التميز' : '⭐ جعله VIP'}</button>
+                            ${item.status === 'pending' ? `<button onclick="approveListing('${item.id}')" style="background:#27ae60; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">✅ قبول ونشر</button>` : `<button onclick="pendListing('${item.id}')" style="background:#e67e22; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">⏸️ إخفاء</button>`}
+                            <button onclick="toggleVip('${item.id}', ${!item.vip})" style="background:${item.vip ? '#f39c12' : '#2980b9'}; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">${item.vip ? '⭐ إلغاء VIP' : '⭐ جعله VIP'}</button>
                             <button onclick="editListingData('${item.id}', '${item.name}', '${item.phone}', '${item.address || ''}')" style="background:var(--accent-color); color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">✏️ تعديل</button>
-                            <button onclick="notifyOwner('${item.phone}', '${item.fb}', '${item.insta}', '${item.name}')" style="background:#27ae60; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">📢 إشعار صاحب المحل</button>
+                            <button onclick="notifyOwner('${item.phone}', '${item.fb}', '${item.insta}', '${item.name}')" style="background:#27ae60; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">📢 إشعار</button>
                             <button onclick="deleteListing('${item.id}')" style="background:var(--danger-color); color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:10px;">🗑️ حذف</button>
                         </div>
                     </div>
                 `).join('');
-            } catch(e) {
-                adminContainer.innerHTML = '<p style="font-size:11px; color:red;">خطأ في جلب البيانات.</p>';
-            }
+            } catch(e) { adminContainer.innerHTML = '<p style="font-size:11px; color:red;">خطأ في جلب البيانات.</p>'; }
         }
 
         async function approveListing(id) {
@@ -850,7 +1002,7 @@
                 await window.updateDoc(window.doc(window.db, "listings", id), { status: 'approved' });
             }
             store.status = 'approved';
-            alert('تم اعتماد ونشر الإعلان في التطبيق بنجاح! 🎉');
+            alert('تم اعتماد ونشر الإعلان بنجاح!');
             loadAdminListings();
             loadApprovedListings();
         }
@@ -861,27 +1013,22 @@
                 await window.updateDoc(window.doc(window.db, "listings", id), { status: 'pending' });
             }
             store.status = 'pending';
-            alert('تم إخفاء الإعلان وجعله معلقاً.');
+            alert('تم إخفاء الإعلان.');
             loadAdminListings();
             loadApprovedListings();
         }
 
         function notifyOwner(phone, fb, insta, storeName) {
             let msg = `مرحباً بك يا ${storeName}، تم قبول ونشر إعلانك بنجاح في دليل "سهل الوصول" الشامل في القيارة والموصل. مبارك لكم! 🎉`;
-            
             if (phone && phone !== 'لا يوجد' && phone.length >= 10) {
                 let cleanPhone = phone.startsWith('0') ? '964' + phone.substring(1) : phone;
                 window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
             } else if (fb && fb.startsWith('http')) {
                 navigator.clipboard.writeText(msg);
-                alert('تم نسخ رسالة القبول إلى الحافظة تلقائياً! سيتم فتح رابط الفيسبوك، فقط قم بلصقها وإرسالها.');
+                alert('تم نسخ رسالة القبول! سيتم فتح رابط الفيسبوك.');
                 window.open(fb, '_blank');
-            } else if (insta && insta.startsWith('http')) {
-                navigator.clipboard.writeText(msg);
-                alert('تم نسخ رسالة القبول إلى الحافظة تلقائياً! سيتم فتح رابط انستغرام، فقط قم بلصقها وإرسالها.');
-                window.open(insta, '_blank');
             } else {
-                alert('هذا المحل لم يضف رقم هاتف أو رابط تواصل، لكن تم قبول إعلانه وعرضه بنجاح!');
+                alert('تم قبول الإعلان.');
             }
         }
 
@@ -892,7 +1039,7 @@
             } else {
                 store.vip = makeVip;
             }
-            alert(makeVip ? 'تم تعيين المحل كمتجر مميز VIP بنجاح!' : 'تم إزالة ميزة VIP عن المحل.');
+            alert(makeVip ? 'تم تعيين المحل كمتجر VIP!' : 'تم إزالة VIP.');
             loadAdminListings();
             loadApprovedListings();
         }
@@ -904,25 +1051,19 @@
             if(newName && newPhone) {
                 let store = window.allListings.find(s => s.id === id);
                 if(store && !store.id.startsWith('demo')) {
-                    await window.updateDoc(window.doc(window.db, "listings", id), {
-                        name: newName, phone: newPhone, address: newAddress
-                    });
+                    await window.updateDoc(window.doc(window.db, "listings", id), { name: newName, phone: newPhone, address: newAddress });
                 } else if(store) {
-                    store.name = newName;
-                    store.phone = newPhone;
-                    store.address = newAddress;
+                    store.name = newName; store.phone = newPhone; store.address = newAddress;
                 }
-                alert('تم تعديل بيانات المحل بنجاح!');
-                if(document.getElementById('storeProfileView').style.display === 'block') {
-                    openStoreProfile(id);
-                }
+                alert('تم التعديل بنجاح!');
+                if(document.getElementById('storeProfileView').style.display === 'block') { openStoreProfile(id); }
                 loadAdminListings();
                 loadApprovedListings();
             }
         }
 
         async function deleteListing(id) {
-            if(confirm("هل أنت متأكد من حذف هذه الصفحة أو المحل نهائياً؟")) {
+            if(confirm("هل أنت متأكد من الحذف نهائياً؟")) {
                 let store = window.allListings.find(s => s.id === id);
                 if(store && !store.id.startsWith('demo')) {
                     await window.deleteDoc(window.doc(window.db, "listings", id));
