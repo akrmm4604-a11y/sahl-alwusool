@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>سهل الوصول - الدليل المحلي الشامل في القيارة والموصل</title>
     
-    <!-- وسوم المعاينة الاحترافية للواتساب وفيسبوك -->
+    <!-- وسوم المعاينة الاحترافية وشعار التطبيق المرئي -->
     <meta property="og:title" content="سهل الوصول - الدليل المحلي الشامل في القيارة والموصل">
     <meta property="og:description" content="دليلك المحلي الأول للمحلات، الأسواق، وخدمات التوصيل. اضغط هنا لتصفح التطبيق الآن وتثبيته على شاشتك!">
     <meta property="og:image" content="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600">
     <meta property="og:url" content="https://akrmm4604-a11y.github.io/sahl-alwusool/">
     <meta property="og:type" content="website">
 
+    <!-- أيقونات الشاشة الرئيسية لتفادي ظهور صورة بيضاء -->
     <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1542838132-92c53300491e?w=192">
     <link rel="icon" type="image/png" href="https://images.unsplash.com/photo-1542838132-92c53300491e?w=192">
 
@@ -120,16 +121,18 @@
         }
         .install-app-banner:hover { background: #fef9e7; }
 
+        /* شريط الطلبات ورف الخير باللون الأزرق البارز */
         .interactive-strips { display: flex; gap: 8px; margin-bottom: 12px; }
         .strip-card {
-            flex: 1; background: linear-gradient(135deg, #ffffff, #fef9e7);
-            border: 1.5px solid #f8c471; border-radius: 10px; padding: 10px;
+            flex: 1; background: linear-gradient(135deg, #2980b9, #3498db);
+            border: 1.5px solid #1b4f72; border-radius: 10px; padding: 12px 10px;
             text-align: center; cursor: pointer; transition: 0.2s;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            box-shadow: 0 3px 10px rgba(41, 128, 185, 0.3);
+            color: white;
         }
-        .strip-card:hover { transform: translateY(-2px); border-color: var(--primary-color); }
-        .strip-card h4 { margin: 0 0 4px 0; font-size: 12px; color: var(--primary-color); }
-        .strip-card p { margin: 0; font-size: 10px; color: var(--gray-text); }
+        .strip-card:hover { transform: translateY(-2px); opacity: 0.95; }
+        .strip-card h4 { margin: 0 0 4px 0; font-size: 13px; color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .strip-card p { margin: 0; font-size: 10px; color: #ebf5fb; }
 
         .admin-card {
             background: linear-gradient(135deg, #ffffff, #fef5e7); border: 1.5px solid #f8c471;
@@ -275,6 +278,7 @@
             <span>📥</span> <span>اضغط هنا لتثبيت تطبيق "سهل الوصول" على شاشة هاتفك بكل سهولة</span>
         </div>
 
+        <!-- شريط الطلبات ورف الخير باللون الأزرق البارز -->
         <div class="interactive-strips">
             <div class="strip-card" onclick="openQuickRequestsModal()">
                 <h4>⚡ شريط الطلبات (24 ساعة)</h4>
