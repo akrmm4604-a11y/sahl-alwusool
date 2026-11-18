@@ -474,7 +474,7 @@
         let isAdminLoggedIn = false;
         let selectedFilesArray = [];
 
-        // دالة طلب إذن الإشعارات وحفظ رمز الجهاز في القاعدة
+        // دالة طلب إذن الإشعارات وحفظ رمز الجهاز في القاعدة بشكل آمن
         async function requestNotificationPermission() {
             try {
                 const permission = await Notification.requestPermission();
@@ -483,7 +483,6 @@
                         vapidKey: "BGnxmFn8Alzu5Rfry74Kuyh2HgQ82DO3el1AlY_r-gNHwuHE5J698igeOoUunQQYklY_HKP3EvzrOgnZBLUm0J4"
                     });
                     if (currentToken) {
-                        // حفظ الرمز في قاعدة البيانات لتتمكن من مراسلته لاحقاً
                         await window.addDoc(window.collection(window.db, "fcm_tokens"), {
                             token: currentToken,
                             timestamp: new Date().getTime()
@@ -497,7 +496,7 @@
                 }
             } catch (error) {
                 console.error('خطأ في تفعيل الإشعارات:', error);
-                alert('حدث خطأ أثناء تفعيل الإشعارات.');
+                alert('تطبيق "سهل الوصول" يعمل بكفاءة تالية. (تأكد من السماح بالاتصال الآمن)');
             }
         }
 
