@@ -7,7 +7,17 @@ firebase.initializeApp({
   projectId: "sahlalwusool",
   storageBucket: "sahlalwusool.appspot.com",
   messagingSenderId: "442219840408",
-  appId: "1:442219840408:web:..."
+  appId: "1:442219840408:web:7157a918a2408bcf82"
 });
 
 const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage((payload) => {
+  console.log('[firebase-messaging-sw.js] Received background message ', payload);
+  const notificationTitle = payload.notification.title;
+  const notificationOptions = {
+    body: payload.notification.body,
+    icon: '/sahl-alwusool/favicon.ico'
+  };
+  self.registration.showNotification(notificationTitle, notificationOptions);
+});
