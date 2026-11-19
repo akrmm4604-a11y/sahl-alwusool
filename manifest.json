@@ -2,14 +2,24 @@
   "name": "سهل الوصول",
   "short_name": "سهل الوصول",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#fef9e7",
-  "theme_color": "#d35400",
+  "background_color": "#f6f6f6",
+  "theme_color": "#ff5a00",
+  "dir": "rtl",
+  "lang": "ar",
   "icons": [
     {
-      "src": "https://images.unsplash.com/photo-1542838132-92c53300491e?w=192",
+      "src": "https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
     }
   ]
 }
