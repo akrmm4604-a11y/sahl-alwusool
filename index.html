@@ -469,6 +469,33 @@
             background: #fafafa;
         }
 
+        .saved-profile-bar {
+            display: none;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-radius: 8px;
+            padding: 7px 10px;
+            margin-bottom: 8px;
+            font-size: 11px;
+            color: var(--brand-orange-dark);
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .clear-saved-btn {
+            background: #ffffff;
+            border: 1px solid #fdba74;
+            color: var(--danger-red);
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-size: 10.5px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+
         .custom-file-upload {
             display: block;
             width: 100%;
@@ -773,6 +800,11 @@
                     <h3 style="margin:0; color:var(--brand-orange-dark); font-size:13.5px; font-weight:800;">تقديم طلب إضافة إعلان أو بضاعة</h3>
                     <button type="button" onclick="closeListingsFormDrawer()" style="background:#f3f4f6; border:none; border-radius:6px; padding:3px 8px; font-size:11px; font-weight:700; cursor:pointer;">إغلاق ✕</button>
                 </div>
+
+                <div id="savedOwnerNotice" class="saved-profile-bar">
+                    <span>💾 تم استرجاع بيانات حسابك الأساسية تلقائياً.</span>
+                    <button type="button" class="clear-saved-btn" onclick="clearSavedOwnerProfile()">مسح بياناتي</button>
+                </div>
                 
                 <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">🏷️ اسم المحل أو صاحب المشروع (إجباري):</label>
                 <input type="text" id="reqName" placeholder="أدخل اسم المحل أو اسمك هنا...">
@@ -956,6 +988,93 @@
         window.groupedPages = [];
         const CHARITY_LOCAL_KEY = "sahl_alwusool_charity_items_v1";
         const LIKED_STORES_KEY = "sahl_alwusool_liked_stores_v1";
+        const SAVED_OWNER_KEY = "sahl_alwusool_saved_owner_v1";
+
+        function getSavedOwnerProfile() {
+            try {
+                const raw = localStorage.getItem(SAVED_OWNER_KEY);
+                if (!raw) return null;
+                const parsed = JSON.parse(raw);
+                if (!parsed || typeof parsed !== 'object') return null;
+                const hasAnyData = Boolean(
+                    (parsed.name && String(parsed.name).trim()) ||
+                    (parsed.phone && String(parsed.phone).trim()) ||
+                    (parsed.address && String(parsed.address).trim()) ||
+                    (parsed.fb && String(parsed.fb).trim()) ||
+                    (parsed.insta && String(parsed.insta).trim())
+                );
+                return hasAnyData ? parsed : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function saveOwnerProfile(profile) {
+            try {
+                const cleanData = {
+                    name: (profile.name || '').trim(),
+                    phone: profile.phone && profile.phone !== 'لا يوجد' ? String(profile.phone).trim() : '',
+                    category: profile.category || 'أشياء أخرى',
+                    address: profile.address && profile.address !== 'غير محدد' ? String(profile.address).trim() : '',
+                    fb: (profile.fb || '').trim(),
+                    insta: (profile.insta || '').trim()
+                };
+                const hasAnyData = Boolean(
+                    cleanData.name || cleanData.phone || cleanData.address || cleanData.fb || cleanData.insta
+                );
+                if (hasAnyData) {
+                    localStorage.setItem(SAVED_OWNER_KEY, JSON.stringify(cleanData));
+                } else {
+                    localStorage.removeItem(SAVED_OWNER_KEY);
+                }
+            } catch (e) {
+                console.warn("Saved owner profile warning:", e);
+            }
+        }
+
+        function applySavedOwnerProfileToForm() {
+            const saved = getSavedOwnerProfile();
+            const noticeEl = document.getElementById('savedOwnerNotice');
+            if (!saved) {
+                if (noticeEl) noticeEl.style.display = 'none';
+                return;
+            }
+
+            const nameEl = document.getElementById('reqName');
+            const phoneEl = document.getElementById('reqPhone');
+            const catEl = document.getElementById('reqCat');
+            const addressEl = document.getElementById('reqAddress');
+            const fbEl = document.getElementById('reqFb');
+            const instaEl = document.getElementById('reqInsta');
+
+            if (nameEl && !nameEl.value && saved.name) nameEl.value = saved.name;
+            if (phoneEl && !phoneEl.value && saved.phone) phoneEl.value = saved.phone;
+            if (catEl && saved.category) catEl.value = saved.category;
+            if (addressEl && !addressEl.value && saved.address) addressEl.value = saved.address;
+            if (fbEl && !fbEl.value && saved.fb) fbEl.value = saved.fb;
+            if (instaEl && !instaEl.value && saved.insta) instaEl.value = saved.insta;
+
+            if (noticeEl) {
+                noticeEl.style.display = 'flex';
+            }
+        }
+
+        function clearSavedOwnerProfile() {
+            try {
+                localStorage.removeItem(SAVED_OWNER_KEY);
+            } catch (e) {
+                console.warn("Clear owner profile warning:", e);
+            }
+            document.getElementById('reqName').value = '';
+            document.getElementById('reqPhone').value = '';
+            document.getElementById('reqCat').value = 'أشياء أخرى';
+            document.getElementById('reqAddress').value = '';
+            document.getElementById('reqPrice').value = '';
+            document.getElementById('reqFb').value = '';
+            document.getElementById('reqInsta').value = '';
+            const noticeEl = document.getElementById('savedOwnerNotice');
+            if (noticeEl) noticeEl.style.display = 'none';
+        }
 
         function getLikedStoreIds() {
             try {
@@ -1347,6 +1466,7 @@
             if (form.style.display === 'block') {
                 form.style.display = 'none';
             } else {
+                applySavedOwnerProfileToForm();
                 form.style.display = 'block';
                 form.scrollIntoView({ behavior: 'smooth' });
             }
@@ -1519,18 +1639,15 @@
                     });
                 }
 
-                document.getElementById('reqName').value = '';
-                document.getElementById('reqPhone').value = '';
-                document.getElementById('reqAddress').value = '';
+                saveOwnerProfile({ name, phone, category: cat, address, fb, insta });
                 document.getElementById('reqPrice').value = '';
-                document.getElementById('reqFb').value = '';
-                document.getElementById('reqInsta').value = '';
                 document.getElementById('reqLogoFile').value = '';
                 document.getElementById('reqImagesFiles').value = '';
                 document.getElementById('logoFileNameDisplay').textContent = 'لم يتم اختيار أي صورة';
                 document.getElementById('logoFileNameDisplay').style.color = 'var(--text-sub)';
                 selectedFilesArray = [];
                 document.getElementById('selectedImagesPreview').innerHTML = '';
+                applySavedOwnerProfileToForm();
                 await loadApprovedListings();
                 openAfterSubmitCloseModal(modalTitle, modalMsg);
             } catch (error) {
@@ -2218,6 +2335,7 @@
         }
 
         window.onload = function() {
+            applySavedOwnerProfileToForm();
             window.allListings = getDemoListings();
             sortAndRenderListings();
             loadApprovedListings();
