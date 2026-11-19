@@ -9,16 +9,18 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 
-    <title>سهل الوصول - الدليل المحلي الشامل في القيارة والموصل</title>
+    <title>ثبّت تطبيق سهل الوصول - الدليل المحلي الشامل في القيارة والموصل</title>
     
-    <meta property="og:title" content="سهل الوصول - الدليل المحلي الشامل في القيارة والموصل">
-    <meta property="og:description" content="دليلك المحلي الأول للمحلات، الأسواق، وخدمات التوصيل، وقسم شغل بيوت للأسر المنتجة. اضغط هنا لتصفح التطبيق الآن!">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1542838132-92c53300491e?w=600">
+    <meta property="og:title" content="ثبّت تطبيق سهل الوصول - دليل التسوق في العراق">
+    <meta property="og:description" content="ثبّت تطبيق سهل الوصول الآن على هاتفك: دليلك المحلي الأول للمحلات، الأسواق، وخدمات التوصيل، وقسم شغل بيوت للأسر المنتجة.">
+    <meta property="og:image" content="https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg">
+    <meta property="og:image:secure_url" content="https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg">
+    <meta property="og:image:type" content="image/jpeg">
     <meta property="og:url" content="https://akrmm4604-a11y.github.io/sahl-alwusool/">
     <meta property="og:type" content="website">
 
-    <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1542838132-92c53300491e?w=192">
-    <link rel="icon" type="image/png" href="https://images.unsplash.com/photo-1542838132-92c53300491e?w=192">
+    <link rel="apple-touch-icon" href="https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg">
+    <link rel="icon" type="image/jpeg" href="https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg">
 
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ff5a00">
@@ -1079,7 +1081,7 @@
 
             bodyEl.innerHTML = `
                 <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-                    <img src="${store.logo || (store.images && store.images[0]) || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=150'}" alt="${safeName}" style="width:46px; height:46px; border-radius:50%; object-fit:cover; border:1.5px solid var(--brand-purple);">
+                    <img src="${store.logo || (store.images && store.images[0]) || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'}" alt="${safeName}" style="width:46px; height:46px; border-radius:50%; object-fit:cover; border:1.5px solid var(--brand-purple);">
                     <div>
                         <div style="font-size:14px; font-weight:800; color:var(--text-main);">${safeName} ${store.vip ? '⭐' : ''}</div>
                         <div style="font-size:11px; color:var(--text-sub);">القسم: <b>${safeCat}</b></div>
@@ -1686,7 +1688,7 @@
             }
 
             container.innerHTML = items.map(item => {
-                const mainImg = (item.images && item.images[0]) || item.logo || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400';
+                const mainImg = (item.images && item.images[0]) || item.logo || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg';
                 const statusLabel = item.vip ? '⭐ مميز VIP' : '✓ معتمد';
                 const safeId = escapeJsSingleQuote(item.id);
                 const safeName = escapeJsSingleQuote(item.name);
@@ -1745,7 +1747,7 @@
 
             document.getElementById('storeProfileContent').innerHTML = `
                 <div class="profile-header">
-                    <img src="${store.logo || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=150'}" class="profile-logo" alt="شعار" onclick="openImageModal('${store.logo || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=150'}')">
+                    <img src="${store.logo || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'}" class="profile-logo" alt="شعار" onclick="openImageModal('${store.logo || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'}')">
                     <div>
                         <h2 style="margin:0 0 2px 0; font-size:16px; font-weight:800;">${store.name} ${store.vip ? '⭐' : ''}</h2>
                         <p style="margin:0; font-size:11.5px; color:var(--text-sub);">القسم: <b>${store.category}</b></p>
@@ -2065,4 +2067,4 @@
         };
     </script>
 </body>
-    </html>
+</html>
