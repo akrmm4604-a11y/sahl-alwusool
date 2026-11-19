@@ -807,7 +807,7 @@
                 </div>
                 
                 <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">🏷️ اسم المحل أو صاحب المشروع (إجباري):</label>
-                <input type="text" id="reqName" placeholder="أدخل اسم المحل أو اسمك هنا...">
+                <input type="text" id="reqName" placeholder="أدخل اسم المحل أو اسمك هنا..." oninput="autofillFromExistingStoreByName()">
 
                 <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">📞 رقم الهاتف للتواصل:</label>
                 <input type="text" id="reqPhone" placeholder="07701234567">
@@ -1059,6 +1059,43 @@
             }
         }
 
+        function autofillFromExistingStoreByName() {
+            const nameEl = document.getElementById('reqName');
+            if (!nameEl) return;
+
+            const normTyped = normalizeArabicText(nameEl.value);
+            if (!normTyped || normTyped.length < 3) return;
+
+            const match = (window.allListings || []).find(item => {
+                const normItem = normalizeArabicText(item.name || '');
+                return normItem && (normItem === normTyped || normItem.includes(normTyped) || normTyped.includes(normItem));
+            });
+
+            if (!match) return;
+
+            const phoneEl = document.getElementById('reqPhone');
+            const catEl = document.getElementById('reqCat');
+            const addressEl = document.getElementById('reqAddress');
+            const fbEl = document.getElementById('reqFb');
+            const instaEl = document.getElementById('reqInsta');
+
+            if (phoneEl && !phoneEl.value.trim() && match.phone && match.phone !== 'لا يوجد') {
+                phoneEl.value = match.phone;
+            }
+            if (catEl && catEl.value === 'أشياء أخرى' && match.category) {
+                catEl.value = match.category;
+            }
+            if (addressEl && !addressEl.value.trim() && match.address && match.address !== 'غير محدد') {
+                addressEl.value = match.address;
+            }
+            if (fbEl && !fbEl.value.trim() && match.fb) {
+                fbEl.value = match.fb;
+            }
+            if (instaEl && !instaEl.value.trim() && match.insta) {
+                instaEl.value = match.insta;
+            }
+        }
+
         function clearSavedOwnerProfile() {
             try {
                 localStorage.removeItem(SAVED_OWNER_KEY);
@@ -1148,12 +1185,7 @@
                 .split('#')[0]
                 .replace(/\/+$/, '');
             if (!stripped) return '';
-            return `${platform}__${stripped}`;
-        }
-
-        function getOwnerGroupKey(item) {
-            const normPhone = normalizePhoneKey(item.phone || '');
-            if (normPhone) return `phone__${normPhone}`;
+            return `${platform}__${stripped}`; }  function getOwnerGroupKey(item) { const normPhone = normalizePhoneKey(item.phone \vert{}\vert{} ''); if (normPhone) return `phone__${normPhone}`;
 
             const normFb = normalizeSocialUrlKey(item.fb || '', 'fb');
             if (normFb) return normFb;
@@ -1162,9 +1194,7 @@
             if (normInsta) return normInsta;
 
             const normName = normalizeArabicText(item.name || '');
-            if (normName) return `name__${normName}`;
-
-            return `id__${String(item.id || '')}`;
+            if (normName) return `name__${normName}`;  return `id__${String(item.id || '')}`;
         }
 
         function findMatchingStoreRecord(items, candidate) {
@@ -1309,8 +1339,7 @@
                 : [{ price: store.price || 'تواصل مع صاحب الصفحة للاطلاع على العروض والأسعار الحالية', images: store.images || [] }];
 
             const offersListHtml = posts.map((post, idx) => {
-                const label = escapeHtmlText(post.price || `إعلان رقم ${idx + 1}`);
-                const loc = post.address ? ` — ${escapeHtmlText(post.address)}` : '';
+                const label = escapeHtmlText(post.price || `إعلان رقم ${idx + 1}`); const loc = post.address ? ` — ${escapeHtmlText(post.address)}` : '';
                 return `<div style="padding:4px 0; border-bottom:1px dashed #fed7aa;">• <b>إعلان ${idx + 1}:</b> ${label}${loc}</div>`;
             }).join('');
 
@@ -1322,9 +1351,9 @@
 
             bodyEl.innerHTML = `
                 <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-                    <img src="${store.logo || (store.images && store.images[0]) || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'}" alt="${safeName}" style="width:46px; height:46px; border-radius:50%; object-fit:cover; border:1.5px solid var(--brand-purple);">
+                    <img src="${store.logo \vert{}\vert{} (store.images && store.images[0]) \vert{}\vert{} 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'}" alt="${safeName}" style="width:46px; height:46px; border-radius:50%; object-fit:cover; border:1.5px solid var(--brand-purple);">
                     <div>
-                        <div style="font-size:15px; font-weight:900; color:var(--danger-red);">${safeName} ${store.vip ? '⭐' : ''}</div>
+                        <div style="font-size:15px; font-weight:900; color:var(--danger-red);">${safeName}${store.vip ? '⭐' : ''}</div>
                         <div style="font-size:11px; color:var(--text-sub);">القسم: <b>${safeCat}</b> • عدد الإعلانات: <b>${posts.length}</b></div>
                     </div>
                 </div>
@@ -1367,10 +1396,10 @@
         function matchesSearchQuery(item, normalizedQuery) {
             if (!normalizedQuery) return true;
             const postsText = Array.isArray(item.posts)
-                ? item.posts.map(p => `${p.title || ''} ${p.price || ''} ${p.address || ''}`).join(' ')
+                ? item.posts.map(p => `${p.title || ''} ${p.price \vert{}\vert{} ''}${p.address || ''}`).join(' ')
                 : '';
             const combined = normalizeArabicText(
-                `${item.name || ''} ${item.price || ''} ${postsText} ${item.address || ''} ${item.category || ''} ${item.phone || ''}`
+                `${item.name \vert{}\vert{} ''}${item.price || ''} ${postsText}${item.address || ''} ${item.category \vert{}\vert{} ''}${item.phone || ''}`
             );
             if (combined.includes(normalizedQuery)) return true;
             const words = normalizedQuery.split(' ').filter(Boolean);
@@ -1467,6 +1496,7 @@
                 form.style.display = 'none';
             } else {
                 applySavedOwnerProfileToForm();
+                autofillFromExistingStoreByName();
                 form.style.display = 'block';
                 form.scrollIntoView({ behavior: 'smooth' });
             }
@@ -1710,8 +1740,7 @@
                 listDiv.innerHTML = requests.map(r => `
                     <div style="background:#fafafa; padding:8px; border-radius:8px; margin-bottom:6px; border:1px solid #e5e7eb; font-size:11px;">
                         <b>طلب:</b> ${r.text}<br>
-                        📞 <a href="tel:${r.phone}" style="color:var(--success-green); font-weight:700;">${r.phone}</a>
-                        ${isAdminLoggedIn ? `<button type="button" onclick="deleteQuickReq('${r.id}')" style="float:left; background:var(--danger-red); color:#fff; border:none; padding:2px 6px; border-radius:4px; font-size:9.5px; cursor:pointer;">حذف</button>` : ''}
+                        📞 <a href="tel:${r.phone}" style="color:var(--success-green); font-weight:700;">${r.phone}</a>${isAdminLoggedIn ? `<button type="button" onclick="deleteQuickReq('${r.id}')" style="float:left; background:var(--danger-red); color:#fff; border:none; padding:2px 6px; border-radius:4px; font-size:9.5px; cursor:pointer;">حذف</button>` : ''}
                     </div>
                 `).join('');
             } catch (e) {
@@ -1856,8 +1885,7 @@
                 <div style="background:#fafafa; padding:8px; border-radius:8px; margin-bottom:6px; border:1px solid #e5e7eb; font-size:11px;">
                     <b>🎁 ${i.title}</b><br>
                     📝 ${i.details || 'بدون تفاصيل'}<br>
-                    📞 <a href="tel:${i.phone}" style="color:var(--success-green); font-weight:700;">${i.phone}</a>
-                    ${isAdminLoggedIn ? `<button type="button" onclick="deleteCharity('${i.id}')" style="float:left; background:var(--danger-red); color:#fff; border:none; padding:2px 6px; border-radius:4px; font-size:9.5px; cursor:pointer;">حذف</button>` : ''}
+                    📞 <a href="tel:${i.phone}" style="color:var(--success-green); font-weight:700;">${i.phone}</a>${isAdminLoggedIn ? `<button type="button" onclick="deleteCharity('${i.id}')" style="float:left; background:var(--danger-red); color:#fff; border:none; padding:2px 6px; border-radius:4px; font-size:9.5px; cursor:pointer;">حذف</button>` : ''}
                 </div>
             `).join('');
         }
@@ -1935,8 +1963,7 @@
                             <span>${item.category || 'أشياء أخرى'}</span>
                         </div>
                         <div class="grid-card-body">
-                            <h3 class="grid-title">${item.name}${postsCount}</h3>
-                            ${item.price ? `<div class="grid-price">${item.price}</div>` : `<div class="grid-price" style="font-size:11.5px; color:var(--text-sub);">${item.category}</div>`}
+                            <h3 class="grid-title">${item.name}${postsCount}</h3>${item.price ? `<div class="grid-price">${item.price}</div>` : `<div class="grid-price" style="font-size:11.5px; color:var(--text-sub);">${item.category}</div>`}
                             <div class="grid-meta">📍 ${item.address || 'غير محدد'}</div>
                             <div class="grid-actions" onclick="event.stopPropagation()">
                                 <button type="button" class="mini-like-btn ${alreadyLiked ? 'liked' : ''}" onclick="addLike('${safeId}')">${alreadyLiked ? '🧡' : '❤️'} ${item.likes || 0}</button>
@@ -2020,9 +2047,9 @@
 
             document.getElementById('storeProfileContent').innerHTML = `
                 <div class="profile-header">
-                    <img src="${store.logo || (store.images && store.images[0]) || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'}" class="profile-logo" alt="شعار" onclick="openImageModal('${store.logo || (store.images && store.images[0]) || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'}')">
+                    <img src="${store.logo \vert{}\vert{} (store.images && store.images[0]) \vert{}\vert{} 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'}" class="profile-logo" alt="شعار" onclick="openImageModal('${store.logo || (store.images && store.images[0]) || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'}')">
                     <div>
-                        <h2 style="margin:0 0 2px 0; font-size:17px; font-weight:900; color:var(--danger-red);">${store.name} ${store.vip ? '⭐' : ''}</h2>
+                        <h2 style="margin:0 0 2px 0; font-size:17px; font-weight:900; color:var(--danger-red);">${store.name}${store.vip ? '⭐' : ''}</h2>
                         <p style="margin:0; font-size:11.5px; color:var(--text-sub);">القسم: <b>${store.category}</b> • إعلانات الصفحة: <b>${posts.length}</b></p>
                     </div>
                 </div>
@@ -2036,8 +2063,7 @@
                     ${store.insta ? `<a href="${store.insta}" target="_blank" class="social-badge insta-badge">📸 انستغرام</a>` : ''}
                 </div>
 
-                <h4 style="font-size:12.5px; font-weight:800; margin:12px 0 6px 0;">إعلانات ومنتجات الصفحة (${posts.length}):</h4>
-                ${postsHtml}
+                <h4 style="font-size:12.5px; font-weight:800; margin:12px 0 6px 0;">إعلانات ومنتجات الصفحة (${posts.length}):</h4>${postsHtml}
 
                 <div style="display:flex; gap:8px; margin-top:12px;">
                     <a href="tel:${store.phone}" class="mini-call-link" style="flex:1; text-align:center; padding:8px; font-size:12px;">📞 اتصال (${store.phone})</a>
@@ -2119,7 +2145,7 @@
                                 <span style="background:#fff7ed; color:var(--brand-orange-dark); border:1px solid #fed7aa; border-radius:6px; padding:1px 6px; font-size:9.5px; font-weight:700;">${badge}</span>
                             </div>
                             <div style="font-size:10px; color:var(--text-sub); margin-top:2px;">
-                                ${item.address || 'غير محدد'} ${(item.allOffersText || item.price) ? ' • ' + (item.allOffersText || item.price) : ''}
+                                ${item.address \vert{}\vert{} 'غير محدد'} ${(item.allOffersText || item.price) ? ' • ' + (item.allOffersText || item.price) : ''}
                             </div>
                         </div>
                     </div>
@@ -2156,190 +2182,9 @@
                     return `
                         <div style="background:#fafafa; padding:8px; border-radius:8px; margin-bottom:7px; border:1px solid #e5e7eb; font-size:11px;">
                             <b>${item.name}</b> (${item.category}) - الحالة: <b>${item.status === 'pending' ? 'بانتظار الموافقة' : 'معتمد'}</b> ${item.vip ? '| <b>VIP</b>' : ''}<br>
-                            📞 ${item.phone} | 📍 ${item.address || 'بلا عنوان'}<br>
+                            📞 ${item.phone} \vert{} 📍 ${item.address || 'بلا عنوان'}<br>
                             <div style="margin-top:6px; display:flex; gap:4px; flex-wrap:wrap;">
                                 ${item.status === 'pending' ? `<button type="button" onclick="approveListing('${safeId}')" style="background:var(--success-green); color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">قبول</button>` : `<button type="button" onclick="pendListing('${safeId}')" style="background:var(--brand-orange); color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">إخفاء</button>`}
                                 <button type="button" onclick="toggleVip('${safeId}', ${!item.vip})" style="background:#2563eb; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">${item.vip ? 'إلغاء VIP' : 'VIP'}</button>
                                 <button type="button" onclick="editListingData('${safeId}', '${safeName}', '${safePhone}', '${safeAddress}', '${safeCat}', '${safePrice}')" style="background:#4b5563; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">تعديل</button>
-                                <button type="button" onclick="notifyOwner('${safePhone}', '${escapeJsSingleQuote(item.fb || '')}', '${escapeJsSingleQuote(item.insta || '')}', '${safeName}')" style="background:var(--success-green); color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">إشعار</button>
-                                <button type="button" onclick="deleteListing('${safeId}')" style="background:var(--danger-red); color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">حذف</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            } catch (e) { adminContainer.innerHTML = '<p style="font-size:11px; color:var(--danger-red);">خطأ في جلب البيانات.</p>'; }
-        }
-
-        async function approveListing(id) {
-            let store = window.allListings.find(s => s.id === id);
-            if (!store) return;
-            if (!String(store.id).startsWith('demo')) {
-                await window.updateDoc(window.doc(window.db, "listings", id), { status: 'approved' });
-            }
-            store.status = 'approved';
-            alert('تم اعتماد ونشر الإعلان بنجاح!');
-            loadAdminListings();
-            loadApprovedListings();
-        }
-
-        async function pendListing(id) {
-            let store = window.allListings.find(s => s.id === id);
-            if (!store) return;
-            if (!String(store.id).startsWith('demo')) {
-                await window.updateDoc(window.doc(window.db, "listings", id), { status: 'pending' });
-            }
-            store.status = 'pending';
-            alert('تم إخفاء الإعلان.');
-            loadAdminListings();
-            loadApprovedListings();
-        }
-
-        function notifyOwner(phone, fb, insta, storeName) {
-            let msg = `مرحباً بك يا ${storeName}، تم قبول ونشر إعلانك بنجاح في دليل "سهل الوصول". مبارك لكم! 🎉`;
-            if (phone && phone !== 'لا يوجد' && phone.length >= 10) {
-                let cleanPhone = phone.startsWith('0') ? '964' + phone.substring(1) : phone;
-                window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-            } else if (fb && fb.startsWith('http')) {
-                navigator.clipboard.writeText(msg);
-                alert('تم نسخ رسالة القبول!');
-                window.open(fb, '_blank');
-            } else {
-                alert('تم قبول الإعلان.');
-            }
-        }
-
-        async function toggleVip(id, makeVip) {
-            let store = window.allListings.find(s => s.id === id);
-            if (!store) return;
-            if (!String(store.id).startsWith('demo')) {
-                await window.updateDoc(window.doc(window.db, "listings", id), { vip: makeVip });
-            }
-            store.vip = makeVip;
-            alert(makeVip ? 'تم تعيين المحل كمتجر VIP!' : 'تم إزالة VIP.');
-            loadAdminListings();
-            loadApprovedListings();
-        }
-
-        async function editListingData(id, oldName, oldPhone, oldAddress, oldCategory, oldPrice) {
-            const store = (window.allListings || []).find(s => s.id === id) || {};
-            const currentName = oldName !== undefined ? oldName : (store.name || '');
-            const currentPhone = oldPhone !== undefined ? oldPhone : (store.phone || '');
-            const currentAddress = oldAddress !== undefined ? oldAddress : (store.address || '');
-            const currentCategory = oldCategory !== undefined ? oldCategory : (store.category || 'أشياء أخرى');
-            const currentPrice = oldPrice !== undefined ? oldPrice : (store.price || '');
-
-            const newName = prompt("تعديل اسم المحل أو صاحب المشروع:", currentName);
-            if (newName === null) return;
-
-            const newPhone = prompt("تعديل رقم الهاتف:", currentPhone);
-            if (newPhone === null) return;
-
-            const newAddress = prompt("تعديل العنوان / الحي:", currentAddress);
-            if (newAddress === null) return;
-
-            const newCategory = prompt(
-                "تعديل القسم (اكتب أحد الأقسام: شغل بيوت، غذائية وحلويات، ملابس وكوزمتك، مطاعم، خضار وفواكه، أشياء أخرى):",
-                currentCategory
-            );
-            if (newCategory === null) return;
-
-            const newPrice = prompt("تعديل السعر والملاحظات:", currentPrice);
-            if (newPrice === null) return;
-
-            const cleanName = newName.trim();
-            const cleanPhone = newPhone.trim();
-            const cleanAddress = newAddress.trim();
-            const cleanCategory = newCategory.trim() || currentCategory;
-            const cleanPrice = newPrice.trim();
-
-            if (!cleanName || !cleanPhone) {
-                alert('يرجى إدخال اسم ورقم هاتف صحيحين.');
-                return;
-            }
-
-            try {
-                if (store && !String(store.id).startsWith('demo') && window.db && window.updateDoc) {
-                    await window.updateDoc(window.doc(window.db, "listings", id), {
-                        name: cleanName,
-                        phone: cleanPhone,
-                        address: cleanAddress,
-                        category: cleanCategory,
-                        price: cleanPrice
-                    });
-                }
-                if (store) {
-                    store.name = cleanName;
-                    store.phone = cleanPhone;
-                    store.address = cleanAddress;
-                    store.category = cleanCategory;
-                    store.price = cleanPrice;
-                }
-                alert('تم تحديث بيانات الإعلان بنجاح!');
-                if (document.getElementById('storeProfileView').style.display === 'block') {
-                    openStoreProfile(id);
-                }
-                loadAdminListings();
-                loadApprovedListings();
-            } catch (e) {
-                console.error("Edit listing error:", e);
-                alert('حدث خطأ أثناء التعديل: ' + (e.code || e.message || 'تحقق من الاتصال.'));
-            }
-        }
-
-        async function deleteListing(id) {
-            if (confirm("هل أنت متأكد من الحذف نهائياً؟")) {
-                const page = findPageByAnyId(id);
-                const idsToDelete = page && Array.isArray(page.memberIds) && page.memberIds.length > 0
-                    ? page.memberIds
-                    : [id];
-
-                for (const docId of idsToDelete) {
-                    if (!String(docId).startsWith('demo') && window.db && window.deleteDoc) {
-                        await window.deleteDoc(window.doc(window.db, "listings", docId));
-                    }
-                }
-                const idSet = new Set(idsToDelete.map(String));
-                window.allListings = (window.allListings || []).filter(s => !idSet.has(String(s.id)));
-                alert('تم الحذف بنجاح.');
-                goBackToCatalog();
-                loadAdminListings();
-                loadApprovedListings();
-            }
-        }
-
-        function deleteListingFromMain(id) {
-            event.stopPropagation();
-            deleteListing(id);
-        }
-
-        function filterCat(cat, btn) {
-            document.querySelectorAll('.categories-strip .cat-chip').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-            currentCat = cat;
-            applyFilters();
-        }
-
-        function applyFilters() {
-            const inputEl = document.getElementById('searchInput');
-            const query = inputEl ? normalizeArabicText(inputEl.value) : '';
-            const pages = window.groupedPages && window.groupedPages.length > 0
-                ? window.groupedPages
-                : buildGroupedPages(window.allListings);
-
-            const filtered = pages.filter(item => {
-                const matchesCat = (currentCat === 'all' || item.category === currentCat);
-                return matchesCat && matchesSearchQuery(item, query);
-            });
-
-            renderListings(filtered);
-        }
-
-        window.onload = function() {
-            applySavedOwnerProfileToForm();
-            window.allListings = getDemoListings();
-            sortAndRenderListings();
-            loadApprovedListings();
-        };
-    </script>
-</body>
-</html>
+                                <button type="button" onclick="notifyOwner('${safePhone}', '${escapeJsSingle
