@@ -244,6 +244,40 @@
             font-weight: 800;
         }
 
+        .install-highlight-strip {
+            margin: 8px 12px 0;
+            background: #ffffff;
+            border: 1px solid #fed7aa;
+            border-radius: 10px;
+            padding: 7px 11px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .install-highlight-text {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .install-highlight-btn {
+            background: var(--brand-orange);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 5px 11px;
+            font-size: 11.5px;
+            font-weight: 800;
+            cursor: pointer;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+
         .categories-strip {
             display: flex;
             gap: 7px;
@@ -727,7 +761,7 @@
             <div class="search-section">
                 <div class="search-box-frame">
                     <button class="search-go-btn" type="button" onclick="applyFilters()">بحث</button>
-                    <input type="text" id="searchInput" class="search-input-field" placeholder="ابحث عن منطقة، حي، محل، معجنات، أو منتج..." oninput="handleSearch()" autocomplete="off">
+                    <input type="text" id="searchInput" class="search-input-field" placeholder="ابحث عن منطقة، حي، محل، معجنات، أو منتج..." oninput="handleSearch()" onkeyup="handleSearch()" autocomplete="off">
                     <div class="search-quick-icons">
                         <span style="cursor:pointer;" onclick="openQuickRequestsModal()" title="طلب سريع">⚡</span>
                         <span style="cursor:pointer;" onclick="openCustomInstallGuide()" title="تثبيت التطبيق">📥</span>
@@ -741,6 +775,14 @@
                 <button class="pill-btn" onclick="setQuickPill('vip', this)">⭐ مميز VIP</button>
                 <button class="pill-btn" onclick="setQuickPill('delivery', this)">🚚 توصيل متوفر</button>
                 <button class="pill-btn" onclick="requestNotificationPermission()">🔔 الإشعارات</button>
+            </div>
+
+            <div class="install-highlight-strip">
+                <div class="install-highlight-text">
+                    <span>📲</span>
+                    <span>ثبّت التطبيق على هاتفك للوصول السريع</span>
+                </div>
+                <button type="button" class="install-highlight-btn" onclick="openCustomInstallGuide()">ثبّت التطبيق</button>
             </div>
 
             <div class="categories-strip">
@@ -930,6 +972,10 @@
         window.allListings = [];
         const CHARITY_LOCAL_KEY = "sahl_alwusool_charity_items_v1";
 
+        function escapeJsArg(str) {
+            return String(str || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        }
+
         function getDemoListings() {
             return [
                 {
@@ -951,13 +997,27 @@
         }
 
         function normalizeArabicText(text) {
-            return String(text || '')
+            if (!text) return '';
+            return String(text)
                 .toLowerCase()
                 .replace(/[\u064B-\u065F]/g, '')
                 .replace(/[أإآ]/g, 'ا')
                 .replace(/ة/g, 'ه')
                 .replace(/ى/g, 'ي')
+                .replace(/[^\u0600-\u06FFa-z0-9\s]/g, ' ')
+                .replace(/\s+/g, ' ')
                 .trim();
+        }
+
+        function matchesSearchQuery(item, normalizedQuery) {
+            if (!normalizedQuery) return true;
+            const combined = normalizeArabicText(
+                `${item.name || ''} ${item.price || ''} ${item.address || ''} ${item.category || ''} ${item.phone || ''}`
+            );
+            if (combined.includes(normalizedQuery)) return true;
+
+            const words = normalizedQuery.split(' ').filter(Boolean);
+            return words.length > 0 && words.every(w => combined.includes(w));
         }
 
         async function waitForFirebase() {
@@ -1175,629 +1235,4 @@
                 return;
             }
 
-            const submitBtn = document.getElementById('submitListingBtn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'جاري معالجة الصور والحفظ...';
-
-            try {
-                await waitForFirebase();
-                let logoUrl = "";
-                if (logoFile) { logoUrl = await resizeAndCompressImage(logoFile); }
-
-                let newImagesUrls = [];
-                if (selectedFilesArray.length > 0) {
-                    for (let i = 0; i < selectedFilesArray.length; i++) {
-                        let compressedImg = await resizeAndCompressImage(selectedFilesArray[i]);
-                        if (compressedImg) { newImagesUrls.push(compressedImg); }
-                    }
-                }
-
-                let existingStore = window.allListings.find(item =>
-                    normalizeArabicText(item.name) === normalizeArabicText(name) &&
-                    item.phone.trim() === phone.trim()
-                );
-
-                if (existingStore && !existingStore.id.startsWith('demo')) {
-                    let updatedImages = [...(existingStore.images || []), ...newImagesUrls];
-                    if (updatedImages.length > 12) { updatedImages = updatedImages.slice(-12); }
-
-                    let updateData = { images: updatedImages };
-                    if (logoUrl) updateData.logo = logoUrl;
-                    if (price) updateData.price = price;
-
-                    await window.updateDoc(window.doc(window.db, "listings", existingStore.id), updateData);
-                    alert('تم إضافة الصور والبضائع الجديدة بنجاح! 🎉');
-                } else {
-                    await window.addDoc(window.collection(window.db, "listings"), {
-                        name, category: cat, address, price, fb, insta, phone,
-                        logo: logoUrl, images: newImagesUrls, status: 'pending', vip: false,
-                        likes: 0, createdAt: new Date().toISOString()
-                    });
-                    alert('تم إرسال طلب إعلانك بنجاح! سيتم مراجعته ونشره قريباً.');
-                }
-
-                document.getElementById('addFormContainer').style.display = 'none';
-                document.getElementById('reqName').value = '';
-                document.getElementById('reqPhone').value = '';
-                document.getElementById('reqAddress').value = '';
-                document.getElementById('reqPrice').value = '';
-                document.getElementById('reqFb').value = '';
-                document.getElementById('reqInsta').value = '';
-                document.getElementById('reqLogoFile').value = '';
-                document.getElementById('reqImagesFiles').value = '';
-                document.getElementById('logoFileNameDisplay').textContent = 'لم يتم اختيار أي صورة';
-                document.getElementById('logoFileNameDisplay').style.color = 'var(--text-sub)';
-                selectedFilesArray = [];
-                document.getElementById('selectedImagesPreview').innerHTML = '';
-                loadApprovedListings();
-            } catch (error) {
-                console.error("خطأ إرسال الإعلان: ", error);
-                alert('حدث خطأ أثناء الحفظ: ' + (error.code || error.message || 'تحقق من الاتصال.'));
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'إرسال الطلب للإدارة';
-            }
-        });
-
-        async function submitQuickRequest() {
-            let text = document.getElementById('qrText').value.trim();
-            let phone = document.getElementById('qrPhone').value.trim();
-            if (!text || !phone) {
-                alert('يرجى كتابة الطلب ورقم الهاتف.');
-                return;
-            }
-            try {
-                await waitForFirebase();
-                await window.addDoc(window.collection(window.db, "quick_requests"), {
-                    text: text,
-                    phone: phone,
-                    timestamp: Date.now()
-                });
-                document.getElementById('qrText').value = '';
-                document.getElementById('qrPhone').value = '';
-                alert('تم نشر طلبك بنجاح!');
-                await loadQuickRequests();
-            } catch (e) {
-                console.error("Quick request error:", e);
-                alert('تعذر إرسال الطلب: ' + (e.code || e.message || 'تحقق من الاتصال والقاعدة.'));
-            }
-        }
-
-        async function loadQuickRequests() {
-            const listDiv = document.getElementById('quickRequestsList');
-            listDiv.innerHTML = '<p style="font-size:10.5px; color:var(--text-sub); text-align:center;">جاري تحميل الطلبات...</p>';
-            try {
-                await waitForFirebase();
-                const snap = await window.getDocs(window.collection(window.db, "quick_requests"));
-                let now = Date.now();
-                let requests = [];
-
-                snap.forEach(d => {
-                    let data = { id: d.id, ...d.data() };
-                    let ts = Number(data.timestamp || now);
-                    if ((now - ts) < 86400000) {
-                        requests.push({ ...data, timestamp: ts });
-                    }
-                });
-
-                requests.sort((a, b) => b.timestamp - a.timestamp);
-
-                if (requests.length === 0) {
-                    listDiv.innerHTML = '<p style="font-size:10.5px; color:var(--text-sub); text-align:center;">لا توجد طلبات نشطة حالياً.</p>';
-                    return;
-                }
-
-                listDiv.innerHTML = requests.map(r => `
-                    <div style="background:#fafafa; padding:8px; border-radius:8px; margin-bottom:6px; border:1px solid #e5e7eb; font-size:11px;">
-                        <b>طلب:</b> ${r.text}<br>
-                        📞 <a href="tel:${r.phone}" style="color:var(--success-green); font-weight:700;">${r.phone}</a>
-                        ${isAdminLoggedIn ? `<button type="button" onclick="deleteQuickReq('${r.id}')" style="float:left; background:var(--danger-red); color:#fff; border:none; padding:2px 6px; border-radius:4px; font-size:9.5px; cursor:pointer;">حذف</button>` : ''}
-                    </div>
-                `).join('');
-            } catch (e) {
-                console.error("Load quick requests error:", e);
-                listDiv.innerHTML = '<p style="font-size:10.5px; color:var(--danger-red); text-align:center;">تعذر تحميل الطلبات، أعد المحاولة.</p>';
-            }
-        }
-
-        async function deleteQuickReq(id) {
-            try {
-                await waitForFirebase();
-                await window.deleteDoc(window.doc(window.db, "quick_requests", id));
-                await loadQuickRequests();
-            } catch (e) {
-                alert('تعذر حذف الطلب.');
-            }
-        }
-
-        function getLocalCharityItems() {
-            try {
-                const raw = localStorage.getItem(CHARITY_LOCAL_KEY);
-                const parsed = raw ? JSON.parse(raw) : [];
-                return Array.isArray(parsed) ? parsed : [];
-            } catch (e) {
-                return [];
-            }
-        }
-
-        function saveLocalCharityItem(item) {
-            try {
-                const current = getLocalCharityItems();
-                current.unshift(item);
-                localStorage.setItem(CHARITY_LOCAL_KEY, JSON.stringify(current.slice(0, 50)));
-            } catch (e) {
-                console.warn("Local charity save warning:", e);
-            }
-        }
-
-        function removeLocalCharityItem(id) {
-            try {
-                const current = getLocalCharityItems().filter(item => String(item.id) !== String(id));
-                localStorage.setItem(CHARITY_LOCAL_KEY, JSON.stringify(current));
-            } catch (e) {
-                console.warn("Local charity remove warning:", e);
-            }
-        }
-
-        async function submitCharityItem() {
-            const titleInput = document.getElementById('csTitle');
-            const detailsInput = document.getElementById('csDetails');
-            const phoneInput = document.getElementById('csPhone');
-
-            const title = titleInput ? titleInput.value.trim() : '';
-            const details = detailsInput ? detailsInput.value.trim() : '';
-            const phone = phoneInput ? phoneInput.value.trim() : '';
-
-            if (!title || !phone) {
-                alert('يرجى إدخال اسم الغرض ورقم الهاتف.');
-                return;
-            }
-
-            const newItem = {
-                id: 'local_' + Date.now(),
-                title: title,
-                details: details,
-                phone: phone,
-                timestamp: Date.now()
-            };
-
-            try {
-                await waitForFirebase();
-                const docRef = await window.addDoc(window.collection(window.db, "charity_shelf"), {
-                    title: title,
-                    details: details,
-                    phone: phone,
-                    timestamp: newItem.timestamp
-                });
-                newItem.id = docRef && docRef.id ? docRef.id : newItem.id;
-                saveLocalCharityItem(newItem);
-
-                titleInput.value = '';
-                detailsInput.value = '';
-                phoneInput.value = '';
-                alert('تم إضافة الغرض إلى رف الخير بنجاح!');
-                await loadCharityItems();
-            } catch (e) {
-                console.error("Charity submit error:", e);
-                saveLocalCharityItem(newItem);
-                titleInput.value = '';
-                detailsInput.value = '';
-                phoneInput.value = '';
-                alert('تم حفظ الغرض في رف الخير محلياً على جهازك (' + (e.code || e.message || 'تحقق من صلاحيات Firestore') + ').');
-                await loadCharityItems();
-            }
-        }
-
-        async function loadCharityItems() {
-            const listDiv = document.getElementById('charityItemsList');
-            if (!listDiv) return;
-
-            listDiv.innerHTML = '<p style="font-size:10.5px; color:var(--text-sub); text-align:center;">جاري تحميل الأغراض...</p>';
-
-            const now = Date.now();
-            const maxAge = 259200000;
-            const mergedMap = new Map();
-
-            getLocalCharityItems().forEach(item => {
-                const ts = Number(item.timestamp || now);
-                if ((now - ts) < maxAge && item.title && item.phone) {
-                    mergedMap.set(String(item.id), { ...item, timestamp: ts });
-                }
-            });
-
-            try {
-                await waitForFirebase();
-                const snap = await window.getDocs(window.collection(window.db, "charity_shelf"));
-                snap.forEach(d => {
-                    const data = d.data() || {};
-                    const ts = Number(data.timestamp || now);
-                    if ((now - ts) < maxAge && data.title && data.phone) {
-                        mergedMap.set(String(d.id), {
-                            id: d.id,
-                            title: data.title,
-                            details: data.details || '',
-                            phone: data.phone,
-                            timestamp: ts
-                        });
-                    }
-                });
-            } catch (e) {
-                console.warn("Load charity items from Firestore warning:", e);
-            }
-
-            const items = Array.from(mergedMap.values()).sort((a, b) => b.timestamp - a.timestamp);
-
-            if (items.length === 0) {
-                listDiv.innerHTML = '<p style="font-size:10.5px; color:var(--text-sub); text-align:center;">لا توجد أغراض معروضة حالياً. أضف أول غرض من الأعلى.</p>';
-                return;
-            }
-
-            listDiv.innerHTML = items.map(i => `
-                <div style="background:#fafafa; padding:8px; border-radius:8px; margin-bottom:6px; border:1px solid #e5e7eb; font-size:11px;">
-                    <b>🎁 ${i.title}</b><br>
-                    📝 ${i.details || 'بدون تفاصيل'}<br>
-                    📞 <a href="tel:${i.phone}" style="color:var(--success-green); font-weight:700;">${i.phone}</a>
-                    ${isAdminLoggedIn ? `<button type="button" onclick="deleteCharity('${i.id}')" style="float:left; background:var(--danger-red); color:#fff; border:none; padding:2px 6px; border-radius:4px; font-size:9.5px; cursor:pointer;">حذف</button>` : ''}
-                </div>
-            `).join('');
-        }
-
-        async function deleteCharity(id) {
-            removeLocalCharityItem(id);
-            try {
-                if (!String(id).startsWith('local_')) {
-                    await waitForFirebase();
-                    await window.deleteDoc(window.doc(window.db, "charity_shelf", id));
-                }
-                await loadCharityItems();
-            } catch (e) {
-                await loadCharityItems();
-            }
-        }
-
-        async function loadApprovedListings() {
-            const container = document.getElementById('vendorsList');
-            try {
-                await waitForFirebase();
-                const querySnapshot = await window.getDocs(window.collection(window.db, "listings"));
-                const loaded = [];
-                querySnapshot.forEach((docSnap) => {
-                    loaded.push({ id: docSnap.id, ...docSnap.data() });
-                });
-                window.allListings = loaded.length > 0 ? loaded : getDemoListings();
-                sortAndRenderListings();
-            } catch (err) {
-                console.error("Load listings error:", err);
-                if (!window.allListings || window.allListings.length === 0) {
-                    window.allListings = getDemoListings();
-                }
-                sortAndRenderListings();
-            }
-        }
-
-        function sortAndRenderListings() {
-            let approved = window.allListings.filter(item => item.status === 'approved');
-            approved.sort((a, b) => {
-                if ((b.vip === true) !== (a.vip === true)) return (b.vip === true) - (a.vip === true);
-                return (b.likes || 0) - (a.likes || 0);
-            });
-            renderListings(approved);
-        }
-
-        function renderListings(items) {
-            const container = document.getElementById('vendorsList');
-            if (items.length === 0) {
-                container.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:var(--text-sub); font-size:12px; padding:18px;">لا توجد عناصر مطابقة حالياً.</p>';
-                return;
-            }
-
-            container.innerHTML = items.map(item => {
-                const mainImg = (item.images && item.images[0]) || item.logo || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400';
-                return `
-                    <article class="grid-item-card ${item.vip ? 'vip-card' : ''}" onclick="openStoreProfile('${item.id}')">
-                        <div class="grid-img-box">
-                            <img src="${mainImg}" alt="${item.name}" onclick="event.stopPropagation(); openImageModal('${mainImg}')">
-                        </div>
-                        <div class="grid-ribbon">
-                            <span>${item.vip ? '⭐ مميز VIP' : item.category}</span>
-                            <span>${item.category}</span>
-                        </div>
-                        <div class="grid-card-body">
-                            <h3 class="grid-title">${item.name}</h3>
-                            ${item.price ? `<div class="grid-price">${item.price}</div>` : `<div class="grid-price" style="font-size:11.5px; color:var(--text-sub);">${item.category}</div>`}
-                            <div class="grid-meta">📍 ${item.address || 'غير محدد'}</div>
-                            <div class="grid-actions" onclick="event.stopPropagation()">
-                                <button type="button" class="mini-like-btn" onclick="addLike('${item.id}')">❤️ ${item.likes || 0}</button>
-                                <a href="tel:${item.phone}" class="mini-call-link">📞 اتصال</a>
-                            </div>
-                            ${isAdminLoggedIn ? `
-                                <div style="display:flex; gap:4px; margin-top:6px;" onclick="event.stopPropagation()">
-                                    <button type="button" onclick="editListingData('${item.id}', '${item.name}', '${item.phone}', '${item.address || ''}')" style="flex:1; background:var(--brand-orange); color:#fff; border:none; border-radius:6px; padding:3px; font-size:10px; cursor:pointer;">تعديل</button>
-                                    <button type="button" onclick="deleteListingFromMain('${item.id}')" style="flex:1; background:var(--danger-red); color:#fff; border:none; border-radius:6px; padding:3px; font-size:10px; cursor:pointer;">حذف</button>
-                                </div>
-                            ` : ''}
-                        </div>
-                    </article>
-                `;
-            }).join('');
-        }
-
-        async function addLike(id) {
-            let store = window.allListings.find(s => s.id === id);
-            if (!store) return;
-            store.likes = (store.likes || 0) + 1;
-            if (!store.id.startsWith('demo') && window.db && window.updateDoc) {
-                await window.updateDoc(window.doc(window.db, "listings", id), { likes: window.increment(1) });
-            }
-            sortAndRenderListings();
-        }
-
-        async function openStoreProfile(id) {
-            const store = window.allListings.find(s => s.id === id);
-            if (!store) return;
-
-            document.getElementById('mainCatalogView').style.display = 'none';
-            const profileView = document.getElementById('storeProfileView');
-            profileView.style.display = 'block';
-            document.getElementById('searchSuggestions').style.display = 'none';
-
-            document.getElementById('storeProfileContent').innerHTML = `
-                <div class="profile-header">
-                    <img src="${store.logo || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=150'}" class="profile-logo" alt="شعار" onclick="openImageModal('${store.logo || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=150'}')">
-                    <div>
-                        <h2 style="margin:0 0 2px 0; font-size:16px; font-weight:800;">${store.name} ${store.vip ? '⭐' : ''}</h2>
-                        <p style="margin:0; font-size:11.5px; color:var(--text-sub);">القسم: <b>${store.category}</b></p>
-                    </div>
-                </div>
-                <div style="margin-bottom:8px;">
-                    <button type="button" class="mini-like-btn" onclick="addLike('${store.id}'); openStoreProfile('${store.id}');">❤️ إعجاب (${store.likes || 0})</button>
-                </div>
-                ${store.price ? `<div style="background:#f0fdf4; color:var(--success-green); padding:8px 10px; border-radius:8px; font-size:12px; font-weight:700; margin-bottom:8px;">💰 السعر والملاحظات: ${store.price}</div>` : ''}
-                <p style="font-size:12px; margin-bottom:10px;"><b>العنوان:</b> ${store.address || 'غير محدد'}</p>
-                
-                <div class="social-links">
-                    ${store.fb ? `<a href="${store.fb}" target="_blank" class="social-badge fb-badge">🔵 فيسبوك</a>` : ''}
-                    ${store.insta ? `<a href="${store.insta}" target="_blank" class="social-badge insta-badge">📸 انستغرام</a>` : ''}
-                </div>
-
-                <h4 style="font-size:12.5px; font-weight:800; margin:12px 0 6px 0;">معرض الصور والمنتجات:</h4>
-                ${store.images && store.images.length > 0 ? `
-                    <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px; margin-bottom:12px;">
-                        ${store.images.map(img => `<img src="${img}" style="width:100%; height:135px; border-radius:10px; object-fit:cover; border:1px solid #e5e7eb; cursor:pointer;" alt="صورة المنتج" onclick="openImageModal('${img}')">`).join('')}
-                    </div>
-                ` : '<p style="font-size:11px; color:var(--text-sub);">لا توجد صور إضافية.</p>'}
-
-                <div style="display:flex; gap:8px; margin-top:12px;">
-                    <a href="tel:${store.phone}" class="mini-call-link" style="flex:1; text-align:center; padding:8px; font-size:12px;">📞 اتصال (${store.phone})</a>
-                    <a href="https://maps.google.com/?q=${encodeURIComponent(store.address || '')}" target="_blank" class="mini-like-btn" style="flex:1; text-align:center; text-decoration:none; padding:8px; font-size:12px;">📍 الخريطة</a>
-                </div>
-            `;
-
-            const adminActionsDiv = document.getElementById('adminStoreActions');
-            if (isAdminLoggedIn) {
-                adminActionsDiv.style.display = 'flex';
-                adminActionsDiv.innerHTML = `
-                    <button type="button" onclick="editListingData('${store.id}', '${store.name}', '${store.phone}', '${store.address || ''}')" style="background:var(--brand-orange); color:#fff; border:none; padding:6px 10px; border-radius:7px; cursor:pointer; font-size:11px; font-weight:700;">تعديل</button>
-                    <button type="button" onclick="deleteListing('${store.id}')" style="background:var(--danger-red); color:#fff; border:none; padding:6px 10px; border-radius:7px; cursor:pointer; font-size:11px; font-weight:700;">حذف</button>
-                `;
-            } else {
-                adminActionsDiv.style.display = 'none';
-            }
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function goBackToCatalog() {
-            document.getElementById('storeProfileView').style.display = 'none';
-            document.getElementById('mainCatalogView').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function handleSearch() {
-            const rawQuery = document.getElementById('searchInput').value;
-            const query = normalizeArabicText(rawQuery);
-            const suggestionsBox = document.getElementById('searchSuggestions');
-
-            applyFilters();
-
-            if (query === "") {
-                suggestionsBox.style.display = 'none';
-                return;
-            }
-
-            const approved = window.allListings.filter(item => item.status === 'approved');
-            const matches = approved.filter(item => {
-                const searchable = normalizeArabicText(
-                    `${item.name} ${item.price || ''} ${item.address || ''} ${item.category || ''}`
-                );
-                return searchable.includes(query);
-            });
-
-            if (matches.length === 0) {
-                suggestionsBox.style.display = 'block';
-                suggestionsBox.innerHTML = `
-                    <div class="suggestion-item" onclick="openQuickRequestsModal()" style="color:var(--brand-orange-dark); font-weight:700;">
-                        ⚡ لم تجد "${rawQuery}"؟ اضغط هنا لنشره في شريط الطلبات السريعة
-                    </div>
-                `;
-                return;
-            }
-
-            suggestionsBox.style.display = 'block';
-            suggestionsBox.innerHTML = matches.slice(0, 8).map(item => {
-                const isAddressMatch = normalizeArabicText(item.address).includes(query);
-                const isProductMatch = normalizeArabicText(item.price).includes(query);
-                let badge = item.category === 'شغل بيوت' ? '🏠 شغل بيوت' : '🏪 متجر';
-                if (isAddressMatch) badge = '📍 منطقة';
-                else if (isProductMatch) badge = '💰 منتج/عرض';
-
-                return `
-                    <div class="suggestion-item" onclick="selectSuggestion('${item.id}')">
-                        <div style="flex:1;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
-                                <b>${item.name}</b>
-                                <span style="background:#fff7ed; color:var(--brand-orange-dark); border:1px solid #fed7aa; border-radius:6px; padding:1px 6px; font-size:9.5px; font-weight:700;">${badge}</span>
-                            </div>
-                            <div style="font-size:10px; color:var(--text-sub); margin-top:2px;">
-                                ${item.address || 'غير محدد'} ${item.price ? ' • ' + item.price : ''}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function selectSuggestion(id) {
-            document.getElementById('searchSuggestions').style.display = 'none';
-            document.getElementById('searchInput').value = '';
-            openStoreProfile(id);
-        }
-
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.search-section')) {
-                document.getElementById('searchSuggestions').style.display = 'none';
-            }
-        });
-
-        async function loadAdminListings() {
-            const adminContainer = document.getElementById('adminPendingList');
-            adminContainer.innerHTML = '<p style="font-size:11px; color:var(--text-sub);">جاري التحميل...</p>';
-            try {
-                let items = window.allListings;
-                if (items.length === 0) { adminContainer.innerHTML = '<p style="font-size:11px; color:var(--text-sub);">لا توجد إعلانات حالياً.</p>'; return; }
-
-                adminContainer.innerHTML = items.map(item => `
-                    <div style="background:#fafafa; padding:8px; border-radius:8px; margin-bottom:7px; border:1px solid #e5e7eb; font-size:11px;">
-                        <b>${item.name}</b> (${item.category}) - الحالة: <b>${item.status === 'pending' ? 'بانتظار الموافقة' : 'معتمد'}</b> ${item.vip ? '| <b>VIP</b>' : ''}<br>
-                        📞 ${item.phone} | 📍 ${item.address || 'بلا عنوان'}<br>
-                        <div style="margin-top:6px; display:flex; gap:4px; flex-wrap:wrap;">
-                            ${item.status === 'pending' ? `<button type="button" onclick="approveListing('${item.id}')" style="background:var(--success-green); color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">قبول</button>` : `<button type="button" onclick="pendListing('${item.id}')" style="background:var(--brand-orange); color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">إخفاء</button>`}
-                            <button type="button" onclick="toggleVip('${item.id}', ${!item.vip})" style="background:#2563eb; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">${item.vip ? 'إلغاء VIP' : 'VIP'}</button>
-                            <button type="button" onclick="editListingData('${item.id}', '${item.name}', '${item.phone}', '${item.address || ''}')" style="background:#4b5563; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">تعديل</button>
-                            <button type="button" onclick="notifyOwner('${item.phone}', '${item.fb}', '${item.insta}', '${item.name}')" style="background:var(--success-green); color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">إشعار</button>
-                            <button type="button" onclick="deleteListing('${item.id}')" style="background:var(--danger-red); color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">حذف</button>
-                        </div>
-                    </div>
-                `).join('');
-            } catch (e) { adminContainer.innerHTML = '<p style="font-size:11px; color:var(--danger-red);">خطأ في جلب البيانات.</p>'; }
-        }
-
-        async function approveListing(id) {
-            let store = window.allListings.find(s => s.id === id);
-            if (store && !store.id.startsWith('demo')) {
-                await window.updateDoc(window.doc(window.db, "listings", id), { status: 'approved' });
-            }
-            store.status = 'approved';
-            alert('تم اعتماد ونشر الإعلان بنجاح!');
-            loadAdminListings();
-            loadApprovedListings();
-        }
-
-        async function pendListing(id) {
-            let store = window.allListings.find(s => s.id === id);
-            if (store && !store.id.startsWith('demo')) {
-                await window.updateDoc(window.doc(window.db, "listings", id), { status: 'pending' });
-            }
-            store.status = 'pending';
-            alert('تم إخفاء الإعلان.');
-            loadAdminListings();
-            loadApprovedListings();
-        }
-
-        function notifyOwner(phone, fb, insta, storeName) {
-            let msg = `مرحباً بك يا ${storeName}، تم قبول ونشر إعلانك بنجاح في دليل "سهل الوصول". مبارك لكم! 🎉`;
-            if (phone && phone !== 'لا يوجد' && phone.length >= 10) {
-                let cleanPhone = phone.startsWith('0') ? '964' + phone.substring(1) : phone;
-                window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-            } else if (fb && fb.startsWith('http')) {
-                navigator.clipboard.writeText(msg);
-                alert('تم نسخ رسالة القبول!');
-                window.open(fb, '_blank');
-            } else {
-                alert('تم قبول الإعلان.');
-            }
-        }
-
-        async function toggleVip(id, makeVip) {
-            let store = window.allListings.find(s => s.id === id);
-            if (store && !store.id.startsWith('demo')) {
-                await window.updateDoc(window.doc(window.db, "listings", id), { vip: makeVip });
-            } else {
-                store.vip = makeVip;
-            }
-            alert(makeVip ? 'تم تعيين المحل كمتجر VIP!' : 'تم إزالة VIP.');
-            loadAdminListings();
-            loadApprovedListings();
-        }
-
-        async function editListingData(id, oldName, oldPhone, oldAddress) {
-            let newName = prompt("تعديل اسم المحل أو صاحب المشروع:", oldName);
-            let newPhone = prompt("تعديل رقم الهاتف:", oldPhone);
-            let newAddress = prompt("تعديل العنوان:", oldAddress);
-            if (newName && newPhone) {
-                let store = window.allListings.find(s => s.id === id);
-                if (store && !store.id.startsWith('demo')) {
-                    await window.updateDoc(window.doc(window.db, "listings", id), { name: newName, phone: newPhone, address: newAddress });
-                } else if (store) {
-                    store.name = newName; store.phone = newPhone; store.address = newAddress;
-                }
-                alert('تم التعديل بنجاح!');
-                if (document.getElementById('storeProfileView').style.display === 'block') { openStoreProfile(id); }
-                loadAdminListings();
-                loadApprovedListings();
-            }
-        }
-
-        async function deleteListing(id) {
-            if (confirm("هل أنت متأكد من الحذف نهائياً؟")) {
-                let store = window.allListings.find(s => s.id === id);
-                if (store && !store.id.startsWith('demo')) {
-                    await window.deleteDoc(window.doc(window.db, "listings", id));
-                } else {
-                    window.allListings = window.allListings.filter(s => s.id !== id);
-                }
-                alert('تم الحذف بنجاح.');
-                goBackToCatalog();
-                loadAdminListings();
-                loadApprovedListings();
-            }
-        }
-
-        function deleteListingFromMain(id) {
-            event.stopPropagation();
-            deleteListing(id);
-        }
-
-        function filterCat(cat, btn) {
-            document.querySelectorAll('.categories-strip .cat-chip').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-            currentCat = cat;
-            applyFilters();
-        }
-
-        function applyFilters() {
-            const query = normalizeArabicText(document.getElementById('searchInput').value);
-            const approved = window.allListings.filter(item => item.status === 'approved');
-            const filtered = approved.filter(item => {
-                const matchesCat = (currentCat === 'all' || item.category === currentCat);
-                const addressAndPrice = normalizeArabicText(`${item.address || ''} ${item.price || ''}`);
-                let matchesPill = true;
-                if (currentQuickPill === 'vip') matchesPill = item.vip === true;
-                if (currentQuickPill === 'delivery') matchesPill = addressAndPrice.includes('توصيل');
-
-                const textCheck = normalizeArabicText(
-                    `${item.name} ${item.price || ''} ${item.address || ''} ${item.category || ''}`
-                );
-                return matchesCat && matchesPill && textCheck.includes(query);
-            });
-            renderListings(filtered);
-        }
-
-        window.onload = function() {
-            window.allListings = getDemoListings();
-            sortAndRenderListings();
-            loadApprovedListings();
-        };
-    </script>
-</body>
-</html>
+            const submitBtn = document.getElementById('submitListing
