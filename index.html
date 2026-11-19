@@ -140,7 +140,8 @@
 
         .search-section {
             background: #ffffff;
-            padding: 10px 12px 8px;
+            padding: 10px 12px 10px;
+            border-bottom: 1px solid var(--border-soft);
         }
 
         .search-box-frame {
@@ -207,42 +208,6 @@
 
         .suggestion-item:hover {
             background: #fff7ed;
-        }
-
-        .quick-pills-row {
-            background: #ffffff;
-            display: flex;
-            gap: 8px;
-            padding: 4px 12px 10px;
-            overflow-x: auto;
-            scrollbar-width: none;
-            border-bottom: 1px solid var(--border-soft);
-        }
-
-        .quick-pills-row::-webkit-scrollbar {
-            display: none;
-        }
-
-        .pill-btn {
-            background: #ffffff;
-            border: 1px solid #d1d5db;
-            border-radius: 10px;
-            padding: 6px 12px;
-            font-size: 11.5px;
-            font-weight: 700;
-            color: var(--text-main);
-            cursor: pointer;
-            white-space: nowrap;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            font-family: inherit;
-        }
-
-        .pill-btn.active {
-            border-color: var(--text-main);
-            background: #fff7ed;
-            font-weight: 800;
         }
 
         /* شريط عبارة ثبّت التطبيق */
@@ -487,6 +452,13 @@
             font-weight: 700;
             cursor: pointer;
             font-family: inherit;
+        }
+
+        .mini-like-btn.liked {
+            background: #ffedd5;
+            border-color: var(--brand-orange);
+            color: var(--brand-orange);
+            font-weight: 800;
         }
 
         .mini-plus-btn {
@@ -796,13 +768,6 @@
                 <div id="searchSuggestions" class="search-suggestions"></div>
             </div>
 
-            <div class="quick-pills-row">
-                <button class="pill-btn active" onclick="setQuickPill('all', this)">🔥 الكل</button>
-                <button class="pill-btn" onclick="setQuickPill('vip', this)">⭐ مميز VIP</button>
-                <button class="pill-btn" onclick="setQuickPill('delivery', this)">🚚 توصيل متوفر</button>
-                <button class="pill-btn" onclick="requestNotificationPermission()">🔔 الإشعارات</button>
-            </div>
-
             <div class="install-highlight-strip">
                 <div class="install-highlight-text">
                     <span>📲</span>
@@ -1020,9 +985,36 @@
         let isAdminLoggedIn = false;
         let selectedFilesArray = [];
         let currentCat = 'all';
-        let currentQuickPill = 'all';
         window.allListings = [];
         const CHARITY_LOCAL_KEY = "sahl_alwusool_charity_items_v1";
+        const LIKED_STORES_KEY = "sahl_alwusool_liked_stores_v1";
+
+        function getLikedStoreIds() {
+            try {
+                const raw = localStorage.getItem(LIKED_STORES_KEY);
+                const parsed = raw ? JSON.parse(raw) : [];
+                return Array.isArray(parsed) ? parsed.map(String) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function hasLikedStore(id) {
+            return getLikedStoreIds().includes(String(id));
+        }
+
+        function markStoreAsLiked(id) {
+            try {
+                const current = getLikedStoreIds();
+                const strId = String(id);
+                if (!current.includes(strId)) {
+                    current.push(strId);
+                    localStorage.setItem(LIKED_STORES_KEY, JSON.stringify(current));
+                }
+            } catch (e) {
+                console.warn("Liked store save warning:", e);
+            }
+        }
 
         function escapeJsSingleQuote(val) {
             return String(val || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
@@ -1190,43 +1182,6 @@
                 openCharityShelfModal();
             } else if (navKey === 'admin') {
                 openAdmin();
-            }
-        }
-
-        function setQuickPill(pillKey, btn) {
-            document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-            currentQuickPill = pillKey;
-            applyFilters();
-        }
-
-        async function requestNotificationPermission() {
-            try {
-                if (!window.messaging || !window.getToken) {
-                    alert('الإشعارات غير متاحة على هذا المتصفح حالياً، وباقي مزايا التطبيق تعمل بشكل طبيعي.');
-                    return;
-                }
-                await waitForFirebase();
-                const permission = await Notification.requestPermission();
-                if (permission === 'granted') {
-                    const currentToken = await window.getToken(window.messaging, {
-                        vapidKey: "BGnxmFn8Alzu5Rfry74Kuyh2HgQ82DO3el1AlY_r-gNHwuHE5J698igeOoUunQQYklY_HKP3EvzrOgnZBLUm0J4"
-                    });
-                    if (currentToken) {
-                        await window.addDoc(window.collection(window.db, "fcm_tokens"), {
-                            token: currentToken,
-                            timestamp: Date.now()
-                        });
-                        alert('تم تفعيل الإشعارات بنجاح! 🎉');
-                    } else {
-                        alert('لم يتم العثور على رمز الجهاز.');
-                    }
-                } else {
-                    alert('تم رفض إذن الإشعارات من المتصفح.');
-                }
-            } catch (error) {
-                console.error('خطأ في تفعيل الإشعارات:', error);
-                alert('تعذر تفعيل الإشعارات على هذا المتصفح.');
             }
         }
 
@@ -1690,6 +1645,7 @@
             container.innerHTML = items.map(item => {
                 const mainImg = (item.images && item.images[0]) || item.logo || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg';
                 const statusLabel = item.vip ? '⭐ مميز VIP' : '✓ معتمد';
+                const alreadyLiked = hasLikedStore(item.id);
                 const safeId = escapeJsSingleQuote(item.id);
                 const safeName = escapeJsSingleQuote(item.name);
                 const safePhone = escapeJsSingleQuote(item.phone);
@@ -1710,7 +1666,7 @@
                             ${item.price ? `<div class="grid-price">${item.price}</div>` : `<div class="grid-price" style="font-size:11.5px; color:var(--text-sub);">${item.category}</div>`}
                             <div class="grid-meta">📍 ${item.address || 'غير محدد'}</div>
                             <div class="grid-actions" onclick="event.stopPropagation()">
-                                <button type="button" class="mini-like-btn" onclick="addLike('${safeId}')">❤️ ${item.likes || 0}</button>
+                                <button type="button" class="mini-like-btn ${alreadyLiked ? 'liked' : ''}" onclick="addLike('${safeId}')">${alreadyLiked ? '🧡' : '❤️'} ${item.likes || 0}</button>
                                 <button type="button" class="mini-plus-btn" title="معلومات وعروض" onclick="openPlusInfoOffersModal('${safeId}')">+</button>
                                 <a href="tel:${safePhone}" class="mini-call-link">📞 اتصال</a>
                             </div>
@@ -1727,18 +1683,37 @@
         }
 
         async function addLike(id) {
-            let store = window.allListings.find(s => s.id === id);
-            if (!store) return;
-            store.likes = (store.likes || 0) + 1;
-            if (!String(store.id).startsWith('demo') && window.db && window.updateDoc) {
-                await window.updateDoc(window.doc(window.db, "listings", id), { likes: window.increment(1) });
+            if (hasLikedStore(id)) {
+                alert('لقد أعجبت بهذا الإعلان مسبقاً، يُسمح بإعجاب واحد لكل حساب أو جهاز.');
+                return;
             }
-            sortAndRenderListings();
+
+            let store = window.allListings.find(s => String(s.id) === String(id));
+            if (!store) return;
+
+            markStoreAsLiked(id);
+            store.likes = (store.likes || 0) + 1;
+
+            if (!String(store.id).startsWith('demo') && window.db && window.updateDoc) {
+                try {
+                    await window.updateDoc(window.doc(window.db, "listings", id), { likes: window.increment(1) });
+                } catch (e) {
+                    console.warn("Like update warning:", e);
+                }
+            }
+
+            if (document.getElementById('storeProfileView').style.display === 'block') {
+                openStoreProfile(id);
+            } else {
+                applyFilters();
+            }
         }
 
         async function openStoreProfile(id) {
-            const store = window.allListings.find(s => s.id === id);
+            const store = window.allListings.find(s => String(s.id) === String(id));
             if (!store) return;
+
+            const alreadyLiked = hasLikedStore(store.id);
 
             document.getElementById('mainCatalogView').style.display = 'none';
             const profileView = document.getElementById('storeProfileView');
@@ -1754,7 +1729,7 @@
                     </div>
                 </div>
                 <div style="margin-bottom:8px;">
-                    <button type="button" class="mini-like-btn" onclick="addLike('${escapeJsSingleQuote(store.id)}'); openStoreProfile('${escapeJsSingleQuote(store.id)}');">❤️ إعجاب (${store.likes || 0})</button>
+                    <button type="button" class="mini-like-btn ${alreadyLiked ? 'liked' : ''}" onclick="addLike('${escapeJsSingleQuote(store.id)}');">${alreadyLiked ? '🧡 تم الإعجاب' : '❤️ إعجاب'} (${store.likes || 0})</button>
                 </div>
                 ${store.price ? `<div style="background:#f0fdf4; color:var(--success-green); padding:8px 10px; border-radius:8px; font-size:12px; font-weight:700; margin-bottom:8px;">💰 السعر والملاحظات: ${store.price}</div>` : ''}
                 <p style="font-size:12px; margin-bottom:10px;"><b>العنوان:</b> ${store.address || 'غير محدد'}</p>
@@ -1800,6 +1775,7 @@
         function goBackToCatalog() {
             document.getElementById('storeProfileView').style.display = 'none';
             document.getElementById('mainCatalogView').style.display = 'block';
+            applyFilters();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -2048,13 +2024,7 @@
 
             const filtered = approved.filter(item => {
                 const matchesCat = (currentCat === 'all' || item.category === currentCat);
-                const addressAndPrice = normalizeArabicText(`${item.address || ''} ${item.price || ''}`);
-
-                let matchesPill = true;
-                if (currentQuickPill === 'vip') matchesPill = item.vip === true;
-                if (currentQuickPill === 'delivery') matchesPill = addressAndPrice.includes('توصيل');
-
-                return matchesCat && matchesPill && matchesSearchQuery(item, query);
+                return matchesCat && matchesSearchQuery(item, query);
             });
 
             renderListings(filtered);
