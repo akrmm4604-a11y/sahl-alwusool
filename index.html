@@ -470,7 +470,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 5px;
+            gap: 4px;
             padding-top: 6px;
             border-top: 1px solid #f3f4f6;
         }
@@ -480,9 +480,22 @@
             border: 1px solid #fed7aa;
             color: var(--brand-orange-dark);
             border-radius: 7px;
-            padding: 3px 7px;
+            padding: 3px 6px;
             font-size: 10.5px;
             font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .mini-plus-btn {
+            background: #f3e8ff;
+            border: 1px solid #d8b4fe;
+            color: var(--brand-purple);
+            border-radius: 7px;
+            padding: 3px 8px;
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.1;
             cursor: pointer;
             font-family: inherit;
         }
@@ -493,7 +506,7 @@
             color: var(--success-green);
             border: 1px solid #bbf7d0;
             border-radius: 7px;
-            padding: 3px 8px;
+            padding: 3px 7px;
             font-size: 10.5px;
             font-weight: 700;
         }
@@ -746,6 +759,17 @@
             max-height: 88vh;
             overflow-y: auto;
         }
+
+        .info-offer-box {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 8px 0 10px;
+            font-size: 12px;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
@@ -801,7 +825,10 @@
             </div>
 
             <div id="addFormContainer" class="form-container">
-                <h3 style="margin:0 0 8px 0; color:var(--brand-orange-dark); font-size:13.5px; font-weight:800;">تقديم طلب إضافة إعلان أو بضاعة</h3>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <h3 style="margin:0; color:var(--brand-orange-dark); font-size:13.5px; font-weight:800;">تقديم طلب إضافة إعلان أو بضاعة</h3>
+                    <button type="button" onclick="closeListingsFormDrawer()" style="background:#f3f4f6; border:none; border-radius:6px; padding:3px 8px; font-size:11px; font-weight:700; cursor:pointer;">إغلاق ✕</button>
+                </div>
                 
                 <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">🏷️ اسم المحل أو صاحب المشروع (إجباري):</label>
                 <input type="text" id="reqName" placeholder="أدخل اسم المحل أو اسمك هنا...">
@@ -890,6 +917,29 @@
         </button>
     </nav>
 
+    <!-- نافذة إغلاق بعد تقديم الإعلان وإغلاق قائمة الإعلانات -->
+    <div class="custom-modal" id="afterSubmitCloseModal">
+        <div class="custom-modal-content" style="text-align:center;">
+            <h3 id="afterSubmitTitle" style="margin:0 0 8px 0; color:var(--brand-orange-dark); font-size:15px; font-weight:800;">تم تقديم إعلانك بنجاح ✅</h3>
+            <p id="afterSubmitMessage" style="font-size:12px; color:var(--text-sub); line-height:1.6; margin:0 0 14px 0;">
+                تم استلام طلبك بنجاح. اضغط على إغلاق لإغلاق قائمة الإعلانات والعودة إلى تصفح المحلات.
+            </p>
+            <button type="button" class="submit-btn" onclick="closeAfterSubmitAndListings()">إغلاق قائمة الإعلانات</button>
+        </div>
+    </div>
+
+    <!-- نافذة معلومات وعروض المحل عند الضغط على زر + -->
+    <div class="custom-modal" id="plusInfoOffersModal">
+        <div class="custom-modal-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <h3 style="margin:0; color:var(--brand-purple); font-size:14px; font-weight:800;">📌 معلومات وعروض الصفحة</h3>
+                <button type="button" onclick="closeModal('plusInfoOffersModal')" style="background:none; border:none; font-size:15px; cursor:pointer;">✕</button>
+            </div>
+            <div id="plusInfoOffersBody"></div>
+            <button type="button" class="submit-btn" style="margin-top:10px;" onclick="closeModal('plusInfoOffersModal')">إغلاق</button>
+        </div>
+    </div>
+
     <div class="image-modal" id="imageModal" onclick="closeImageModal()">
         <button class="image-modal-close" type="button" onclick="closeImageModal()">✕</button>
         <img id="modalFullImage" src="" alt="صورة مكبرة">
@@ -976,6 +1026,81 @@
             return String(val || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         }
 
+        function escapeHtmlText(val) {
+            return String(val || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function closeListingsFormDrawer() {
+            const form = document.getElementById('addFormContainer');
+            if (form) form.style.display = 'none';
+        }
+
+        function openAfterSubmitCloseModal(titleText, messageText) {
+            const titleEl = document.getElementById('afterSubmitTitle');
+            const msgEl = document.getElementById('afterSubmitMessage');
+            const modalEl = document.getElementById('afterSubmitCloseModal');
+            if (titleEl && titleText) titleEl.textContent = titleText;
+            if (msgEl && messageText) msgEl.textContent = messageText;
+            if (modalEl) modalEl.style.display = 'flex';
+        }
+
+        function closeAfterSubmitAndListings() {
+            closeModal('afterSubmitCloseModal');
+            closeListingsFormDrawer();
+            goBackToCatalog();
+        }
+
+        function openPlusInfoOffersModal(id) {
+            const store = (window.allListings || []).find(s => String(s.id) === String(id));
+            const bodyEl = document.getElementById('plusInfoOffersBody');
+            const modalEl = document.getElementById('plusInfoOffersModal');
+            if (!store || !bodyEl || !modalEl) return;
+
+            const safeName = escapeHtmlText(store.name || 'مشروع محلي');
+            const safeCat = escapeHtmlText(store.category || 'أشياء أخرى');
+            const safeAddress = escapeHtmlText(store.address || 'غير محدد');
+            const safePhone = escapeHtmlText(store.phone || 'غير متوفر');
+            const safePrice = escapeHtmlText(store.price || 'تواصل مع صاحب الصفحة للاطلاع على العروض والأسعار الحالية');
+
+            let offersListHtml = `<p style="margin:0;">${safePrice}</p>`;
+            if (Array.isArray(store.offers) && store.offers.length > 0) {
+                offersListHtml = `<ul style="margin:4px 0 0; padding-right:16px;">${store.offers.map(o => `<li>${escapeHtmlText(o)}</li>`).join('')}</ul>`;
+            }
+
+            const galleryHtml = Array.isArray(store.images) && store.images.length > 0
+                ? `<div style="display:grid; grid-template-columns:repeat(2,1fr); gap:6px; margin-top:8px;">
+                    ${store.images.slice(0, 4).map(img => `<img src="${img}" alt="${safeName}" onclick="openImageModal('${img}')" style="width:100%; height:90px; object-fit:cover; border-radius:8px; border:1px solid #e5e7eb; cursor:pointer;">`).join('')}
+                   </div>`
+                : '';
+
+            bodyEl.innerHTML = `
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                    <img src="${store.logo || (store.images && store.images[0]) || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=150'}" alt="${safeName}" style="width:46px; height:46px; border-radius:50%; object-fit:cover; border:1.5px solid var(--brand-purple);">
+                    <div>
+                        <div style="font-size:14px; font-weight:800; color:var(--text-main);">${safeName} ${store.vip ? '⭐' : ''}</div>
+                        <div style="font-size:11px; color:var(--text-sub);">القسم: <b>${safeCat}</b></div>
+                    </div>
+                </div>
+                <div style="font-size:11.5px; margin-bottom:6px;">📍 <b>العنوان:</b> ${safeAddress}</div>
+                <div style="font-size:11.5px; margin-bottom:8px;">📞 <b>الهاتف:</b> <a href="tel:${safePhone}" style="color:var(--success-green); font-weight:700; text-decoration:none;">${safePhone}</a></div>
+                <div class="info-offer-box">
+                    <div style="font-weight:800; color:var(--brand-orange-dark); margin-bottom:4px;">🎁 العروض والأسعار والملاحظات:</div>
+                    ${offersListHtml}
+                </div>
+                ${galleryHtml}
+                <div style="display:flex; gap:8px; margin-top:10px;">
+                    <a href="tel:${safePhone}" class="mini-call-link" style="flex:1; text-align:center; padding:7px; font-size:11.5px;">📞 اتصال مباشر</a>
+                    <button type="button" class="mini-like-btn" style="flex:1; padding:7px; font-size:11.5px;" onclick="closeModal('plusInfoOffersModal'); openStoreProfile('${escapeJsSingleQuote(store.id)}');">فتح الصفحة كاملة</button>
+                </div>
+            `;
+
+            modalEl.style.display = 'flex';
+        }
+
         function getDemoListings() {
             return [
                 {
@@ -983,7 +1108,7 @@
                     name: 'أم محمد للمعجنات والحلويات البيتية',
                     category: 'شغل بيوت',
                     address: 'القيارة - حي المعلمين (توصيل متوفر)',
-                    price: '12,000 د.ع',
+                    price: '12,000 د.ع - عرض طلب صينية معجنات مع تحلية مجانية',
                     fb: 'https://facebook.com',
                     insta: '',
                     phone: '07700000000',
@@ -1256,6 +1381,9 @@
                     item.phone.trim() === phone.trim()
                 );
 
+                let modalTitle = 'تم إرسال طلب إعلانك بنجاح! 🎉';
+                let modalMsg = 'سيتم مراجعة الإعلان من قبل الإدارة ونشره قريباً. اضغط إغلاق لإغلاق قائمة الإعلانات.';
+
                 if (existingStore && !String(existingStore.id).startsWith('demo')) {
                     let updatedImages = [...(existingStore.images || []), ...newImagesUrls];
                     if (updatedImages.length > 12) { updatedImages = updatedImages.slice(-12); }
@@ -1265,17 +1393,16 @@
                     if (price) updateData.price = price;
 
                     await window.updateDoc(window.doc(window.db, "listings", existingStore.id), updateData);
-                    alert('تم إضافة الصور والبضائع الجديدة بنجاح! 🎉');
+                    modalTitle = 'تم تحديث الإعلان والصور بنجاح! 🎉';
+                    modalMsg = 'تمت إضافة الصور والعروض الجديدة بنجاح. اضغط إغلاق لإغلاق قائمة الإعلانات.';
                 } else {
                     await window.addDoc(window.collection(window.db, "listings"), {
                         name, category: cat, address, price, fb, insta, phone,
                         logo: logoUrl, images: newImagesUrls, status: 'pending', vip: false,
                         likes: 0, createdAt: new Date().toISOString()
                     });
-                    alert('تم إرسال طلب إعلانك بنجاح! سيتم مراجعته ونشره قريباً.');
                 }
 
-                document.getElementById('addFormContainer').style.display = 'none';
                 document.getElementById('reqName').value = '';
                 document.getElementById('reqPhone').value = '';
                 document.getElementById('reqAddress').value = '';
@@ -1289,6 +1416,7 @@
                 selectedFilesArray = [];
                 document.getElementById('selectedImagesPreview').innerHTML = '';
                 loadApprovedListings();
+                openAfterSubmitCloseModal(modalTitle, modalMsg);
             } catch (error) {
                 console.error("خطأ إرسال الإعلان: ", error);
                 alert('حدث خطأ أثناء الحفظ: ' + (error.code || error.message || 'تحقق من الاتصال.'));
@@ -1560,13 +1688,14 @@
             container.innerHTML = items.map(item => {
                 const mainImg = (item.images && item.images[0]) || item.logo || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400';
                 const statusLabel = item.vip ? '⭐ مميز VIP' : '✓ معتمد';
+                const safeId = escapeJsSingleQuote(item.id);
                 const safeName = escapeJsSingleQuote(item.name);
                 const safePhone = escapeJsSingleQuote(item.phone);
                 const safeAddress = escapeJsSingleQuote(item.address || '');
                 const safeCat = escapeJsSingleQuote(item.category || '');
                 const safePrice = escapeJsSingleQuote(item.price || '');
                 return `
-                    <article class="grid-item-card ${item.vip ? 'vip-card' : ''}" onclick="openStoreProfile('${item.id}')">
+                    <article class="grid-item-card ${item.vip ? 'vip-card' : ''}" onclick="openStoreProfile('${safeId}')">
                         <div class="grid-img-box">
                             <img src="${mainImg}" alt="${item.name}" onclick="event.stopPropagation(); openImageModal('${mainImg}')">
                         </div>
@@ -1579,13 +1708,14 @@
                             ${item.price ? `<div class="grid-price">${item.price}</div>` : `<div class="grid-price" style="font-size:11.5px; color:var(--text-sub);">${item.category}</div>`}
                             <div class="grid-meta">📍 ${item.address || 'غير محدد'}</div>
                             <div class="grid-actions" onclick="event.stopPropagation()">
-                                <button type="button" class="mini-like-btn" onclick="addLike('${item.id}')">❤️ ${item.likes || 0}</button>
-                                <a href="tel:${item.phone}" class="mini-call-link">📞 اتصال</a>
+                                <button type="button" class="mini-like-btn" onclick="addLike('${safeId}')">❤️ ${item.likes || 0}</button>
+                                <button type="button" class="mini-plus-btn" title="معلومات وعروض" onclick="openPlusInfoOffersModal('${safeId}')">+</button>
+                                <a href="tel:${safePhone}" class="mini-call-link">📞 اتصال</a>
                             </div>
                             ${isAdminLoggedIn ? `
                                 <div style="display:flex; gap:4px; margin-top:6px;" onclick="event.stopPropagation()">
-                                    <button type="button" onclick="editListingData('${item.id}', '${safeName}', '${safePhone}', '${safeAddress}', '${safeCat}', '${safePrice}')" style="flex:1; background:var(--brand-orange); color:#fff; border:none; border-radius:6px; padding:3px; font-size:10px; cursor:pointer;">تعديل</button>
-                                    <button type="button" onclick="deleteListingFromMain('${item.id}')" style="flex:1; background:var(--danger-red); color:#fff; border:none; border-radius:6px; padding:3px; font-size:10px; cursor:pointer;">حذف</button>
+                                    <button type="button" onclick="editListingData('${safeId}', '${safeName}', '${safePhone}', '${safeAddress}', '${safeCat}', '${safePrice}')" style="flex:1; background:var(--brand-orange); color:#fff; border:none; border-radius:6px; padding:3px; font-size:10px; cursor:pointer;">تعديل</button>
+                                    <button type="button" onclick="deleteListingFromMain('${safeId}')" style="flex:1; background:var(--danger-red); color:#fff; border:none; border-radius:6px; padding:3px; font-size:10px; cursor:pointer;">حذف</button>
                                 </div>
                             ` : ''}
                         </div>
@@ -1622,7 +1752,7 @@
                     </div>
                 </div>
                 <div style="margin-bottom:8px;">
-                    <button type="button" class="mini-like-btn" onclick="addLike('${store.id}'); openStoreProfile('${store.id}');">❤️ إعجاب (${store.likes || 0})</button>
+                    <button type="button" class="mini-like-btn" onclick="addLike('${escapeJsSingleQuote(store.id)}'); openStoreProfile('${escapeJsSingleQuote(store.id)}');">❤️ إعجاب (${store.likes || 0})</button>
                 </div>
                 ${store.price ? `<div style="background:#f0fdf4; color:var(--success-green); padding:8px 10px; border-radius:8px; font-size:12px; font-weight:700; margin-bottom:8px;">💰 السعر والملاحظات: ${store.price}</div>` : ''}
                 <p style="font-size:12px; margin-bottom:10px;"><b>العنوان:</b> ${store.address || 'غير محدد'}</p>
@@ -1647,6 +1777,7 @@
 
             const adminActionsDiv = document.getElementById('adminStoreActions');
             if (isAdminLoggedIn) {
+                const safeId = escapeJsSingleQuote(store.id);
                 const safeName = escapeJsSingleQuote(store.name);
                 const safePhone = escapeJsSingleQuote(store.phone);
                 const safeAddress = escapeJsSingleQuote(store.address || '');
@@ -1654,8 +1785,8 @@
                 const safePrice = escapeJsSingleQuote(store.price || '');
                 adminActionsDiv.style.display = 'flex';
                 adminActionsDiv.innerHTML = `
-                    <button type="button" onclick="editListingData('${store.id}', '${safeName}', '${safePhone}', '${safeAddress}', '${safeCat}', '${safePrice}')" style="background:var(--brand-orange); color:#fff; border:none; padding:6px 10px; border-radius:7px; cursor:pointer; font-size:11px; font-weight:700;">تعديل</button>
-                    <button type="button" onclick="deleteListing('${store.id}')" style="background:var(--danger-red); color:#fff; border:none; padding:6px 10px; border-radius:7px; cursor:pointer; font-size:11px; font-weight:700;">حذف</button>
+                    <button type="button" onclick="editListingData('${safeId}', '${safeName}', '${safePhone}', '${safeAddress}', '${safeCat}', '${safePrice}')" style="background:var(--brand-orange); color:#fff; border:none; padding:6px 10px; border-radius:7px; cursor:pointer; font-size:11px; font-weight:700;">تعديل</button>
+                    <button type="button" onclick="deleteListing('${safeId}')" style="background:var(--danger-red); color:#fff; border:none; padding:6px 10px; border-radius:7px; cursor:pointer; font-size:11px; font-weight:700;">حذف</button>
                 `;
             } else {
                 adminActionsDiv.style.display = 'none';
@@ -1708,7 +1839,7 @@
                 else if (isProductMatch) badge = '💰 منتج';
 
                 return `
-                    <div class="suggestion-item" onmousedown="selectSuggestion('${item.id}')" ontouchstart="selectSuggestion('${item.id}')">
+                    <div class="suggestion-item" onmousedown="selectSuggestion('${escapeJsSingleQuote(item.id)}')" ontouchstart="selectSuggestion('${escapeJsSingleQuote(item.id)}')">
                         <div style="flex:1;">
                             <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
                                 <b>${item.name}</b>
@@ -1743,6 +1874,7 @@
                 if (items.length === 0) { adminContainer.innerHTML = '<p style="font-size:11px; color:var(--text-sub);">لا توجد إعلانات حالياً.</p>'; return; }
 
                 adminContainer.innerHTML = items.map(item => {
+                    const safeId = escapeJsSingleQuote(item.id);
                     const safeName = escapeJsSingleQuote(item.name);
                     const safePhone = escapeJsSingleQuote(item.phone);
                     const safeAddress = escapeJsSingleQuote(item.address || '');
@@ -1753,11 +1885,11 @@
                             <b>${item.name}</b> (${item.category}) - الحالة: <b>${item.status === 'pending' ? 'بانتظار الموافقة' : 'معتمد'}</b> ${item.vip ? '| <b>VIP</b>' : ''}<br>
                             📞 ${item.phone} | 📍 ${item.address || 'بلا عنوان'}<br>
                             <div style="margin-top:6px; display:flex; gap:4px; flex-wrap:wrap;">
-                                ${item.status === 'pending' ? `<button type="button" onclick="approveListing('${item.id}')" style="background:var(--success-green); color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">قبول</button>` : `<button type="button" onclick="pendListing('${item.id}')" style="background:var(--brand-orange); color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">إخفاء</button>`}
-                                <button type="button" onclick="toggleVip('${item.id}', ${!item.vip})" style="background:#2563eb; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">${item.vip ? 'إلغاء VIP' : 'VIP'}</button>
-                                <button type="button" onclick="editListingData('${item.id}', '${safeName}', '${safePhone}', '${safeAddress}', '${safeCat}', '${safePrice}')" style="background:#4b5563; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">تعديل</button>
+                                ${item.status === 'pending' ? `<button type="button" onclick="approveListing('${safeId}')" style="background:var(--success-green); color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">قبول</button>` : `<button type="button" onclick="pendListing('${safeId}')" style="background:var(--brand-orange); color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">إخفاء</button>`}
+                                <button type="button" onclick="toggleVip('${safeId}', ${!item.vip})" style="background:#2563eb; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">${item.vip ? 'إلغاء VIP' : 'VIP'}</button>
+                                <button type="button" onclick="editListingData('${safeId}', '${safeName}', '${safePhone}', '${safeAddress}', '${safeCat}', '${safePrice}')" style="background:#4b5563; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">تعديل</button>
                                 <button type="button" onclick="notifyOwner('${safePhone}', '${escapeJsSingleQuote(item.fb || '')}', '${escapeJsSingleQuote(item.insta || '')}', '${safeName}')" style="background:var(--success-green); color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">إشعار</button>
-                                <button type="button" onclick="deleteListing('${item.id}')" style="background:var(--danger-red); color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">حذف</button>
+                                <button type="button" onclick="deleteListing('${safeId}')" style="background:var(--danger-red); color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">حذف</button>
                             </div>
                         </div>
                     `;
@@ -1933,4 +2065,4 @@
         };
     </script>
 </body>
-</html>
+    </html>
