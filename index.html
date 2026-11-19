@@ -210,7 +210,6 @@
             background: #fff7ed;
         }
 
-        /* شريط عبارة ثبّت التطبيق */
         .install-highlight-strip {
             margin: 8px 12px 4px;
             background: #ffffff;
@@ -597,6 +596,21 @@
         .fb-badge { background: #2563eb; }
         .insta-badge { background: #db2777; }
 
+        .profile-post-item {
+            background: #fafafa;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .profile-post-title {
+            font-size: 12.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
         .bottom-nav-bar {
             position: fixed;
             bottom: 0;
@@ -839,7 +853,6 @@
         </button>
     </nav>
 
-    <!-- نافذة إغلاق بعد تقديم الإعلان وإغلاق قائمة الإعلانات -->
     <div class="custom-modal" id="afterSubmitCloseModal">
         <div class="custom-modal-content" style="text-align:center;">
             <h3 id="afterSubmitTitle" style="margin:0 0 8px 0; color:var(--brand-orange-dark); font-size:15px; font-weight:800;">تم تقديم إعلانك بنجاح ✅</h3>
@@ -850,7 +863,6 @@
         </div>
     </div>
 
-    <!-- نافذة معلومات وعروض المحل عند الضغط على زر + -->
     <div class="custom-modal" id="plusInfoOffersModal">
         <div class="custom-modal-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -941,6 +953,7 @@
         let selectedFilesArray = [];
         let currentCat = 'all';
         window.allListings = [];
+        window.groupedPages = [];
         const CHARITY_LOCAL_KEY = "sahl_alwusool_charity_items_v1";
         const LIKED_STORES_KEY = "sahl_alwusool_liked_stores_v1";
 
@@ -983,6 +996,165 @@
                 .replace(/"/g, '&quot;');
         }
 
+        function normalizeArabicText(text) {
+            if (!text) return '';
+            return String(text)
+                .toLowerCase()
+                .replace(/[\u064B-\u065F]/g, '')
+                .replace(/[أإآ]/g, 'ا')
+                .replace(/ة/g, 'ه')
+                .replace(/ى/g, 'ي')
+                .replace(/[^\u0600-\u06FFa-z0-9\s]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function normalizePhoneKey(phone) {
+            const cleaned = String(phone || '').trim();
+            if (!cleaned || cleaned === 'لا يوجد' || cleaned === 'غير متوفر') return '';
+            const digits = cleaned.replace(/\D/g, '');
+            if (digits.length < 7) return '';
+            return digits.length >= 10 ? digits.slice(-10) : digits;
+        }
+
+        function normalizeSocialUrlKey(url, platform) {
+            const raw = String(url || '').trim().toLowerCase();
+            if (!raw) return '';
+            const stripped = raw
+                .replace(/^https?:\/\//, '')
+                .replace(/^www\./, '')
+                .replace(/^m\./, '')
+                .replace(/^web\./, '')
+                .split('?')[0]
+                .split('#')[0]
+                .replace(/\/+$/, '');
+            if (!stripped) return '';
+            return `${platform}__${stripped}`;
+        }
+
+        function getOwnerGroupKey(item) {
+            const normPhone = normalizePhoneKey(item.phone || '');
+            if (normPhone) return `phone__${normPhone}`;
+
+            const normFb = normalizeSocialUrlKey(item.fb || '', 'fb');
+            if (normFb) return normFb;
+
+            const normInsta = normalizeSocialUrlKey(item.insta || '', 'insta');
+            if (normInsta) return normInsta;
+
+            const normName = normalizeArabicText(item.name || '');
+            if (normName) return `name__${normName}`;
+
+            return `id__${String(item.id || '')}`;
+        }
+
+        function findMatchingStoreRecord(items, candidate) {
+            const candPhone = normalizePhoneKey(candidate.phone || '');
+            const candFb = normalizeSocialUrlKey(candidate.fb || '', 'fb');
+            const candInsta = normalizeSocialUrlKey(candidate.insta || '', 'insta');
+            const candName = normalizeArabicText(candidate.name || '');
+
+            return (items || []).find(item => {
+                const itemPhone = normalizePhoneKey(item.phone || '');
+                const itemFb = normalizeSocialUrlKey(item.fb || '', 'fb');
+                const itemInsta = normalizeSocialUrlKey(item.insta || '', 'insta');
+                const itemName = normalizeArabicText(item.name || '');
+
+                if (candPhone && itemPhone && candPhone === itemPhone) return true;
+                if (candFb && itemFb && candFb === itemFb) return true;
+                if (candInsta && itemInsta && candInsta === itemInsta) return true;
+                if (!candPhone && !candFb && !candInsta && candName && itemName && candName === itemName) return true;
+                return false;
+            });
+        }
+
+        function buildGroupedPages(items) {
+            const approved = (items || []).filter(item => item.status === 'approved');
+            const groupsMap = new Map();
+
+            approved.forEach(rawItem => {
+                const item = { ...rawItem };
+                const key = getOwnerGroupKey(item);
+                const itemImgs = Array.isArray(item.images) ? item.images.filter(Boolean) : [];
+                const postEntry = {
+                    sourceId: item.id,
+                    title: item.name || 'إعلان',
+                    price: item.price || '',
+                    address: item.address || '',
+                    category: item.category || 'أشياء أخرى',
+                    images: itemImgs,
+                    createdAt: item.createdAt || ''
+                };
+
+                if (!groupsMap.has(key)) {
+                    const initialPosts = Array.isArray(item.posts) && item.posts.length > 0
+                        ? item.posts.slice()
+                        : [postEntry];
+
+                    groupsMap.set(key, {
+                        ...item,
+                        id: item.id,
+                        memberIds: [item.id],
+                        posts: initialPosts,
+                        allOffersText: initialPosts.map(p => p.price).filter(Boolean).join(' • ')
+                    });
+                } else {
+                    const existing = groupsMap.get(key);
+                    existing.memberIds.push(item.id);
+                    existing.likes = (Number(existing.likes) || 0) + (Number(item.likes) || 0);
+                    if (item.vip) existing.vip = true;
+                    if (!existing.logo && item.logo) existing.logo = item.logo;
+                    if (!existing.fb && item.fb) existing.fb = item.fb;
+                    if (!existing.insta && item.insta) existing.insta = item.insta;
+                    if ((!existing.phone || existing.phone === 'لا يوجد') && item.phone && item.phone !== 'لا يوجد') {
+                        existing.phone = item.phone;
+                    }
+                    if ((!existing.address || existing.address === 'غير محدد') && item.address) {
+                        existing.address = item.address;
+                    }
+
+                    const mergedImgs = Array.isArray(existing.images) ? existing.images.slice() : [];
+                    itemImgs.forEach(img => {
+                        if (!mergedImgs.includes(img)) mergedImgs.push(img);
+                    });
+                    existing.images = mergedImgs;
+
+                    const alreadyHasPost = existing.posts.some(p =>
+                        String(p.sourceId) === String(item.id) ||
+                        (normalizeArabicText(p.price) === normalizeArabicText(postEntry.price) &&
+                         JSON.stringify(p.images || []) === JSON.stringify(postEntry.images || []))
+                    );
+                    if (!alreadyHasPost) {
+                        existing.posts.push(postEntry);
+                    }
+                    if (item.price) {
+                        existing.price = item.price;
+                    }
+                    existing.allOffersText = existing.posts.map(p => p.price).filter(Boolean).join(' • ');
+                }
+            });
+
+            const grouped = Array.from(groupsMap.values());
+            grouped.sort((a, b) => {
+                if ((b.vip === true) !== (a.vip === true)) return (b.vip === true) - (a.vip === true);
+                return (b.likes || 0) - (a.likes || 0);
+            });
+            window.groupedPages = grouped;
+            return grouped;
+        }
+
+        function findPageByAnyId(id) {
+            const strId = String(id);
+            const pages = window.groupedPages && window.groupedPages.length > 0
+                ? window.groupedPages
+                : buildGroupedPages(window.allListings);
+
+            return pages.find(p =>
+                String(p.id) === strId ||
+                (Array.isArray(p.memberIds) && p.memberIds.map(String).includes(strId))
+            );
+        }
+
         function closeListingsFormDrawer() {
             const form = document.getElementById('addFormContainer');
             if (form) form.style.display = 'none';
@@ -1004,7 +1176,7 @@
         }
 
         function openPlusInfoOffersModal(id) {
-            const store = (window.allListings || []).find(s => String(s.id) === String(id));
+            const store = findPageByAnyId(id);
             const bodyEl = document.getElementById('plusInfoOffersBody');
             const modalEl = document.getElementById('plusInfoOffersModal');
             if (!store || !bodyEl || !modalEl) return;
@@ -1013,16 +1185,19 @@
             const safeCat = escapeHtmlText(store.category || 'أشياء أخرى');
             const safeAddress = escapeHtmlText(store.address || 'غير محدد');
             const safePhone = escapeHtmlText(store.phone || 'غير متوفر');
-            const safePrice = escapeHtmlText(store.price || 'تواصل مع صاحب الصفحة للاطلاع على العروض والأسعار الحالية');
+            const posts = Array.isArray(store.posts) && store.posts.length > 0
+                ? store.posts
+                : [{ price: store.price || 'تواصل مع صاحب الصفحة للاطلاع على العروض والأسعار الحالية', images: store.images || [] }];
 
-            let offersListHtml = `<p style="margin:0;">${safePrice}</p>`;
-            if (Array.isArray(store.offers) && store.offers.length > 0) {
-                offersListHtml = `<ul style="margin:4px 0 0; padding-right:16px;">${store.offers.map(o => `<li>${escapeHtmlText(o)}</li>`).join('')}</ul>`;
-            }
+            const offersListHtml = posts.map((post, idx) => {
+                const label = escapeHtmlText(post.price || `إعلان رقم ${idx + 1}`);
+                const loc = post.address ? ` — ${escapeHtmlText(post.address)}` : '';
+                return `<div style="padding:4px 0; border-bottom:1px dashed #fed7aa;">• <b>إعلان ${idx + 1}:</b> ${label}${loc}</div>`;
+            }).join('');
 
             const galleryHtml = Array.isArray(store.images) && store.images.length > 0
                 ? `<div style="display:grid; grid-template-columns:repeat(2,1fr); gap:6px; margin-top:8px;">
-                    ${store.images.slice(0, 4).map(img => `<img src="${img}" alt="${safeName}" onclick="openImageModal('${img}')" style="width:100%; height:90px; object-fit:cover; border-radius:8px; border:1px solid #e5e7eb; cursor:pointer;">`).join('')}
+                    ${store.images.slice(0, 6).map(img => `<img src="${img}" alt="${safeName}" onclick="openImageModal('${img}')" style="width:100%; height:90px; object-fit:cover; border-radius:8px; border:1px solid #e5e7eb; cursor:pointer;">`).join('')}
                    </div>`
                 : '';
 
@@ -1031,13 +1206,13 @@
                     <img src="${store.logo || (store.images && store.images[0]) || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'}" alt="${safeName}" style="width:46px; height:46px; border-radius:50%; object-fit:cover; border:1.5px solid var(--brand-purple);">
                     <div>
                         <div style="font-size:14px; font-weight:800; color:var(--text-main);">${safeName} ${store.vip ? '⭐' : ''}</div>
-                        <div style="font-size:11px; color:var(--text-sub);">القسم: <b>${safeCat}</b></div>
+                        <div style="font-size:11px; color:var(--text-sub);">القسم: <b>${safeCat}</b> • عدد الإعلانات: <b>${posts.length}</b></div>
                     </div>
                 </div>
                 <div style="font-size:11.5px; margin-bottom:6px;">📍 <b>العنوان:</b> ${safeAddress}</div>
                 <div style="font-size:11.5px; margin-bottom:8px;">📞 <b>الهاتف:</b> <a href="tel:${safePhone}" style="color:var(--success-green); font-weight:700; text-decoration:none;">${safePhone}</a></div>
                 <div class="info-offer-box">
-                    <div style="font-weight:800; color:var(--brand-orange-dark); margin-bottom:4px;">🎁 العروض والأسعار والملاحظات:</div>
+                    <div style="font-weight:800; color:var(--brand-orange-dark); margin-bottom:4px;">🎁 جميع إعلانات وعروض الصفحة:</div>
                     ${offersListHtml}
                 </div>
                 ${galleryHtml}
@@ -1070,23 +1245,13 @@
             ];
         }
 
-        function normalizeArabicText(text) {
-            if (!text) return '';
-            return String(text)
-                .toLowerCase()
-                .replace(/[\u064B-\u065F]/g, '')
-                .replace(/[أإآ]/g, 'ا')
-                .replace(/ة/g, 'ه')
-                .replace(/ى/g, 'ي')
-                .replace(/[^\u0600-\u06FFa-z0-9\s]/g, ' ')
-                .replace(/\s+/g, ' ')
-                .trim();
-        }
-
         function matchesSearchQuery(item, normalizedQuery) {
             if (!normalizedQuery) return true;
+            const postsText = Array.isArray(item.posts)
+                ? item.posts.map(p => `${p.title || ''} ${p.price || ''} ${p.address || ''}`).join(' ')
+                : '';
             const combined = normalizeArabicText(
-                `${item.name || ''} ${item.price || ''} ${item.address || ''} ${item.category || ''} ${item.phone || ''}`
+                `${item.name || ''} ${item.price || ''} ${postsText} ${item.address || ''} ${item.category || ''} ${item.phone || ''}`
             );
             if (combined.includes(normalizedQuery)) return true;
             const words = normalizedQuery.split(' ').filter(Boolean);
@@ -1288,29 +1453,68 @@
                     }
                 }
 
-                let existingStore = window.allListings.find(item =>
-                    normalizeArabicText(item.name) === normalizeArabicText(name) &&
-                    item.phone.trim() === phone.trim()
-                );
+                let existingStore = findMatchingStoreRecord(window.allListings || [], { name, phone, fb, insta });
 
                 let modalTitle = 'تم إرسال طلب إعلانك بنجاح! 🎉';
-                let modalMsg = 'سيتم مراجعة الإعلان من قبل الإدارة ونشره قريباً. اضغط إغلاق لإغلاق قائمة الإعلانات.';
+                let modalMsg = 'سيتم مراجعة الإعلان من قبل الإدارة ونشره في صفحتك. اضغط إغلاق لإغلاق قائمة الإعلانات.';
 
                 if (existingStore && !String(existingStore.id).startsWith('demo')) {
                     let updatedImages = [...(existingStore.images || []), ...newImagesUrls];
-                    if (updatedImages.length > 12) { updatedImages = updatedImages.slice(-12); }
+                    if (updatedImages.length > 16) { updatedImages = updatedImages.slice(-16); }
 
-                    let updateData = { images: updatedImages };
+                    const existingPosts = Array.isArray(existingStore.posts) && existingStore.posts.length > 0
+                        ? existingStore.posts.slice()
+                        : [{
+                            sourceId: existingStore.id,
+                            title: existingStore.name || name,
+                            price: existingStore.price || '',
+                            address: existingStore.address || address,
+                            category: existingStore.category || cat,
+                            images: existingStore.images || [],
+                            createdAt: existingStore.createdAt || ''
+                        }];
+
+                    existingPosts.push({
+                        sourceId: 'post_' + Date.now(),
+                        title: name,
+                        price: price,
+                        address: address,
+                        category: cat,
+                        images: newImagesUrls,
+                        createdAt: new Date().toISOString()
+                    });
+
+                    let updateData = {
+                        images: updatedImages,
+                        posts: existingPosts
+                    };
                     if (logoUrl) updateData.logo = logoUrl;
                     if (price) updateData.price = price;
+                    if (address && address !== 'غير محدد') updateData.address = address;
+                    if (fb && !existingStore.fb) updateData.fb = fb;
+                    if (insta && !existingStore.insta) updateData.insta = insta;
+                    if (phone && phone !== 'لا يوجد' && (!existingStore.phone || existingStore.phone === 'لا يوجد')) {
+                        updateData.phone = phone;
+                    }
 
                     await window.updateDoc(window.doc(window.db, "listings", existingStore.id), updateData);
-                    modalTitle = 'تم تحديث الإعلان والصور بنجاح! 🎉';
-                    modalMsg = 'تمت إضافة الصور والعروض الجديدة بنجاح. اضغط إغلاق لإغلاق قائمة الإعلانات.';
+                    modalTitle = 'تمت إضافة الإعلان إلى صفحتك بنجاح! 🎉';
+                    modalMsg = 'تم ربط الإعلان الجديد بحسابك وإضافته داخل صفحتك دون تكرار بطاقة جديدة. اضغط إغلاق لإغلاق قائمة الإعلانات.';
                 } else {
+                    const initialPost = {
+                        sourceId: 'init_' + Date.now(),
+                        title: name,
+                        price: price,
+                        address: address,
+                        category: cat,
+                        images: newImagesUrls,
+                        createdAt: new Date().toISOString()
+                    };
+
                     await window.addDoc(window.collection(window.db, "listings"), {
                         name, category: cat, address, price, fb, insta, phone,
-                        logo: logoUrl, images: newImagesUrls, status: 'pending', vip: false,
+                        logo: logoUrl, images: newImagesUrls, posts: [initialPost],
+                        status: 'pending', vip: false,
                         likes: 0, createdAt: new Date().toISOString()
                     });
                 }
@@ -1327,7 +1531,7 @@
                 document.getElementById('logoFileNameDisplay').style.color = 'var(--text-sub)';
                 selectedFilesArray = [];
                 document.getElementById('selectedImagesPreview').innerHTML = '';
-                loadApprovedListings();
+                await loadApprovedListings();
                 openAfterSubmitCloseModal(modalTitle, modalMsg);
             } catch (error) {
                 console.error("خطأ إرسال الإعلان: ", error);
@@ -1581,12 +1785,8 @@
         }
 
         function sortAndRenderListings() {
-            let approved = (window.allListings || []).filter(item => item.status === 'approved');
-            approved.sort((a, b) => {
-                if ((b.vip === true) !== (a.vip === true)) return (b.vip === true) - (a.vip === true);
-                return (b.likes || 0) - (a.likes || 0);
-            });
-            renderListings(approved);
+            buildGroupedPages(window.allListings || []);
+            applyFilters();
         }
 
         function renderListings(items) {
@@ -1599,6 +1799,7 @@
 
             container.innerHTML = items.map(item => {
                 const mainImg = (item.images && item.images[0]) || item.logo || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg';
+                const postsCount = Array.isArray(item.posts) && item.posts.length > 1 ? ` (${item.posts.length} إعلانات)` : '';
                 const statusLabel = item.vip ? '⭐ مميز VIP' : '✓ معتمد';
                 const alreadyLiked = hasLikedStore(item.id);
                 const safeId = escapeJsSingleQuote(item.id);
@@ -1617,7 +1818,7 @@
                             <span>${item.category || 'أشياء أخرى'}</span>
                         </div>
                         <div class="grid-card-body">
-                            <h3 class="grid-title">${item.name}</h3>
+                            <h3 class="grid-title">${item.name}${postsCount}</h3>
                             ${item.price ? `<div class="grid-price">${item.price}</div>` : `<div class="grid-price" style="font-size:11.5px; color:var(--text-sub);">${item.category}</div>`}
                             <div class="grid-meta">📍 ${item.address || 'غير محدد'}</div>
                             <div class="grid-actions" onclick="event.stopPropagation()">
@@ -1643,32 +1844,57 @@
                 return;
             }
 
-            let store = window.allListings.find(s => String(s.id) === String(id));
+            let store = findPageByAnyId(id) || (window.allListings || []).find(s => String(s.id) === String(id));
             if (!store) return;
 
-            markStoreAsLiked(id);
+            markStoreAsLiked(store.id);
             store.likes = (store.likes || 0) + 1;
 
-            if (!String(store.id).startsWith('demo') && window.db && window.updateDoc) {
+            const targetDocId = String(store.id);
+            if (!targetDocId.startsWith('demo') && window.db && window.updateDoc) {
                 try {
-                    await window.updateDoc(window.doc(window.db, "listings", id), { likes: window.increment(1) });
+                    await window.updateDoc(window.doc(window.db, "listings", targetDocId), { likes: window.increment(1) });
                 } catch (e) {
                     console.warn("Like update warning:", e);
                 }
             }
 
             if (document.getElementById('storeProfileView').style.display === 'block') {
-                openStoreProfile(id);
+                openStoreProfile(store.id);
             } else {
                 applyFilters();
             }
         }
 
         async function openStoreProfile(id) {
-            const store = window.allListings.find(s => String(s.id) === String(id));
+            const store = findPageByAnyId(id) || (window.allListings || []).find(s => String(s.id) === String(id));
             if (!store) return;
 
             const alreadyLiked = hasLikedStore(store.id);
+            const posts = Array.isArray(store.posts) && store.posts.length > 0
+                ? store.posts
+                : [{
+                    title: store.name || 'إعلان',
+                    price: store.price || '',
+                    address: store.address || '',
+                    images: store.images || []
+                }];
+
+            const postsHtml = posts.map((post, idx) => {
+                const imgs = Array.isArray(post.images) ? post.images.filter(Boolean) : [];
+                return `
+                    <div class="profile-post-item">
+                        <div class="profile-post-title">📌 إعلان ${idx + 1}${post.price ? ` — ${escapeHtmlText(post.price)}` : ''}</div>
+                        ${post.address ? `<div style="font-size:11px; color:var(--text-sub); margin-bottom:6px;">📍 ${escapeHtmlText(post.address)}</div>` : ''}
+                        ${imgs.length > 0
+                            ? `<div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px;">
+                                ${imgs.map(img => `<img src="${img}" style="width:100%; height:135px; border-radius:10px; object-fit:cover; border:1px solid #e5e7eb; cursor:pointer;" alt="صورة الإعلان" onclick="openImageModal('${img}')">`).join('')}
+                               </div>`
+                            : '<p style="font-size:11px; color:var(--text-sub); margin:0;">لا توجد صور مرفقة لهذا الإعلان.</p>'
+                        }
+                    </div>
+                `;
+            }).join('');
 
             document.getElementById('mainCatalogView').style.display = 'none';
             const profileView = document.getElementById('storeProfileView');
@@ -1677,16 +1903,15 @@
 
             document.getElementById('storeProfileContent').innerHTML = `
                 <div class="profile-header">
-                    <img src="${store.logo || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'}" class="profile-logo" alt="شعار" onclick="openImageModal('${store.logo || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'}')">
+                    <img src="${store.logo || (store.images && store.images[0]) || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'}" class="profile-logo" alt="شعار" onclick="openImageModal('${store.logo || (store.images && store.images[0]) || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'}')">
                     <div>
                         <h2 style="margin:0 0 2px 0; font-size:16px; font-weight:800;">${store.name} ${store.vip ? '⭐' : ''}</h2>
-                        <p style="margin:0; font-size:11.5px; color:var(--text-sub);">القسم: <b>${store.category}</b></p>
+                        <p style="margin:0; font-size:11.5px; color:var(--text-sub);">القسم: <b>${store.category}</b> • إعلانات الصفحة: <b>${posts.length}</b></p>
                     </div>
                 </div>
                 <div style="margin-bottom:8px;">
                     <button type="button" class="mini-like-btn ${alreadyLiked ? 'liked' : ''}" onclick="addLike('${escapeJsSingleQuote(store.id)}');">${alreadyLiked ? '🧡 تم الإعجاب' : '❤️ إعجاب'} (${store.likes || 0})</button>
                 </div>
-                ${store.price ? `<div style="background:#f0fdf4; color:var(--success-green); padding:8px 10px; border-radius:8px; font-size:12px; font-weight:700; margin-bottom:8px;">💰 السعر والملاحظات: ${store.price}</div>` : ''}
                 <p style="font-size:12px; margin-bottom:10px;"><b>العنوان:</b> ${store.address || 'غير محدد'}</p>
                 
                 <div class="social-links">
@@ -1694,12 +1919,8 @@
                     ${store.insta ? `<a href="${store.insta}" target="_blank" class="social-badge insta-badge">📸 انستغرام</a>` : ''}
                 </div>
 
-                <h4 style="font-size:12.5px; font-weight:800; margin:12px 0 6px 0;">معرض الصور والمنتجات:</h4>
-                ${store.images && store.images.length > 0 ? `
-                    <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px; margin-bottom:12px;">
-                        ${store.images.map(img => `<img src="${img}" style="width:100%; height:135px; border-radius:10px; object-fit:cover; border:1px solid #e5e7eb; cursor:pointer;" alt="صورة المنتج" onclick="openImageModal('${img}')">`).join('')}
-                    </div>
-                ` : '<p style="font-size:11px; color:var(--text-sub);">لا توجد صور إضافية.</p>'}
+                <h4 style="font-size:12.5px; font-weight:800; margin:12px 0 6px 0;">إعلانات ومنتجات الصفحة (${posts.length}):</h4>
+                ${postsHtml}
 
                 <div style="display:flex; gap:8px; margin-top:12px;">
                     <a href="tel:${store.phone}" class="mini-call-link" style="flex:1; text-align:center; padding:8px; font-size:12px;">📞 اتصال (${store.phone})</a>
@@ -1750,8 +1971,10 @@
                 return;
             }
 
-            const approved = (window.allListings || []).filter(item => item.status === 'approved');
-            const matches = approved.filter(item => matchesSearchQuery(item, query));
+            const pages = window.groupedPages && window.groupedPages.length > 0
+                ? window.groupedPages
+                : buildGroupedPages(window.allListings);
+            const matches = pages.filter(item => matchesSearchQuery(item, query));
 
             suggestionsBox.style.display = 'block';
 
@@ -1766,7 +1989,7 @@
 
             suggestionsBox.innerHTML = matches.slice(0, 8).map(item => {
                 const isAddressMatch = normalizeArabicText(item.address).includes(query);
-                const isProductMatch = normalizeArabicText(item.price).includes(query);
+                const isProductMatch = normalizeArabicText(item.allOffersText || item.price).includes(query);
                 let badge = item.category === 'شغل بيوت' ? '🏠 شغل بيوت' : '🏪 متجر';
                 if (isAddressMatch) badge = '📍 منطقة';
                 else if (isProductMatch) badge = '💰 منتج';
@@ -1779,7 +2002,7 @@
                                 <span style="background:#fff7ed; color:var(--brand-orange-dark); border:1px solid #fed7aa; border-radius:6px; padding:1px 6px; font-size:9.5px; font-weight:700;">${badge}</span>
                             </div>
                             <div style="font-size:10px; color:var(--text-sub); margin-top:2px;">
-                                ${item.address || 'غير محدد'} ${item.price ? ' • ' + item.price : ''}
+                                ${item.address || 'غير محدد'} ${(item.allOffersText || item.price) ? ' • ' + (item.allOffersText || item.price) : ''}
                             </div>
                         </div>
                     </div>
@@ -1948,11 +2171,18 @@
 
         async function deleteListing(id) {
             if (confirm("هل أنت متأكد من الحذف نهائياً؟")) {
-                let store = window.allListings.find(s => s.id === id);
-                if (store && !String(store.id).startsWith('demo')) {
-                    await window.deleteDoc(window.doc(window.db, "listings", id));
+                const page = findPageByAnyId(id);
+                const idsToDelete = page && Array.isArray(page.memberIds) && page.memberIds.length > 0
+                    ? page.memberIds
+                    : [id];
+
+                for (const docId of idsToDelete) {
+                    if (!String(docId).startsWith('demo') && window.db && window.deleteDoc) {
+                        await window.deleteDoc(window.doc(window.db, "listings", docId));
+                    }
                 }
-                window.allListings = (window.allListings || []).filter(s => s.id !== id);
+                const idSet = new Set(idsToDelete.map(String));
+                window.allListings = (window.allListings || []).filter(s => !idSet.has(String(s.id)));
                 alert('تم الحذف بنجاح.');
                 goBackToCatalog();
                 loadAdminListings();
@@ -1975,9 +2205,11 @@
         function applyFilters() {
             const inputEl = document.getElementById('searchInput');
             const query = inputEl ? normalizeArabicText(inputEl.value) : '';
-            const approved = (window.allListings || []).filter(item => item.status === 'approved');
+            const pages = window.groupedPages && window.groupedPages.length > 0
+                ? window.groupedPages
+                : buildGroupedPages(window.allListings);
 
-            const filtered = approved.filter(item => {
+            const filtered = pages.filter(item => {
                 const matchesCat = (currentCat === 'all' || item.category === currentCat);
                 return matchesCat && matchesSearchQuery(item, query);
             });
