@@ -190,7 +190,7 @@
             border-radius: 10px;
             margin-top: 6px;
             box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
-            max-height: 190px;
+            max-height: 220px;
             overflow-y: auto;
         }
 
@@ -727,7 +727,7 @@
             <div class="search-section">
                 <div class="search-box-frame">
                     <button class="search-go-btn" type="button" onclick="applyFilters()">بحث</button>
-                    <input type="text" id="searchInput" class="search-input-field" placeholder="ابحث عن محل، معجنات، ملابس، أو حي..." oninput="handleSearch()" autocomplete="off">
+                    <input type="text" id="searchInput" class="search-input-field" placeholder="ابحث عن منطقة، حي، محل، معجنات، أو منتج..." oninput="handleSearch()" autocomplete="off">
                     <div class="search-quick-icons">
                         <span style="cursor:pointer;" onclick="openQuickRequestsModal()" title="طلب سريع">⚡</span>
                         <span style="cursor:pointer;" onclick="openCustomInstallGuide()" title="تثبيت التطبيق">📥</span>
@@ -928,6 +928,7 @@
         let currentCat = 'all';
         let currentQuickPill = 'all';
         window.allListings = [];
+        const CHARITY_LOCAL_KEY = "sahl_alwusool_charity_items_v1";
 
         function getDemoListings() {
             return [
@@ -947,6 +948,16 @@
                     likes: 5
                 }
             ];
+        }
+
+        function normalizeArabicText(text) {
+            return String(text || '')
+                .toLowerCase()
+                .replace(/[\u064B-\u065F]/g, '')
+                .replace(/[أإآ]/g, 'ا')
+                .replace(/ة/g, 'ه')
+                .replace(/ى/g, 'ي')
+                .trim();
         }
 
         async function waitForFirebase() {
@@ -1182,7 +1193,7 @@
                 }
 
                 let existingStore = window.allListings.find(item =>
-                    item.name.trim().toLowerCase() === name.toLowerCase() &&
+                    normalizeArabicText(item.name) === normalizeArabicText(name) &&
                     item.phone.trim() === phone.trim()
                 );
 
@@ -1266,8 +1277,6 @@
                     let ts = Number(data.timestamp || now);
                     if ((now - ts) < 86400000) {
                         requests.push({ ...data, timestamp: ts });
-                    } else if (isAdminLoggedIn && !String(data.id).startsWith('demo') && window.deleteDoc && window.doc) {
-                        window.deleteDoc(window.doc(window.db, "quick_requests", data.id));
                     }
                 });
 
@@ -1301,80 +1310,148 @@
             }
         }
 
+        function getLocalCharityItems() {
+            try {
+                const raw = localStorage.getItem(CHARITY_LOCAL_KEY);
+                const parsed = raw ? JSON.parse(raw) : [];
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveLocalCharityItem(item) {
+            try {
+                const current = getLocalCharityItems();
+                current.unshift(item);
+                localStorage.setItem(CHARITY_LOCAL_KEY, JSON.stringify(current.slice(0, 50)));
+            } catch (e) {
+                console.warn("Local charity save warning:", e);
+            }
+        }
+
+        function removeLocalCharityItem(id) {
+            try {
+                const current = getLocalCharityItems().filter(item => String(item.id) !== String(id));
+                localStorage.setItem(CHARITY_LOCAL_KEY, JSON.stringify(current));
+            } catch (e) {
+                console.warn("Local charity remove warning:", e);
+            }
+        }
+
         async function submitCharityItem() {
-            let title = document.getElementById('csTitle').value.trim();
-            let details = document.getElementById('csDetails').value.trim();
-            let phone = document.getElementById('csPhone').value.trim();
+            const titleInput = document.getElementById('csTitle');
+            const detailsInput = document.getElementById('csDetails');
+            const phoneInput = document.getElementById('csPhone');
+
+            const title = titleInput ? titleInput.value.trim() : '';
+            const details = detailsInput ? detailsInput.value.trim() : '';
+            const phone = phoneInput ? phoneInput.value.trim() : '';
+
             if (!title || !phone) {
                 alert('يرجى إدخال اسم الغرض ورقم الهاتف.');
                 return;
             }
+
+            const newItem = {
+                id: 'local_' + Date.now(),
+                title: title,
+                details: details,
+                phone: phone,
+                timestamp: Date.now()
+            };
+
             try {
                 await waitForFirebase();
-                await window.addDoc(window.collection(window.db, "charity_shelf"), {
+                const docRef = await window.addDoc(window.collection(window.db, "charity_shelf"), {
                     title: title,
                     details: details,
                     phone: phone,
-                    timestamp: Date.now()
+                    timestamp: newItem.timestamp
                 });
-                document.getElementById('csTitle').value = '';
-                document.getElementById('csDetails').value = '';
-                document.getElementById('csPhone').value = '';
+                newItem.id = docRef && docRef.id ? docRef.id : newItem.id;
+                saveLocalCharityItem(newItem);
+
+                titleInput.value = '';
+                detailsInput.value = '';
+                phoneInput.value = '';
                 alert('تم إضافة الغرض إلى رف الخير بنجاح!');
                 await loadCharityItems();
             } catch (e) {
                 console.error("Charity submit error:", e);
-                alert('تعذر إضافة الغرض: ' + (e.code || e.message || 'تحقق من الاتصال والقاعدة.'));
+                saveLocalCharityItem(newItem);
+                titleInput.value = '';
+                detailsInput.value = '';
+                phoneInput.value = '';
+                alert('تم حفظ الغرض في رف الخير محلياً على جهازك (' + (e.code || e.message || 'تحقق من صلاحيات Firestore') + ').');
+                await loadCharityItems();
             }
         }
 
         async function loadCharityItems() {
             const listDiv = document.getElementById('charityItemsList');
+            if (!listDiv) return;
+
             listDiv.innerHTML = '<p style="font-size:10.5px; color:var(--text-sub); text-align:center;">جاري تحميل الأغراض...</p>';
+
+            const now = Date.now();
+            const maxAge = 259200000;
+            const mergedMap = new Map();
+
+            getLocalCharityItems().forEach(item => {
+                const ts = Number(item.timestamp || now);
+                if ((now - ts) < maxAge && item.title && item.phone) {
+                    mergedMap.set(String(item.id), { ...item, timestamp: ts });
+                }
+            });
+
             try {
                 await waitForFirebase();
                 const snap = await window.getDocs(window.collection(window.db, "charity_shelf"));
-                let now = Date.now();
-                let items = [];
-
                 snap.forEach(d => {
-                    let data = { id: d.id, ...d.data() };
-                    let ts = Number(data.timestamp || now);
-                    if ((now - ts) < 259200000) {
-                        items.push({ ...data, timestamp: ts });
-                    } else if (isAdminLoggedIn && !String(data.id).startsWith('demo') && window.deleteDoc && window.doc) {
-                        window.deleteDoc(window.doc(window.db, "charity_shelf", data.id));
+                    const data = d.data() || {};
+                    const ts = Number(data.timestamp || now);
+                    if ((now - ts) < maxAge && data.title && data.phone) {
+                        mergedMap.set(String(d.id), {
+                            id: d.id,
+                            title: data.title,
+                            details: data.details || '',
+                            phone: data.phone,
+                            timestamp: ts
+                        });
                     }
                 });
-
-                items.sort((a, b) => b.timestamp - a.timestamp);
-
-                if (items.length === 0) {
-                    listDiv.innerHTML = '<p style="font-size:10.5px; color:var(--text-sub); text-align:center;">لا توجد أغراض معروضة حالياً.</p>';
-                    return;
-                }
-
-                listDiv.innerHTML = items.map(i => `
-                    <div style="background:#fafafa; padding:8px; border-radius:8px; margin-bottom:6px; border:1px solid #e5e7eb; font-size:11px;">
-                        <b>🎁 ${i.title}</b><br>
-                        📝 ${i.details || 'بدون تفاصيل'}<br>
-                        📞 <a href="tel:${i.phone}" style="color:var(--success-green); font-weight:700;">${i.phone}</a>
-                        ${isAdminLoggedIn ? `<button type="button" onclick="deleteCharity('${i.id}')" style="float:left; background:var(--danger-red); color:#fff; border:none; padding:2px 6px; border-radius:4px; font-size:9.5px; cursor:pointer;">حذف</button>` : ''}
-                    </div>
-                `).join('');
             } catch (e) {
-                console.error("Load charity items error:", e);
-                listDiv.innerHTML = '<p style="font-size:10.5px; color:var(--danger-red); text-align:center;">تعذر تحميل الأغراض، أعد المحاولة.</p>';
+                console.warn("Load charity items from Firestore warning:", e);
             }
+
+            const items = Array.from(mergedMap.values()).sort((a, b) => b.timestamp - a.timestamp);
+
+            if (items.length === 0) {
+                listDiv.innerHTML = '<p style="font-size:10.5px; color:var(--text-sub); text-align:center;">لا توجد أغراض معروضة حالياً. أضف أول غرض من الأعلى.</p>';
+                return;
+            }
+
+            listDiv.innerHTML = items.map(i => `
+                <div style="background:#fafafa; padding:8px; border-radius:8px; margin-bottom:6px; border:1px solid #e5e7eb; font-size:11px;">
+                    <b>🎁 ${i.title}</b><br>
+                    📝 ${i.details || 'بدون تفاصيل'}<br>
+                    📞 <a href="tel:${i.phone}" style="color:var(--success-green); font-weight:700;">${i.phone}</a>
+                    ${isAdminLoggedIn ? `<button type="button" onclick="deleteCharity('${i.id}')" style="float:left; background:var(--danger-red); color:#fff; border:none; padding:2px 6px; border-radius:4px; font-size:9.5px; cursor:pointer;">حذف</button>` : ''}
+                </div>
+            `).join('');
         }
 
         async function deleteCharity(id) {
+            removeLocalCharityItem(id);
             try {
-                await waitForFirebase();
-                await window.deleteDoc(window.doc(window.db, "charity_shelf", id));
+                if (!String(id).startsWith('local_')) {
+                    await waitForFirebase();
+                    await window.deleteDoc(window.doc(window.db, "charity_shelf", id));
+                }
                 await loadCharityItems();
             } catch (e) {
-                alert('تعذر حذف الغرض.');
+                await loadCharityItems();
             }
         }
 
@@ -1517,28 +1594,57 @@
         }
 
         function handleSearch() {
-            let query = document.getElementById('searchInput').value.toLowerCase().trim();
-            let suggestionsBox = document.getElementById('searchSuggestions');
-            applyFilters();
-            if (query === "") { suggestionsBox.style.display = 'none'; return; }
+            const rawQuery = document.getElementById('searchInput').value;
+            const query = normalizeArabicText(rawQuery);
+            const suggestionsBox = document.getElementById('searchSuggestions');
 
-            let approved = window.allListings.filter(item => item.status === 'approved');
-            let matches = approved.filter(item => {
-                let textCheck = (item.name + ' ' + (item.price || '') + ' ' + (item.address || '') + ' ' + item.category).toLowerCase();
-                return textCheck.includes(query);
+            applyFilters();
+
+            if (query === "") {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+
+            const approved = window.allListings.filter(item => item.status === 'approved');
+            const matches = approved.filter(item => {
+                const searchable = normalizeArabicText(
+                    `${item.name} ${item.price || ''} ${item.address || ''} ${item.category || ''}`
+                );
+                return searchable.includes(query);
             });
 
-            if (matches.length === 0) { suggestionsBox.style.display = 'none'; return; }
+            if (matches.length === 0) {
+                suggestionsBox.style.display = 'block';
+                suggestionsBox.innerHTML = `
+                    <div class="suggestion-item" onclick="openQuickRequestsModal()" style="color:var(--brand-orange-dark); font-weight:700;">
+                        ⚡ لم تجد "${rawQuery}"؟ اضغط هنا لنشره في شريط الطلبات السريعة
+                    </div>
+                `;
+                return;
+            }
 
             suggestionsBox.style.display = 'block';
-            suggestionsBox.innerHTML = matches.map(item => `
-                <div class="suggestion-item" onclick="selectSuggestion('${item.id}')">
-                    <div>
-                        <b>${item.name}</b> <span style="color:var(--text-sub); font-size:10px;">(${item.category})</span>
-                        <div style="font-size:10px; color:var(--text-sub);">${item.address || ''}</div>
+            suggestionsBox.innerHTML = matches.slice(0, 8).map(item => {
+                const isAddressMatch = normalizeArabicText(item.address).includes(query);
+                const isProductMatch = normalizeArabicText(item.price).includes(query);
+                let badge = item.category === 'شغل بيوت' ? '🏠 شغل بيوت' : '🏪 متجر';
+                if (isAddressMatch) badge = '📍 منطقة';
+                else if (isProductMatch) badge = '💰 منتج/عرض';
+
+                return `
+                    <div class="suggestion-item" onclick="selectSuggestion('${item.id}')">
+                        <div style="flex:1;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+                                <b>${item.name}</b>
+                                <span style="background:#fff7ed; color:var(--brand-orange-dark); border:1px solid #fed7aa; border-radius:6px; padding:1px 6px; font-size:9.5px; font-weight:700;">${badge}</span>
+                            </div>
+                            <div style="font-size:10px; color:var(--text-sub); margin-top:2px;">
+                                ${item.address || 'غير محدد'} ${item.price ? ' • ' + item.price : ''}
+                            </div>
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function selectSuggestion(id) {
@@ -1670,16 +1776,18 @@
         }
 
         function applyFilters() {
-            let query = document.getElementById('searchInput').value.toLowerCase();
-            let approved = window.allListings.filter(item => item.status === 'approved');
-            let filtered = approved.filter(item => {
-                let matchesCat = (currentCat === 'all' || item.category === currentCat);
-                let addressAndPrice = ((item.address || '') + ' ' + (item.price || '')).toLowerCase();
+            const query = normalizeArabicText(document.getElementById('searchInput').value);
+            const approved = window.allListings.filter(item => item.status === 'approved');
+            const filtered = approved.filter(item => {
+                const matchesCat = (currentCat === 'all' || item.category === currentCat);
+                const addressAndPrice = normalizeArabicText(`${item.address || ''} ${item.price || ''}`);
                 let matchesPill = true;
                 if (currentQuickPill === 'vip') matchesPill = item.vip === true;
                 if (currentQuickPill === 'delivery') matchesPill = addressAndPrice.includes('توصيل');
 
-                let textCheck = (item.name + ' ' + (item.price || '') + ' ' + (item.address || '') + ' ' + item.category).toLowerCase();
+                const textCheck = normalizeArabicText(
+                    `${item.name} ${item.price || ''} ${item.address || ''} ${item.category || ''}`
+                );
                 return matchesCat && matchesPill && textCheck.includes(query);
             });
             renderListings(filtered);
