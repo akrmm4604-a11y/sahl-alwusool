@@ -311,7 +311,7 @@
 
         .utility-actions-bar {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr;
             gap: 8px;
             padding: 0 12px 10px;
         }
@@ -519,48 +519,80 @@
             flex: 1;
         }
 
+        /* تكبير خانات الكتابة والعناوين التي فوقها داخل نموذج إضافة إعلان */
         .form-container {
             display: none;
             background: #ffffff;
-            margin: 0 12px 12px;
-            border-radius: 12px;
-            padding: 12px;
-            border: 1.5px solid var(--brand-orange);
+            margin: 0 12px 14px;
+            border-radius: 14px;
+            padding: 16px 14px;
+            border: 2px solid var(--brand-orange);
+            box-shadow: 0 6px 18px rgba(255, 90, 0, 0.08);
+        }
+
+        .form-container .listing-field-label {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            display: block;
+            margin: 4px 0 6px 0;
+            line-height: 1.45;
         }
 
         .form-container input,
         .form-container select,
         .form-container textarea {
             width: 100%;
-            padding: 8px 10px;
-            margin-bottom: 8px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 12px;
+            min-height: 46px;
+            padding: 11px 13px;
+            margin-bottom: 12px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
             font-family: inherit;
             background: #ffffff;
             color: var(--text-main);
+            line-height: 1.45;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .form-container input:focus,
+        .form-container select:focus,
+        .form-container textarea:focus {
+            outline: none;
+            font-size: 16px;
+            border-color: var(--brand-orange);
+            box-shadow: 0 0 0 3px rgba(255, 90, 0, 0.14);
+        }
+
+        .form-container input::placeholder,
+        .form-container textarea::placeholder {
+            font-size: 13px;
+            font-weight: 500;
+            color: #9ca3af;
         }
 
         .whatsapp-priority-tip {
             background: #fff7ed;
             border: 1px solid #fdba74;
-            border-radius: 9px;
-            padding: 8px 10px;
-            margin-bottom: 8px;
-            font-size: 11px;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            font-size: 12.5px;
             color: #9a3412;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         .saved-profile-bar {
             display: none;
             background: #fff7ed;
             border: 1px solid #fed7aa;
-            border-radius: 8px;
-            padding: 7px 10px;
-            margin-bottom: 8px;
-            font-size: 11px;
+            border-radius: 10px;
+            padding: 9px 12px;
+            margin-bottom: 12px;
+            font-size: 12.5px;
+            font-weight: 700;
             color: #9a3412;
             align-items: center;
             justify-content: space-between;
@@ -571,10 +603,10 @@
             background: #ffffff;
             border: 1px solid #fca5a5;
             color: #dc2626;
-            border-radius: 6px;
-            padding: 3px 8px;
-            font-size: 10.5px;
-            font-weight: 700;
+            border-radius: 7px;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: 800;
             cursor: pointer;
             font-family: inherit;
             white-space: nowrap;
@@ -586,32 +618,33 @@
             background: #fff7ed;
             border: 1.5px dashed var(--brand-orange);
             color: var(--brand-orange-dark);
-            padding: 8px;
-            border-radius: 8px;
+            padding: 12px 10px;
+            border-radius: 10px;
             text-align: center;
-            font-size: 11.5px;
-            font-weight: 700;
+            font-size: 13.5px;
+            font-weight: 800;
             cursor: pointer;
             margin-bottom: 6px;
         }
 
         .file-name-display {
-            font-size: 10.5px;
+            font-size: 12px;
+            font-weight: 600;
             color: var(--text-sub);
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .preview-container {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             flex-wrap: wrap;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .preview-thumb-box {
             position: relative;
-            width: 58px;
-            height: 58px;
+            width: 64px;
+            height: 64px;
         }
 
         .preview-thumb-box img {
@@ -623,15 +656,15 @@
 
         .remove-img-btn {
             position: absolute;
-            top: -4px;
-            right: -4px;
+            top: -5px;
+            right: -5px;
             background: #dc2626;
             color: #ffffff;
             border: none;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            font-size: 10px;
+            font-size: 11px;
             cursor: pointer;
             font-weight: 800;
         }
@@ -640,10 +673,11 @@
             background: linear-gradient(135deg, #ff7a00, #ff4d00);
             color: #ffffff;
             border: none;
-            border-radius: 10px;
-            padding: 9px 12px;
+            border-radius: 11px;
+            padding: 12px 14px;
+            min-height: 48px;
             width: 100%;
-            font-size: 12.5px;
+            font-size: 14.5px;
             font-weight: 800;
             cursor: pointer;
             font-family: inherit;
@@ -940,13 +974,12 @@
 
             <div class="utility-actions-bar">
                 <button class="utility-btn primary-action" id="toggleFormBtn" type="button">📢 إضافة إعلان أو بضاعة</button>
-                <button class="utility-btn" type="button" onclick="openOrdersHistoryModal()">🔐 سجل الطلبات (الإدارة)</button>
             </div>
 
             <div id="addFormContainer" class="form-container">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <h3 style="margin:0; color:#e64a00; font-size:13.5px; font-weight:800;">تقديم طلب إضافة إعلان أو بضاعة</h3>
-                    <button type="button" onclick="closeListingsFormDrawer()" style="background:#f3f4f6; color:#111827; border:none; border-radius:6px; padding:3px 8px; font-size:11px; font-weight:700; cursor:pointer;">إغلاق ✕</button>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <h3 style="margin:0; color:#e64a00; font-size:16px; font-weight:900;">تقديم طلب إضافة إعلان أو بضاعة</h3>
+                    <button type="button" onclick="closeListingsFormDrawer()" style="background:#f3f4f6; color:#111827; border:none; border-radius:8px; padding:5px 10px; font-size:12.5px; font-weight:800; cursor:pointer;">إغلاق ✕</button>
                 </div>
 
                 <div class="whatsapp-priority-tip">
@@ -958,22 +991,22 @@
                     <button type="button" class="clear-saved-btn" onclick="clearSavedOwnerProfile()">مسح بياناتي</button>
                 </div>
                 
-                <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">🏷️ اسم المحل أو صاحب المشروع (إجباري):</label>
+                <label class="listing-field-label">🏷️ اسم المحل أو صاحب المشروع (إجباري):</label>
                 <input type="text" id="reqName" placeholder="أدخل اسم المحل أو اسمك هنا...">
 
-                <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">💬 رقم واتساب للطلبات (موصى به لاستلام الطلبات مباشرة):</label>
+                <label class="listing-field-label">💬 رقم واتساب للطلبات (موصى به لاستلام الطلبات مباشرة):</label>
                 <input type="text" id="reqOrderWhatsapp" placeholder="مثال: 07801234567">
 
-                <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">📞 رقم هاتف إضافي للتواصل:</label>
+                <label class="listing-field-label">📞 رقم هاتف إضافي للتواصل:</label>
                 <input type="text" id="reqPhone" placeholder="07701234567">
 
-                <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">📸 رابط أو يوزر إنستغرام (للدخول المباشر للصفحة):</label>
+                <label class="listing-field-label">📸 رابط أو يوزر إنستغرام (للدخول المباشر للصفحة):</label>
                 <input type="text" id="reqInsta" placeholder="مثال: username أو https://instagram.com/username">
 
-                <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">📘 رابط فيسبوك (اختياري):</label>
+                <label class="listing-field-label">📘 رابط فيسبوك (اختياري):</label>
                 <input type="text" id="reqFb" placeholder="https://facebook.com/...">
 
-                <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">📂 القسم:</label>
+                <label class="listing-field-label">📂 القسم:</label>
                 <select id="reqCat">
                     <option value="أشياء أخرى">-- اختر القسم المناسب --</option>
                     <option value="شغل بيوت">🏠 شغل بيوت (أسر منتجة ومعجنات)</option>
@@ -984,20 +1017,20 @@
                     <option value="أشياء أخرى">أشياء أخرى</option>
                 </select>
 
-                <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">👤 صورة الشعار (اختياري):</label>
+                <label class="listing-field-label">👤 صورة الشعار (اختياري):</label>
                 <label for="reqLogoFile" class="custom-file-upload">📷 اختر صورة الشعار</label>
                 <input type="file" id="reqLogoFile" accept="image/*" style="display:none;" onchange="updateLogoFileName(this)">
                 <div id="logoFileNameDisplay" class="file-name-display">لم يتم اختيار أي صورة</div>
                 
-                <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">🖼️ صور المنتج أو العمل (اختياري):</label>
+                <label class="listing-field-label">🖼️ صور المنتج أو العمل (اختياري):</label>
                 <label for="reqImagesFiles" class="custom-file-upload">🖼️ اختر صور المنتجات</label>
                 <input type="file" id="reqImagesFiles" accept="image/*" multiple style="display:none;" onchange="handleImageSelection(event)">
                 <div id="selectedImagesPreview" class="preview-container"></div>
 
-                <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">📍 العنوان / الحي:</label>
+                <label class="listing-field-label">📍 العنوان / الحي:</label>
                 <input type="text" id="reqAddress" placeholder="مثال: القيارة - حي الحيالي (يوجد توصيل)">
 
-                <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">💰 السعر والملاحظات:</label>
+                <label class="listing-field-label">💰 السعر والملاحظات:</label>
                 <input type="text" id="reqPrice" placeholder="مثال: 15,000 د.ع أو حسب الطلب">
 
                 <button class="submit-btn" id="submitListingBtn" type="button">إرسال الطلب للإدارة</button>
@@ -1039,45 +1072,6 @@
             <span>الإدارة</span>
         </button>
     </nav>
-
-    <!-- نافذة سجل الطلبات الكامل (مخصصة للمدير) -->
-    <div class="custom-modal" id="ordersHistoryModal">
-        <div class="custom-modal-content" style="max-width: 440px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h3 style="margin:0; color:#e64a00; font-size:14px; font-weight:800;">📋 سجل الطلبات التفصيلي (للمدير)</h3>
-                <button type="button" onclick="closeModal('ordersHistoryModal')" style="background:none; color:#111827; border:none; font-size:15px; cursor:pointer;">✕</button>
-            </div>
-
-            <div class="info-offer-box" style="margin-top:0; margin-bottom:8px; font-size:11px;">
-                <b>كيف يعمل هذا السجل لك كمدير؟</b> يسجّل جميع الطلبات والزيارات (سواء وُجد واتساب لدى الجهة أو لم يتوفر كمتابعة احتياطية، إضافة إلى زيارات إنستغرام/فيسبوك من التطبيق) لمتابعة الحالات، معرفة أكثر الجهات طلباً، وتصدير التقارير.
-            </div>
-
-            <div id="ordersHistoryAuthBox" style="display:none; background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:10px; margin-bottom:8px;">
-                <div style="font-size:11.5px; font-weight:800; color:#c2410c; margin-bottom:6px;">🔐 أدخل رمز الإدارة لعرض سجل الطلبات:</div>
-                <input type="password" id="ordersHistoryPinInput" placeholder="أدخل الرمز السري للإدارة" style="width:100%; padding:8px; font-size:12px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:6px; font-family:inherit;">
-                <button type="button" class="submit-btn" onclick="unlockOrdersHistoryWithPin()">فتح سجل الطلبات</button>
-            </div>
-
-            <div id="ordersHistoryContentArea">
-                <input type="text" id="orderSearchInput" oninput="renderOrdersHistory()" placeholder="ابحث باسم الزبون، رقم الهاتف، أو اسم المحل..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:8px; font-family:inherit;">
-
-                <div style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px;">
-                    <button type="button" class="cat-chip active" data-order-filter="all" onclick="setOrderFilter('all', this)">الكل</button>
-                    <button type="button" class="cat-chip" data-order-filter="new" onclick="setOrderFilter('new', this)">جديد / واتساب</button>
-                    <button type="button" class="cat-chip" data-order-filter="processing" onclick="setOrderFilter('processing', this)">قيد التجهيز</button>
-                    <button type="button" class="cat-chip" data-order-filter="completed" onclick="setOrderFilter('completed', this)">مكتمل</button>
-                </div>
-
-                <div style="display:flex; gap:6px; margin-bottom:10px;">
-                    <button type="button" class="mini-like-btn" style="flex:1; padding:6px;" onclick="refreshOrdersHistory()">🔄 تحديث السجل</button>
-                    <button type="button" class="mini-call-link" style="flex:1; cursor:pointer; font-family:inherit;" onclick="exportOrdersCsv()">📥 تصدير CSV</button>
-                </div>
-
-                <div id="ordersHistoryStats" class="info-offer-box" style="margin-top:0; font-size:11px;"></div>
-                <div id="ordersHistoryList" style="max-height:260px; overflow-y:auto;"></div>
-            </div>
-        </div>
-    </div>
 
     <!-- نافذة الطلب عبر واتساب أولاً + سجل احتياطي عند غياب واتساب + دخول إنستغرام -->
     <div class="custom-modal" id="inAppOrderModal">
@@ -1225,8 +1219,6 @@
         let lastOrderMessageText = '';
         let toastTimer = null;
         let autoSyncInterval = null;
-        let allOrdersCache = [];
-        let currentOrderFilter = 'all';
         window.allListings = [];
         window.groupedPages = [];
         const CHARITY_LOCAL_KEY = "sahl_alwusool_charity_items_v1";
@@ -1905,207 +1897,6 @@
                 `;
             }
             showToastNotice('تم حفظ الطلب في السجل الاحتياطي لعدم توفر رقم واتساب للجهة.');
-        }
-
-        function syncOrdersHistoryAccessView() {
-            const authBox = document.getElementById('ordersHistoryAuthBox');
-            const contentArea = document.getElementById('ordersHistoryContentArea');
-            if (!authBox || !contentArea) return;
-
-            if (isAdminLoggedIn) {
-                authBox.style.display = 'none';
-                contentArea.style.display = 'block';
-            } else {
-                authBox.style.display = 'block';
-                contentArea.style.display = 'none';
-            }
-        }
-
-        function unlockOrdersHistoryWithPin() {
-            const pinInput = document.getElementById('ordersHistoryPinInput');
-            const entered = pinInput ? pinInput.value : '';
-            if (entered === ADMIN_PIN_CODE) {
-                isAdminLoggedIn = true;
-                if (pinInput) pinInput.value = '';
-                syncOrdersHistoryAccessView();
-                refreshOrdersHistory();
-                showToastNotice('تم فتح سجل الطلبات للإدارة ✅');
-            } else {
-                alert('الرمز السري غير صحيح!');
-            }
-        }
-
-        function openOrdersHistoryModal() {
-            const modal = document.getElementById('ordersHistoryModal');
-            if (!modal) return;
-            modal.style.display = 'flex';
-            syncModalScrollLock();
-            syncOrdersHistoryAccessView();
-            if (isAdminLoggedIn) {
-                refreshOrdersHistory();
-            }
-        }
-
-        function setOrderFilter(filterKey, btn) {
-            currentOrderFilter = filterKey;
-            document.querySelectorAll('#ordersHistoryModal .cat-chip').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-            renderOrdersHistory();
-        }
-
-        async function refreshOrdersHistory() {
-            if (!isAdminLoggedIn) {
-                syncOrdersHistoryAccessView();
-                return;
-            }
-
-            const listEl = document.getElementById('ordersHistoryList');
-            if (listEl) {
-                listEl.innerHTML = '<p style="font-size:11px; color:var(--text-sub); text-align:center;">جاري جلب سجل الطلبات...</p>';
-            }
-
-            const merged = new Map();
-            (getLocalOrders() || []).forEach(item => {
-                merged.set(String(item.id), {
-                    ...item,
-                    orderState: item.orderState || 'new',
-                    timestamp: Number(item.timestamp || Date.now())
-                });
-            });
-
-            try {
-                await waitForFirebase();
-                const snap = await window.getDocs(window.collection(window.db, "app_orders"));
-                snap.forEach(docSnap => {
-                    const data = docSnap.data() || {};
-                    const prev = merged.get(String(docSnap.id)) || {};
-                    merged.set(String(docSnap.id), {
-                        ...prev,
-                        id: docSnap.id,
-                        ...data,
-                        orderState: data.orderState || prev.orderState || 'new',
-                        timestamp: Number(data.timestamp || prev.timestamp || Date.now())
-                    });
-                });
-            } catch (err) {
-                console.warn("Firestore orders fetch warning:", err);
-            }
-
-            allOrdersCache = Array.from(merged.values()).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-            renderOrdersHistory();
-        }
-
-        async function updateOrderState(orderId, nextState) {
-            const target = allOrdersCache.find(o => String(o.id) === String(orderId));
-            if (!target) return;
-            target.orderState = nextState;
-
-            try {
-                const localList = getLocalOrders().map(item =>
-                    String(item.id) === String(orderId) ? { ...item, orderState: nextState } : item
-                );
-                localStorage.setItem(LOCAL_ORDERS_KEY, JSON.stringify(localList));
-            } catch (e) {}
-
-            if (!String(orderId).startsWith('ord_') && !String(orderId).startsWith('soc_') && window.db && window.updateDoc) {
-                try {
-                    await window.updateDoc(window.doc(window.db, "app_orders", String(orderId)), { orderState: nextState });
-                } catch (e) {
-                    console.warn("Update orderState warning:", e);
-                }
-            }
-
-            renderOrdersHistory();
-            showToastNotice('تم تحديث حالة الطلب ✅');
-        }
-
-        function renderOrdersHistory() {
-            const listEl = document.getElementById('ordersHistoryList');
-            const statsEl = document.getElementById('ordersHistoryStats');
-            const query = normalizeArabicText((document.getElementById('orderSearchInput')?.value || ''));
-            if (!listEl) return;
-
-            const filtered = allOrdersCache.filter(order => {
-                const state = order.orderState || 'new';
-                const matchesState = currentOrderFilter === 'all' || state === currentOrderFilter;
-                const hay = normalizeArabicText(`${order.storeName || ''} ${order.customerName || ''} ${order.customerPhone || ''} ${order.orderDetails || ''} ${order.channel || ''}`);
-                const matchesText = !query || hay.includes(query);
-                return matchesState && matchesText;
-            });
-
-            const totalCount = allOrdersCache.length;
-            const completedCount = allOrdersCache.filter(o => o.orderState === 'completed').length;
-            const newCount = allOrdersCache.filter(o => (o.orderState || 'new') === 'new').length;
-
-            if (statsEl) {
-                statsEl.innerHTML = `إجمالي السجل: <b>${totalCount}</b> • جديد: <b>${newCount}</b> • مكتمل: <b>${completedCount}</b> • المعروض: <b>${filtered.length}</b>`;
-            }
-
-            if (filtered.length === 0) {
-                listEl.innerHTML = '<p style="font-size:11px; color:var(--text-sub); text-align:center;">لا توجد طلبات مطابقة للبحث أو الفلتر.</p>';
-                return;
-            }
-
-            const stateLabels = {
-                new: 'جديد',
-                processing: 'قيد التجهيز',
-                completed: 'مكتمل'
-            };
-
-            listEl.innerHTML = filtered.map(o => {
-                const currentState = o.orderState || 'new';
-                const dateStr = o.timeText || new Date(o.timestamp || Date.now()).toLocaleString('ar-IQ');
-                const typeBadge = o.statusLabel || o.channel || 'طلب';
-                return `
-                    <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:9px; padding:8px 10px; margin-bottom:7px; font-size:11px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:4px;">
-                            <b style="color:#b91c1c;">${escapeHtmlText(o.storeName || 'جهة غير محددة')}</b>
-                            <span style="color:var(--text-sub); font-size:10px;">${escapeHtmlText(dateStr)}</span>
-                        </div>
-                        <div style="margin-bottom:4px; color:#c2410c; font-weight:700; font-size:10.5px;">
-                            📌 ${escapeHtmlText(typeBadge)} • الحالة: <b>${escapeHtmlText(stateLabels[currentState] || 'جديد')}</b>
-                        </div>
-                        <div style="margin-bottom:4px;">
-                            👤 <b>${escapeHtmlText(o.customerName || 'زبون')}</b>
-                            ${o.customerPhone ? `• 📞 <a href="tel:${escapeHtmlText(o.customerPhone)}" style="color:var(--success-green); font-weight:700; text-decoration:none;">${escapeHtmlText(o.customerPhone)}</a>` : ''}
-                        </div>
-                        <div style="color:var(--text-main); margin-bottom:6px;">📝 ${escapeHtmlText(o.orderDetails || '')}</div>
-                        <div style="display:flex; gap:4px; flex-wrap:wrap;">
-                            <button type="button" class="mini-like-btn" onclick="updateOrderState('${escapeJsSingleQuote(o.id)}', 'new')">جديد</button>
-                            <button type="button" class="mini-like-btn" onclick="updateOrderState('${escapeJsSingleQuote(o.id)}', 'processing')">قيد التجهيز</button>
-                            <button type="button" class="mini-call-link" style="cursor:pointer; font-family:inherit;" onclick="updateOrderState('${escapeJsSingleQuote(o.id)}', 'completed')">مكتمل</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function exportOrdersCsv() {
-            if (!allOrdersCache.length) {
-                alert('لا توجد بيانات طلبات لتصديرها.');
-                return;
-            }
-            const headers = ['الجهة', 'الزبون', 'الهاتف', 'التفاصيل', 'المسار', 'الحالة', 'الوقت'];
-            const rows = allOrdersCache.map(o => [
-                o.storeName || '',
-                o.customerName || '',
-                o.customerPhone || '',
-                o.orderDetails || '',
-                o.channel || '',
-                o.orderState || 'new',
-                o.timeText || new Date(o.timestamp || Date.now()).toLocaleString('ar-IQ')
-            ]);
-            const csvContent = '\uFEFF' + [headers, ...rows]
-                .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
-                .join('\n');
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'sahl-alwusool-orders.csv';
-            link.click();
-            URL.revokeObjectURL(url);
         }
 
         function switchAdminSection(section) {
