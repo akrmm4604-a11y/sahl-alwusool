@@ -949,7 +949,7 @@
         </button>
     </nav>
 
-    <!-- نافذة الطلب المباشر داخل التطبيق مع التوجيه التلقائي لقناة العميل -->
+    <!-- نافذة الطلب المباشر داخل التطبيق مع التوجيه التلقائي للمراسلة -->
     <div class="custom-modal" id="inAppOrderModal">
         <div class="custom-modal-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -957,16 +957,16 @@
                 <button type="button" onclick="closeModal('inAppOrderModal')" style="background:none; border:none; font-size:15px; cursor:pointer;">✕</button>
             </div>
             <div id="orderStoreBanner" class="info-offer-box" style="margin-top:0;"></div>
-            <p style="font-size:11px; color:var(--text-sub); margin:0 0 8px 0;">يُرسل طلبك مباشرة إلى قناة العميل المتوفرة (واتساب أو إنستغرام أو فيسبوك) بدون تسجيل دخول.</p>
+            <p style="font-size:11px; color:var(--text-sub); margin:0 0 8px 0;">يُحوّل طلبك مباشرة إلى مراسلة العميل مع توضيح أنه أتى من <b>تطبيق سهل الوصول</b>.</p>
 
             <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">👤 اسمك (اختياري):</label>
-            <input type="text" id="orderCustomerName" placeholder="مثال: أبو علي" style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:6px; font-family:inherit;">
+            <input type="text" id="orderCustomerName" placeholder="مثال: ابراهيم" style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:6px; font-family:inherit;">
 
             <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">📞 رقم هاتفك (إجباري للتواصل):</label>
             <input type="text" id="orderCustomerPhone" placeholder="0770..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:6px; font-family:inherit;">
 
             <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">📝 تفاصيل الطلب / الكمية / العنوان:</label>
-            <textarea id="orderDetailsInput" rows="3" placeholder="مثال: أريد طلب صينية معجنات، التوصيل إلى القيارة - حي المعلمين..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:8px; font-family:inherit;"></textarea>
+            <textarea id="orderDetailsInput" rows="3" placeholder="مثال: قالب كيك أو صينية معجنات..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:8px; font-family:inherit;"></textarea>
 
             <button class="submit-btn" id="confirmInAppOrderBtn" type="button" onclick="submitInAppOrder()">تأكيد الطلب وإرساله للعميل ✅</button>
             <div id="orderWhatsappFallback" style="margin-top:8px;"></div>
@@ -1096,7 +1096,7 @@
             if (toastTimer) clearTimeout(toastTimer);
             toastTimer = setTimeout(() => {
                 toastEl.style.display = 'none';
-            }, 2800);
+            }, 3000);
         }
 
         async function copyTextSafe(text) {
@@ -1132,6 +1132,55 @@
             if (digits.startsWith('0')) return '964' + digits.slice(1);
             if (digits.length === 10) return '964' + digits;
             return digits;
+        }
+
+        function extractUsernameOrHandle(url) {
+            const raw = String(url || '').trim();
+            if (!raw) return '';
+            try {
+                const clean = raw
+                    .replace(/^https?:\/\//i, '')
+                    .replace(/^(www\.|m\.|web\.)/i, '')
+                    .split('?')[0]
+                    .split('#')[0]
+                    .replace(/\/+$/, '');
+                const parts = clean.split('/').filter(Boolean);
+                if (parts.length >= 2) {
+                    return parts[parts.length - 1];
+                }
+                return '';
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function buildMessengerDirectUrl(fbUrl) {
+            const raw = String(fbUrl || '').trim();
+            if (!raw) return '';
+            if (raw.includes('m.me/')) return raw;
+
+            const idMatch = raw.match(/[?&]id=(\d+)/);
+            if (idMatch && idMatch[1]) {
+                return `https://m.me/${idMatch[1]}`;
+            }
+
+            const handle = extractUsernameOrHandle(raw);
+            if (handle && !['profile.php', 'pages', 'people', 'share'].includes(handle.toLowerCase())) {
+                return `https://m.me/${handle}`;
+            }
+            return raw;
+        }
+
+        function buildInstagramDirectUrl(instaUrl) {
+            const raw = String(instaUrl || '').trim();
+            if (!raw) return '';
+            if (raw.includes('ig.me/m/')) return raw;
+
+            const handle = extractUsernameOrHandle(raw);
+            if (handle) {
+                return `https://ig.me/m/${handle}`;
+            }
+            return raw;
         }
 
         function syncModalScrollLock() {
@@ -1503,13 +1552,13 @@
             const waFallbackEl = document.getElementById('orderWhatsappFallback');
 
             const channelHint = hasValidPhoneNumber(store.phone)
-                ? 'واتساب العميل'
-                : (store.insta ? 'إنستغرام العميل (مع نسخ الطلب تلقائياً)' : (store.fb ? 'فيسبوك العميل (مع نسخ الطلب تلقائياً)' : 'سجل الطلبات'));
+                ? 'مراسلة واتساب العميل مباشرة'
+                : (store.insta ? 'مراسلة إنستغرام العميل (مع نسخ الرسالة تلقائياً)' : (store.fb ? 'مراسلة مسنجر العميل (مع نسخ الرسالة تلقائياً)' : 'سجل الطلبات'));
 
             if (bannerEl) {
                 bannerEl.innerHTML = `
                     <div style="font-weight:900; color:var(--danger-red); font-size:13.5px;">📌 ${escapeHtmlText(store.name)}</div>
-                    <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">📍 ${escapeHtmlText(store.address || 'غير محدد')} • التوجيه الآلي: <b>${channelHint}</b></div>
+                    <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">📍 ${escapeHtmlText(store.address || 'غير محدد')} • التحويل: <b>${channelHint}</b></div>
                     ${store.price ? `<div style="font-size:11.5px; font-weight:800; color:var(--brand-orange-dark); margin-top:3px;">💰 ${escapeHtmlText(store.price)}</div>` : ''}
                 `;
             }
@@ -1543,11 +1592,11 @@
             }
         }
 
-        // تأكيد الطلب وتوجيهه آلياً إلى واتساب أو إنستغرام أو فيسبوك + تسجيل عدّاد مختصر للإدارة
+        // تأكيد الطلب وتحويل الزبون مباشرة للمراسلة مع توضيح أنه أتى من تطبيق سهل الوصول
         async function submitInAppOrder() {
             if (!activeOrderTargetStore) return;
 
-            const customerName = (document.getElementById('orderCustomerName').value || '').trim() || 'زبون التطبيق';
+            const customerName = (document.getElementById('orderCustomerName').value || '').trim() || 'ابراهيم';
             const customerPhone = (document.getElementById('orderCustomerPhone').value || '').trim();
             const orderDetails = (document.getElementById('orderDetailsInput').value || '').trim();
 
@@ -1564,7 +1613,7 @@
 
             const btn = document.getElementById('confirmInAppOrderBtn');
             btn.disabled = true;
-            btn.textContent = 'جاري إرسال طلبك...';
+            btn.textContent = 'جاري التحويل للمراسلة...';
 
             saveCustomerProfile({ name: customerName, phone: customerPhone });
 
@@ -1615,16 +1664,18 @@
             await copyTextSafe(orderMessageText);
 
             if (waNum) {
-                showToastNotice('تم تسجيل الطلب ونسخه — جاري فتح واتساب العميل...');
+                showToastNotice('تم تأكيد الطلب (من تطبيق سهل الوصول) — جاري فتح مراسلة واتساب...');
                 window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(orderMessageText)}`, '_blank');
             } else if (instaUrl) {
-                showToastNotice('تم نسخ تفاصيل الطلب تلقائياً — الصقها في رسالة إنستغرام العميل');
-                window.open(instaUrl, '_blank');
+                const igDirect = buildInstagramDirectUrl(instaUrl);
+                showToastNotice('تم نسخ الرسالة (من تطبيق سهل الوصول) — جاري فتح مراسلة إنستغرام للصقها فوراً');
+                window.open(igDirect, '_blank');
             } else if (fbUrl) {
-                showToastNotice('تم نسخ تفاصيل الطلب تلقائياً — الصقها في رسالة فيسبوك العميل');
-                window.open(fbUrl, '_blank');
+                const fbDirect = buildMessengerDirectUrl(fbUrl);
+                showToastNotice('تم نسخ الرسالة (من تطبيق سهل الوصول) — جاري فتح مراسلة مسنجر للصقها فوراً');
+                window.open(fbDirect, '_blank');
             } else {
-                showToastNotice('تم تسجيل الطلب بنجاح ✅');
+                showToastNotice('تم تسجيل الطلب عبر تطبيق سهل الوصول بنجاح ✅');
             }
 
             btn.disabled = false;
@@ -1750,7 +1801,7 @@
 
             const phoneLineHtml = hasPhone
                 ? `<div style="font-size:11.5px; margin-bottom:8px;">📞 <b>الهاتف:</b> <a href="tel:${safePhone}" style="color:var(--success-green); font-weight:700; text-decoration:none;">${safePhone}</a></div>`
-                : `<div style="font-size:11.5px; margin-bottom:8px;">🛒 <b>الطلب:</b> يُوجّه تلقائياً لقناة العميل المتاحة</div>`;
+                : `<div style="font-size:11.5px; margin-bottom:8px;">🛒 <b>الطلب:</b> يُوجّه تلقائياً لمراسلة العميل</div>`;
 
             bodyEl.innerHTML = `
                 <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
@@ -2851,4 +2902,4 @@
         };
     </script>
 </body>
-                    </html>
+    </html>
