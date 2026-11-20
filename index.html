@@ -644,11 +644,19 @@
             margin-bottom: 10px;
         }
 
+        .profile-post-info-box {
+            background: #fafafa;
+            border: 1px solid #f3f4f6;
+            border-radius: 9px;
+            padding: 9px 10px;
+        }
+
         .profile-post-title {
-            font-size: 12.5px;
-            font-weight: 800;
-            color: var(--text-main);
-            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 900;
+            color: var(--danger-red);
+            margin-bottom: 4px;
+            line-height: 1.4;
         }
 
         .bottom-nav-bar {
@@ -2088,16 +2096,29 @@
 
             const postsHtml = posts.map((post, idx) => {
                 const imgs = Array.isArray(post.images) ? post.images.filter(Boolean) : [];
+                const fullPostName = escapeHtmlText(post.title || store.name || `إعلان ${idx + 1}`);
+                const postPrice = post.price ? escapeHtmlText(post.price) : '';
+                const postAddr = post.address ? escapeHtmlText(post.address) : '';
+
                 return `
                     <div class="profile-post-item">
-                        <div class="profile-post-title">📌 إعلان ${idx + 1}${post.price ? ` — ${escapeHtmlText(post.price)}` : ''}</div>
-                        ${post.address ? `<div style="font-size:11px; color:var(--text-sub); margin-bottom:6px;">📍 ${escapeHtmlText(post.address)}</div>` : ''}
                         ${imgs.length > 0
-                            ? `<div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px;">
-                                ${imgs.map(img => `<img src="${img}" style="width:100%; height:135px; border-radius:10px; object-fit:cover; border:1px solid #e5e7eb; cursor:pointer;" alt="صورة الإعلان" onclick="openImageModal('${img}')">`).join('')}
+                            ? `<div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px; margin-bottom:10px;">
+                                ${imgs.map(img => `<img src="${img}" style="width:100%; height:140px; border-radius:10px; object-fit:cover; border:1px solid #e5e7eb; cursor:pointer;" alt="${fullPostName}" onclick="openImageModal('${img}')">`).join('')}
                                </div>`
-                            : '<p style="font-size:11px; color:var(--text-sub); margin:0;">لا توجد صور مرفقة لهذا الإعلان.</p>'
+                            : ''
                         }
+                        <div class="profile-post-info-box">
+                            <div class="profile-post-title">📌 إعلان ${idx + 1}: ${fullPostName}</div>
+                            ${postPrice
+                                ? `<div style="font-size:13px; font-weight:800; color:#111827; margin-bottom:4px;">💰 السعر والملاحظات: <span style="color:var(--brand-orange-dark);">${postPrice}</span></div>`
+                                : ''
+                            }
+                            ${postAddr
+                                ? `<div style="font-size:11.5px; color:var(--text-sub);">📍 ${postAddr}</div>`
+                                : ''
+                            }
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -2442,4 +2463,4 @@
         };
     </script>
 </body>
-                        </html>
+    </html>
