@@ -627,33 +627,6 @@
             cursor: pointer;
         }
 
-        .social-links {
-            display: flex;
-            gap: 8px;
-            margin: 10px 0;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .social-badge {
-            text-decoration: none;
-            color: #ffffff;
-            padding: 6px 12px;
-            border-radius: 9px;
-            font-size: 12px;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            opacity: 0.92;
-        }
-
-        .fb-badge { background: #2563eb; }
-        .insta-badge {
-            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-        }
-
         .profile-post-item {
             background: #ffffff;
             border: 1px solid #e5e7eb;
@@ -793,6 +766,17 @@
             line-height: 1.5;
         }
 
+        .in-app-receipt-box {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 11.5px;
+            color: var(--text-main);
+            line-height: 1.55;
+        }
+
         .toast-notice {
             display: none;
             position: fixed;
@@ -876,11 +860,8 @@
                 <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">📞 رقم الهاتف للتواصل:</label>
                 <input type="text" id="reqPhone" placeholder="07701234567">
 
-                <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">💬 رقم واتساب مخصص للطلبات (اختياري - إذا اختلف عن الهاتف العام):</label>
-                <input type="text" id="reqOrderWhatsapp" placeholder="مثال: 07801234567 (يُوجّه الطلبات إليه مباشرة)">
-
-                <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">✉️ يوزر المراسلة المباشر (إنستغرام أو مسنجر - اختياري):</label>
-                <input type="text" id="reqChatHandle" placeholder="مثال: sahl_store أو @sahl_store">
+                <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">💬 رقم واتساب للطلبات (اختياري - يفتح واتساب مباشرة):</label>
+                <input type="text" id="reqOrderWhatsapp" placeholder="مثال: 07801234567 (إذا تُرك فارغاً يُستخدم داخل التطبيق أو الهاتف)">
 
                 <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">📂 القسم:</label>
                 <select id="reqCat">
@@ -908,12 +889,6 @@
 
                 <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">💰 السعر والملاحظات:</label>
                 <input type="text" id="reqPrice" placeholder="مثال: 15,000 د.ع أو حسب الطلب">
-
-                <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">🔵 رابط فيسبوك (اختياري):</label>
-                <input type="text" id="reqFb" placeholder="https://facebook.com/...">
-
-                <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">📸 رابط انستغرام (اختياري):</label>
-                <input type="text" id="reqInsta" placeholder="https://instagram.com/...">
 
                 <button class="submit-btn" id="submitListingBtn" type="button">إرسال الطلب للإدارة</button>
             </div>
@@ -955,15 +930,15 @@
         </button>
     </nav>
 
-    <!-- نافذة الطلب المباشر داخل التطبيق مع التوجيه التلقائي للمراسلة -->
+    <!-- نافذة الطلب المباشر: واتساب أو داخل التطبيق فقط -->
     <div class="custom-modal" id="inAppOrderModal">
         <div class="custom-modal-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h3 style="margin:0; color:var(--brand-orange-dark); font-size:14px; font-weight:800;">🛒 طلب مباشر داخل التطبيق</h3>
+                <h3 style="margin:0; color:var(--brand-orange-dark); font-size:14px; font-weight:800;">🛒 طلب مباشر (واتساب أو داخل التطبيق)</h3>
                 <button type="button" onclick="closeModal('inAppOrderModal')" style="background:none; border:none; font-size:15px; cursor:pointer;">✕</button>
             </div>
             <div id="orderStoreBanner" class="info-offer-box" style="margin-top:0;"></div>
-            <p style="font-size:11px; color:var(--text-sub); margin:0 0 8px 0;">يُحوّل طلبك مباشرة إلى مراسلة العميل مع توضيح أنه أتى من <b>تطبيق سهل الوصول</b>.</p>
+            <p style="font-size:11px; color:var(--text-sub); margin:0 0 8px 0;">يتم إرسال الطلب عبر <b>واتساب</b> إذا كان متوفراً، أو تسجيله مباشرة <b>داخل التطبيق</b> مع توضيح أنه من <b>تطبيق سهل الوصول</b>.</p>
 
             <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">👤 اسمك (اختياري):</label>
             <input type="text" id="orderCustomerName" placeholder="مثال: ابراهيم" style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:6px; font-family:inherit;">
@@ -974,8 +949,8 @@
             <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">📝 تفاصيل الطلب / الكمية / العنوان:</label>
             <textarea id="orderDetailsInput" rows="3" placeholder="مثال: قالب كيك أو صينية معجنات..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:8px; font-family:inherit;"></textarea>
 
-            <button class="submit-btn" id="confirmInAppOrderBtn" type="button" onclick="submitInAppOrder()">تأكيد الطلب وإرساله للعميل ✅</button>
-            <div id="orderWhatsappFallback" style="margin-top:8px;"></div>
+            <button class="submit-btn" id="confirmInAppOrderBtn" type="button" onclick="submitInAppOrder()">تأكيد الطلب وإرساله ✅</button>
+            <div id="orderReceiptBanner"></div>
         </div>
     </div>
 
@@ -1084,6 +1059,7 @@
         let selectedFilesArray = [];
         let currentCat = 'all';
         let activeOrderTargetStore = null;
+        let lastOrderMessageText = '';
         let toastTimer = null;
         let autoSyncInterval = null;
         window.allListings = [];
@@ -1126,9 +1102,15 @@
             }
         }
 
+        async function copyLastOrderText() {
+            if (!lastOrderMessageText) return;
+            const ok = await copyTextSafe(lastOrderMessageText);
+            showToastNotice(ok ? 'تم نسخ نص الطلب مرة أخرى ✅' : 'تعذر النسخ تلقائياً');
+        }
+
         function hasValidPhoneNumber(phone) {
             const cleaned = String(phone || '').trim();
-            return Boolean(cleaned && cleaned !== 'لا يوجد' && cleaned !== 'غير متوفر');
+            return Boolean(cleaned && cleaned !== 'لا يوجد' && cleaned !== 'غير متوفر' && cleaned.replace(/\D/g, '').length >= 7);
         }
 
         function formatIraqWhatsappNumber(phone) {
@@ -1140,141 +1122,30 @@
             return digits;
         }
 
-        function cleanHandleInput(handleOrUrl) {
-            const raw = String(handleOrUrl || '').trim();
-            if (!raw) return '';
-            if (!raw.includes('/') && !raw.includes('.')) {
-                return raw.replace(/^@+/, '').trim();
-            }
-            const clean = raw
-                .replace(/^https?:\/\//i, '')
-                .replace(/^(www\.|m\.|web\.|ig\.me\/m\/|m\.me\/)/i, '')
-                .split('?')[0]
-                .split('#')[0]
-                .replace(/\/+$/, '');
-            const parts = clean.split('/').filter(Boolean);
-            const skipSegments = new Set(['p', 'reel', 'reels', 'stories', 'tv', 'share', 'explore', 'direct']);
-            for (let i = 0; i < parts.length; i++) {
-                const seg = parts[i].replace(/^@+/, '').trim();
-                if (seg && !skipSegments.has(seg.toLowerCase())) {
-                    return seg;
-                }
-            }
-            return '';
-        }
-
-        function buildMessengerDirectUrl(fbUrl) {
-            const raw = String(fbUrl || '').trim();
-            if (!raw) return '';
-            if (raw.includes('m.me/')) return raw;
-
-            const idMatch = raw.match(/[?&]id=(\d+)/);
-            if (idMatch && idMatch[1]) {
-                return `https://m.me/${idMatch[1]}`;
-            }
-
-            const handle = cleanHandleInput(raw);
-            if (handle && !['profile.php', 'pages', 'people', 'share'].includes(handle.toLowerCase())) {
-                return `https://m.me/${handle}`;
-            }
-            return raw;
-        }
-
-        // فتح خانة المراسلة الخاصة للزبون مع إنستغرام بدقة
-        function buildInstagramDirectUrl(instaUrl) {
-            const raw = String(instaUrl || '').trim();
-            if (!raw) return '';
-            const handle = cleanHandleInput(raw);
-            if (handle) {
-                const isAndroid = /Android/i.test(navigator.userAgent || '');
-                if (isAndroid) {
-                    return `intent://ig.me/m/${encodeURIComponent(handle)}#Intent;package=com.instagram.android;scheme=https;S.browser_fallback_url=${encodeURIComponent(`https://ig.me/m/${handle}`)};end`;
-                }
-                return `https://ig.me/m/${handle}`;
-            }
-            if (raw.includes('ig.me/m/')) return raw;
-            return raw;
-        }
-
-        function openDirectMessagingChannel(routing, messageText, onCopiedNotice) {
-            if (!routing) return;
-            if (routing.type === 'whatsapp' && routing.url) {
-                showToastNotice(onCopiedNotice || 'تم تأكيد الطلب (من تطبيق سهل الوصول) — جاري فتح مراسلة واتساب...');
-                window.open(`${routing.url}?text=${encodeURIComponent(messageText)}`, '_blank');
-                return;
-            }
-            if ((routing.type === 'instagram' || routing.type === 'messenger') && routing.url) {
-                showToastNotice(onCopiedNotice || `تم نسخ الطلب (من تطبيق سهل الوصول) — جاري فتح صندوق مراسلة ${routing.channelLabel} للصق الرسالة`);
-                try {
-                    window.location.href = routing.url;
-                } catch (e) {
-                    window.open(routing.url, '_blank');
-                }
-                return;
-            }
-            showToastNotice('تم تسجيل الطلب عبر تطبيق سهل الوصول بنجاح ✅');
-        }
-
+        // ميزة الطلب مقتصرة على: واتساب أو داخل التطبيق فقط
         function resolveOrderRoutingTarget(store) {
             const orderWaRaw = (store.orderWhatsapp || '').trim();
             const phoneRaw = (store.phone || '').trim();
-            const chatHandleRaw = (store.chatHandle || '').trim();
-            const instaRaw = (store.insta || '').trim();
-            const fbRaw = (store.fb || '').trim();
 
             if (hasValidPhoneNumber(orderWaRaw)) {
                 return {
                     type: 'whatsapp',
-                    channelLabel: 'واتساب الطلبات المخصص',
+                    channelLabel: 'واتساب (الطلبات)',
                     url: `https://wa.me/${formatIraqWhatsappNumber(orderWaRaw)}`
                 };
-            }
-
-            if (chatHandleRaw) {
-                const cleanH = cleanHandleInput(chatHandleRaw);
-                if (cleanH) {
-                    const isFb = fbRaw && !instaRaw && fbRaw.toLowerCase().includes('facebook');
-                    const isAndroid = /Android/i.test(navigator.userAgent || '');
-                    const directUrl = isFb
-                        ? `https://m.me/${cleanH}`
-                        : (isAndroid
-                            ? `intent://ig.me/m/${encodeURIComponent(cleanH)}#Intent;package=com.instagram.android;scheme=https;S.browser_fallback_url=${encodeURIComponent(`https://ig.me/m/${cleanH}`)};end`
-                            : `https://ig.me/m/${cleanH}`);
-                    return {
-                        type: isFb ? 'messenger' : 'instagram',
-                        channelLabel: isFb ? 'مسنجر (مراسلة خاصة)' : 'إنستغرام (مراسلة خاصة)',
-                        url: directUrl
-                    };
-                }
             }
 
             if (hasValidPhoneNumber(phoneRaw)) {
                 return {
                     type: 'whatsapp',
-                    channelLabel: 'واتساب الرقم العام',
+                    channelLabel: 'واتساب',
                     url: `https://wa.me/${formatIraqWhatsappNumber(phoneRaw)}`
                 };
             }
 
-            if (instaRaw) {
-                return {
-                    type: 'instagram',
-                    channelLabel: 'إنستغرام (مراسلة خاصة)',
-                    url: buildInstagramDirectUrl(instaRaw)
-                };
-            }
-
-            if (fbRaw) {
-                return {
-                    type: 'messenger',
-                    channelLabel: 'مسنجر (مراسلة خاصة)',
-                    url: buildMessengerDirectUrl(fbRaw)
-                };
-            }
-
             return {
-                type: 'log',
-                channelLabel: 'سجل التطبيق',
+                type: 'in_app',
+                channelLabel: 'داخل التطبيق',
                 url: ''
             };
         }
@@ -1326,10 +1197,7 @@
                     (parsed.name && String(parsed.name).trim()) ||
                     (parsed.phone && String(parsed.phone).trim()) ||
                     (parsed.orderWhatsapp && String(parsed.orderWhatsapp).trim()) ||
-                    (parsed.chatHandle && String(parsed.chatHandle).trim()) ||
-                    (parsed.address && String(parsed.address).trim()) ||
-                    (parsed.fb && String(parsed.fb).trim()) ||
-                    (parsed.insta && String(parsed.insta).trim())
+                    (parsed.address && String(parsed.address).trim())
                 );
                 return hasAnyData ? parsed : null;
             } catch (e) {
@@ -1343,15 +1211,11 @@
                     name: (profile.name || '').trim(),
                     phone: profile.phone && profile.phone !== 'لا يوجد' ? String(profile.phone).trim() : '',
                     orderWhatsapp: (profile.orderWhatsapp || '').trim(),
-                    chatHandle: (profile.chatHandle || '').trim(),
                     category: profile.category || 'أشياء أخرى',
-                    address: profile.address && profile.address !== 'غير محدد' ? String(profile.address).trim() : '',
-                    fb: (profile.fb || '').trim(),
-                    insta: (profile.insta || '').trim()
+                    address: profile.address && profile.address !== 'غير محدد' ? String(profile.address).trim() : ''
                 };
                 const hasAnyData = Boolean(
-                    cleanData.name || cleanData.phone || cleanData.orderWhatsapp ||
-                    cleanData.chatHandle || cleanData.address || cleanData.fb || cleanData.insta
+                    cleanData.name || cleanData.phone || cleanData.orderWhatsapp || cleanData.address
                 );
                 if (hasAnyData) {
                     localStorage.setItem(SAVED_OWNER_KEY, JSON.stringify(cleanData));
@@ -1374,20 +1238,14 @@
             const nameEl = document.getElementById('reqName');
             const phoneEl = document.getElementById('reqPhone');
             const orderWaEl = document.getElementById('reqOrderWhatsapp');
-            const chatHandleEl = document.getElementById('reqChatHandle');
             const catEl = document.getElementById('reqCat');
             const addressEl = document.getElementById('reqAddress');
-            const fbEl = document.getElementById('reqFb');
-            const instaEl = document.getElementById('reqInsta');
 
             if (nameEl && !nameEl.value && saved.name) nameEl.value = saved.name;
             if (phoneEl && !phoneEl.value && saved.phone) phoneEl.value = saved.phone;
             if (orderWaEl && !orderWaEl.value && saved.orderWhatsapp) orderWaEl.value = saved.orderWhatsapp;
-            if (chatHandleEl && !chatHandleEl.value && saved.chatHandle) chatHandleEl.value = saved.chatHandle;
             if (catEl && saved.category) catEl.value = saved.category;
             if (addressEl && !addressEl.value && saved.address) addressEl.value = saved.address;
-            if (fbEl && !fbEl.value && saved.fb) fbEl.value = saved.fb;
-            if (instaEl && !instaEl.value && saved.insta) instaEl.value = saved.insta;
 
             if (noticeEl) {
                 noticeEl.style.display = 'flex';
@@ -1403,12 +1261,9 @@
             document.getElementById('reqName').value = '';
             document.getElementById('reqPhone').value = '';
             document.getElementById('reqOrderWhatsapp').value = '';
-            document.getElementById('reqChatHandle').value = '';
             document.getElementById('reqCat').value = 'أشياء أخرى';
             document.getElementById('reqAddress').value = '';
             document.getElementById('reqPrice').value = '';
-            document.getElementById('reqFb').value = '';
-            document.getElementById('reqInsta').value = '';
             const noticeEl = document.getElementById('savedOwnerNotice');
             if (noticeEl) noticeEl.style.display = 'none';
         }
@@ -1473,36 +1328,12 @@
             return digits.length >= 10 ? digits.slice(-10) : digits;
         }
 
-        function normalizeSocialUrlKey(url, platform) {
-            const raw = String(url || '').trim().toLowerCase();
-            if (!raw) return '';
-            const stripped = raw
-                .replace(/^https?:\/\//, '')
-                .replace(/^www\./, '')
-                .replace(/^m\./, '')
-                .replace(/^web\./, '')
-                .split('?')[0]
-                .split('#')[0]
-                .replace(/\/+$/, '');
-            if (!stripped) return '';
-            return `${platform}__${stripped}`;
-        }
-
         function getOwnerGroupKey(item) {
             const normPhone = normalizePhoneKey(item.phone || '');
             if (normPhone) return `phone__${normPhone}`;
 
             const normOrderWa = normalizePhoneKey(item.orderWhatsapp || '');
             if (normOrderWa) return `phone__${normOrderWa}`;
-
-            const normChatHandle = cleanHandleInput(item.chatHandle || '').toLowerCase();
-            if (normChatHandle) return `handle__${normChatHandle}`;
-
-            const normFb = normalizeSocialUrlKey(item.fb || '', 'fb');
-            if (normFb) return normFb;
-
-            const normInsta = normalizeSocialUrlKey(item.insta || '', 'insta');
-            if (normInsta) return normInsta;
 
             const normName = normalizeArabicText(item.name || '');
             if (normName) return `name__${normName}`;
@@ -1513,25 +1344,16 @@
         function findMatchingStoreRecord(items, candidate) {
             const candPhone = normalizePhoneKey(candidate.phone || '');
             const candOrderWa = normalizePhoneKey(candidate.orderWhatsapp || '');
-            const candHandle = cleanHandleInput(candidate.chatHandle || '').toLowerCase();
-            const candFb = normalizeSocialUrlKey(candidate.fb || '', 'fb');
-            const candInsta = normalizeSocialUrlKey(candidate.insta || '', 'insta');
             const candName = normalizeArabicText(candidate.name || '');
 
             return (items || []).find(item => {
                 const itemPhone = normalizePhoneKey(item.phone || '');
                 const itemOrderWa = normalizePhoneKey(item.orderWhatsapp || '');
-                const itemHandle = cleanHandleInput(item.chatHandle || '').toLowerCase();
-                const itemFb = normalizeSocialUrlKey(item.fb || '', 'fb');
-                const itemInsta = normalizeSocialUrlKey(item.insta || '', 'insta');
                 const itemName = normalizeArabicText(item.name || '');
 
                 if (candPhone && (itemPhone === candPhone || itemOrderWa === candPhone)) return true;
                 if (candOrderWa && (itemPhone === candOrderWa || itemOrderWa === candOrderWa)) return true;
-                if (candHandle && itemHandle && candHandle === itemHandle) return true;
-                if (candFb && itemFb && candFb === itemFb) return true;
-                if (candInsta && itemInsta && candInsta === itemInsta) return true;
-                if (!candPhone && !candOrderWa && !candHandle && !candFb && !candInsta && candName && itemName && candName === itemName) return true;
+                if (!candPhone && !candOrderWa && candName && itemName && candName === itemName) return true;
                 return false;
             });
         }
@@ -1577,9 +1399,6 @@
                     if (item.vip) existing.vip = true;
                     if (!existing.logo && item.logo) existing.logo = item.logo;
                     if (!existing.orderWhatsapp && item.orderWhatsapp) existing.orderWhatsapp = item.orderWhatsapp;
-                    if (!existing.chatHandle && item.chatHandle) existing.chatHandle = item.chatHandle;
-                    if (!existing.fb && item.fb) existing.fb = item.fb;
-                    if (!existing.insta && item.insta) existing.insta = item.insta;
                     if ((!existing.phone || existing.phone === 'لا يوجد') && item.phone && item.phone !== 'لا يوجد') {
                         existing.phone = item.phone;
                     }
@@ -1629,48 +1448,6 @@
             );
         }
 
-        async function handleSocialReferralClick(event, storeId, platformName, itemContext) {
-            if (event) event.preventDefault();
-            const store = findPageByAnyId(storeId) || (window.allListings || []).find(s => String(s.id) === String(storeId));
-            const targetName = store ? store.name : 'هذه الصفحة';
-            const detailPart = itemContext ? ` بخصوص (${itemContext})` : '';
-            const referralMsg = `مرحباً، تواصلت معكم عبر تطبيق سهل الوصول بخصوص صفحة (${targetName})${detailPart}.`;
-
-            if (store) {
-                store.contactClicks = (Number(store.contactClicks) || 0) + 1;
-                const docId = String(store.id);
-                if (!docId.startsWith('demo') && window.db && window.updateDoc && window.increment) {
-                    try {
-                        await window.updateDoc(window.doc(window.db, "listings", docId), {
-                            contactClicks: window.increment(1)
-                        });
-                    } catch (err) {
-                        console.warn("Contact click update warning:", err);
-                    }
-                }
-            }
-
-            const copied = await copyTextSafe(referralMsg);
-            const rawHref = event && event.currentTarget ? event.currentTarget.getAttribute('href') : '';
-            const targetUrl = platformName === 'انستغرام'
-                ? buildInstagramDirectUrl(rawHref || (store && store.insta) || '')
-                : buildMessengerDirectUrl(rawHref || (store && store.fb) || '');
-
-            if (copied) {
-                showToastNotice(`تم نسخ رسالة التعريف (${platformName}) — الصقها في خانة المراسلة لتوضيح أنك من تطبيق سهل الوصول`);
-            } else {
-                showToastNotice(`جاري فتح ${platformName} — اذكر أنك من تطبيق سهل الوصول`);
-            }
-
-            if (targetUrl) {
-                if (platformName === 'انستغرام') {
-                    window.location.href = targetUrl;
-                } else {
-                    window.open(targetUrl, '_blank');
-                }
-            }
-        }
-
         function openInAppOrderModal(storeId, prefilledNote) {
             const store = findPageByAnyId(storeId) || (window.allListings || []).find(s => String(s.id) === String(storeId));
             if (!store) return;
@@ -1683,12 +1460,12 @@
             const nameInput = document.getElementById('orderCustomerName');
             const phoneInput = document.getElementById('orderCustomerPhone');
             const detailsInput = document.getElementById('orderDetailsInput');
-            const waFallbackEl = document.getElementById('orderWhatsappFallback');
+            const receiptEl = document.getElementById('orderReceiptBanner');
 
             if (bannerEl) {
                 bannerEl.innerHTML = `
                     <div style="font-weight:900; color:var(--danger-red); font-size:13.5px;">📌 ${escapeHtmlText(store.name)}</div>
-                    <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">📍 ${escapeHtmlText(store.address || 'غير محدد')} • التوجيه: <b>${routing.channelLabel}</b></div>
+                    <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">📍 ${escapeHtmlText(store.address || 'غير محدد')} • طريقة الطلب: <b>${escapeHtmlText(routing.channelLabel)}</b></div>
                     ${store.price ? `<div style="font-size:11.5px; font-weight:800; color:var(--brand-orange-dark); margin-top:3px;">💰 ${escapeHtmlText(store.price)}</div>` : ''}
                 `;
             }
@@ -1696,7 +1473,7 @@
             if (nameInput) nameInput.value = savedCust && savedCust.name ? savedCust.name : '';
             if (phoneInput) phoneInput.value = savedCust && savedCust.phone ? savedCust.phone : '';
             if (detailsInput) detailsInput.value = prefilledNote || '';
-            if (waFallbackEl) waFallbackEl.innerHTML = '';
+            if (receiptEl) receiptEl.innerHTML = '';
 
             document.getElementById('inAppOrderModal').style.display = 'flex';
             syncModalScrollLock();
@@ -1742,7 +1519,7 @@
 
             const btn = document.getElementById('confirmInAppOrderBtn');
             btn.disabled = true;
-            btn.textContent = 'جاري التحويل للمراسلة...';
+            btn.textContent = 'جاري إرسال الطلب...';
 
             saveCustomerProfile({ name: customerName, phone: customerPhone });
 
@@ -1755,13 +1532,19 @@
                 `• الهاتف: ${customerPhone}\n` +
                 `• الطلب: ${orderDetails}`;
 
+            lastOrderMessageText = orderMessageText;
+
+            const timeText = new Date().toLocaleTimeString('ar-IQ', { hour: '2-digit', minute: '2-digit' });
             const compactDoneLog = {
                 id: 'ord_' + Date.now(),
                 statusLabel: 'تم طلب',
                 storeId: activeOrderTargetStore.id,
                 storeName: activeOrderTargetStore.name || 'مشروع محلي',
+                customerName,
+                customerPhone,
+                orderDetails,
                 channel: routing.channelLabel,
-                timeText: new Date().toLocaleTimeString('ar-IQ', { hour: '2-digit', minute: '2-digit' }),
+                timeText,
                 timestamp: Date.now()
             };
 
@@ -1783,15 +1566,32 @@
 
             await copyTextSafe(orderMessageText);
 
-            openDirectMessagingChannel(
-                routing,
-                orderMessageText,
-                `تم نسخ الطلب (من تطبيق سهل الوصول) — جاري فتح صندوق مراسلة ${routing.channelLabel} للصق الرسالة`
-            );
-
             btn.disabled = false;
-            btn.textContent = 'تأكيد الطلب وإرساله للعميل ✅';
-            closeModal('inAppOrderModal');
+            btn.textContent = 'تأكيد الطلب وإرساله ✅';
+
+            if (routing.type === 'whatsapp' && routing.url) {
+                showToastNotice('تم تسجيل الطلب وتحويلك إلى واتساب...');
+                window.open(`${routing.url}?text=${encodeURIComponent(orderMessageText)}`, '_blank');
+                closeModal('inAppOrderModal');
+                return;
+            }
+
+            // مسار داخل التطبيق مباشرة عند عدم توفر رقم واتساب
+            const receiptEl = document.getElementById('orderReceiptBanner');
+            if (receiptEl) {
+                receiptEl.innerHTML = `
+                    <div class="in-app-receipt-box">
+                        <div style="font-weight:900; color:var(--success-green); margin-bottom:4px;">✅ تم تسجيل طلبك داخل التطبيق بنجاح</div>
+                        <div style="font-size:11px; color:var(--text-sub); margin-bottom:6px;">الجهة: <b>${escapeHtmlText(activeOrderTargetStore.name)}</b> • الوقت: <b>${escapeHtmlText(timeText)}</b></div>
+                        <pre style="white-space:pre-wrap; font-family:inherit; background:#ffffff; border:1px solid #d1fae5; border-radius:8px; padding:7px; margin:0 0 8px 0; font-size:11px;">${escapeHtmlText(orderMessageText)}</pre>
+                        <div style="display:flex; gap:6px;">
+                            <button type="button" class="mini-like-btn" style="flex:1; padding:7px; font-weight:800;" onclick="copyLastOrderText()">📋 نسخ نص الطلب</button>
+                            <button type="button" class="mini-call-link" style="flex:1; background:#f0fdf4; cursor:pointer; font-family:inherit; font-weight:800;" onclick="closeModal('inAppOrderModal')">تم / إغلاق</button>
+                        </div>
+                    </div>
+                `;
+            }
+            showToastNotice('تم تسجيل الطلب داخل التطبيق بنجاح ✅');
         }
 
         function switchAdminSection(section) {
@@ -1842,15 +1642,18 @@
 
             ordersDiv.innerHTML = `
                 <div style="background:#fff7ed; border:1px solid #fed7aa; border-radius:8px; padding:7px 10px; margin-bottom:8px; font-size:11px; font-weight:800; color:var(--brand-orange-dark);">
-                    📊 إجمالي الطلبات المنفّذة: ${logs.length} (تُوجَّه آلياً للعميل دون تدخل منك)
+                    📊 إجمالي الطلبات المنفّذة: ${logs.length} (واتساب أو داخل التطبيق)
                 </div>
                 ${logs.slice(0, 40).map(o => `
-                    <div style="background:#fafafa; padding:7px 9px; border-radius:8px; margin-bottom:6px; border:1px solid #e5e7eb; font-size:11px; display:flex; justify-content:space-between; align-items:center; gap:6px;">
-                        <div>
-                            <b style="color:var(--success-green);">✓ ${escapeHtmlText(o.statusLabel || 'تم طلب')}</b> — <b>${escapeHtmlText(o.storeName || '')}</b>
-                            <span style="color:var(--text-sub);">(${escapeHtmlText(o.channel || 'مباشر')})</span>
+                    <div style="background:#fafafa; padding:8px 9px; border-radius:8px; margin-bottom:6px; border:1px solid #e5e7eb; font-size:11px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+                            <div>
+                                <b style="color:var(--success-green);">✓ ${escapeHtmlText(o.statusLabel || 'تم طلب')}</b> — <b>${escapeHtmlText(o.storeName || '')}</b>
+                                <span style="color:var(--text-sub);">(${escapeHtmlText(o.channel || 'داخل التطبيق')})</span>
+                            </div>
+                            <span style="color:var(--text-sub); font-size:10px;">${escapeHtmlText(o.timeText || '')}</span>
                         </div>
-                        <span style="color:var(--text-sub); font-size:10px;">${escapeHtmlText(o.timeText || '')}</span>
+                        ${o.orderDetails ? `<div style="margin-top:4px; color:var(--text-main);">📝 ${escapeHtmlText(o.orderDetails)} ${o.customerPhone ? `• 📞 ${escapeHtmlText(o.customerPhone)}` : ''}</div>` : ''}
                     </div>
                 `).join('')}
             `;
@@ -1911,8 +1714,8 @@
                 : '';
 
             const phoneLineHtml = hasPhone
-                ? `<div style="font-size:11.5px; margin-bottom:8px;">📞 <b>الهاتف:</b> <a href="tel:${safePhone}" style="color:var(--success-green); font-weight:700; text-decoration:none;">${safePhone}</a> • قناة الطلب: <b>${escapeHtmlText(routing.channelLabel)}</b></div>`
-                : `<div style="font-size:11.5px; margin-bottom:8px;">🛒 <b>قناة الطلب:</b> <b>${escapeHtmlText(routing.channelLabel)}</b></div>`;
+                ? `<div style="font-size:11.5px; margin-bottom:8px;">📞 <b>الهاتف:</b> <a href="tel:${safePhone}" style="color:var(--success-green); font-weight:700; text-decoration:none;">${safePhone}</a> • طريقة الطلب: <b>${escapeHtmlText(routing.channelLabel)}</b></div>`
+                : `<div style="font-size:11.5px; margin-bottom:8px;">🛒 <b>طريقة الطلب:</b> <b>${escapeHtmlText(routing.channelLabel)}</b></div>`;
 
             bodyEl.innerHTML = `
                 <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
@@ -1947,9 +1750,9 @@
                     category: 'شغل بيوت',
                     address: 'القيارة - حي المعلمين (توصيل متوفر)',
                     price: '12,000 د.ع - عرض طلب صينية معجنات مع تحلية مجانية',
-                    fb: 'https://facebook.com',
+                    fb: '',
                     insta: '',
-                    phone: '07700000000',
+                    phone: '',
                     orderWhatsapp: '',
                     chatHandle: '',
                     logo: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=150',
@@ -1969,7 +1772,7 @@
                 ? item.posts.map(p => `${p.title || ''} ${p.price || ''} ${p.address || ''}`).join(' ')
                 : '';
             const combined = normalizeArabicText(
-                `${item.name || ''} ${item.price || ''} ${postsText} ${item.address || ''} ${item.category || ''} ${item.phone || ''} ${item.orderWhatsapp || ''} ${item.chatHandle || ''}`
+                `${item.name || ''} ${item.price || ''} ${postsText} ${item.address || ''} ${item.category || ''} ${item.phone || ''} ${item.orderWhatsapp || ''}`
             );
             if (combined.includes(normalizedQuery)) return true;
             const words = normalizedQuery.split(' ').filter(Boolean);
@@ -2171,12 +1974,9 @@
             const name = document.getElementById('reqName').value.trim();
             const phone = document.getElementById('reqPhone').value.trim() || 'لا يوجد';
             const orderWhatsapp = document.getElementById('reqOrderWhatsapp').value.trim() || '';
-            const chatHandle = cleanHandleInput(document.getElementById('reqChatHandle').value.trim() || '');
             const cat = document.getElementById('reqCat').value || 'أشياء أخرى';
             const address = document.getElementById('reqAddress').value.trim() || 'غير محدد';
             const price = document.getElementById('reqPrice').value.trim() || '';
-            const fb = document.getElementById('reqFb').value.trim() || '';
-            const insta = document.getElementById('reqInsta').value.trim() || '';
             const logoFile = document.getElementById('reqLogoFile').files[0];
 
             if (!name) {
@@ -2203,7 +2003,7 @@
                 }
 
                 let existingStore = findMatchingStoreRecord(window.allListings || [], {
-                    name, phone, orderWhatsapp, chatHandle, fb, insta
+                    name, phone, orderWhatsapp
                 });
 
                 let modalTitle = 'تم إرسال طلب إعلانك بنجاح! 🎉';
@@ -2243,9 +2043,6 @@
                     if (price) updateData.price = price;
                     if (address && address !== 'غير محدد') updateData.address = address;
                     if (orderWhatsapp) updateData.orderWhatsapp = orderWhatsapp;
-                    if (chatHandle) updateData.chatHandle = chatHandle;
-                    if (fb && !existingStore.fb) updateData.fb = fb;
-                    if (insta && !existingStore.insta) updateData.insta = insta;
                     if (phone && phone !== 'لا يوجد' && (!existingStore.phone || existingStore.phone === 'لا يوجد')) {
                         updateData.phone = phone;
                     }
@@ -2265,15 +2062,15 @@
                     };
 
                     await window.addDoc(window.collection(window.db, "listings"), {
-                        name, category: cat, address, price, fb, insta, phone,
-                        orderWhatsapp, chatHandle,
+                        name, category: cat, address, price, fb: '', insta: '', phone,
+                        orderWhatsapp, chatHandle: '',
                         logo: logoUrl, images: newImagesUrls, posts: [initialPost],
                         status: 'pending', vip: false,
                         likes: 0, contactClicks: 0, ordersCount: 0, createdAt: new Date().toISOString()
                     });
                 }
 
-                saveOwnerProfile({ name, phone, orderWhatsapp, chatHandle, category: cat, address, fb, insta });
+                saveOwnerProfile({ name, phone, orderWhatsapp, category: cat, address });
                 document.getElementById('reqPrice').value = '';
                 document.getElementById('reqLogoFile').value = '';
                 document.getElementById('reqImagesFiles').value = '';
@@ -2671,8 +2468,6 @@
                 ? `<a href="tel:${store.phone}" class="mini-call-link" style="text-align:center; padding:10px 12px; font-size:12.5px; font-weight:800;">📞 اتصال (${store.phone})</a>`
                 : '';
 
-            const hasSecondarySocial = Boolean(store.fb || store.insta);
-
             document.getElementById('mainCatalogView').style.display = 'none';
             const profileView = document.getElementById('storeProfileView');
             profileView.style.display = 'block';
@@ -2690,7 +2485,7 @@
                     <button type="button" class="mini-like-btn ${alreadyLiked ? 'liked' : ''}" onclick="addLike('${escapeJsSingleQuote(store.id)}');">${alreadyLiked ? '🧡 تم الإعجاب' : '❤️ إعجاب'} (${store.likes || 0})</button>
                 </div>
                 <p style="font-size:12px; margin-bottom:4px;"><b>العنوان:</b> ${store.address || 'غير محدد'}</p>
-                <p style="font-size:11.5px; color:var(--text-sub); margin-bottom:10px;"><b>توجيه الطلبات:</b> ${escapeHtmlText(routing.channelLabel)}</p>
+                <p style="font-size:11.5px; color:var(--text-sub); margin-bottom:10px;"><b>طريقة الطلب:</b> ${escapeHtmlText(routing.channelLabel)}</p>
 
                 <h4 style="font-size:12.5px; font-weight:800; margin:12px 0 6px 0;">إعلانات ومنتجات الصفحة (${posts.length}):</h4>
                 ${postsHtml}
@@ -2700,16 +2495,6 @@
                     ${phoneBtnHtml}
                     <a href="https://maps.google.com/?q=${encodeURIComponent(store.address || '')}" target="_blank" class="mini-like-btn" style="text-align:center; text-decoration:none; padding:10px 12px; font-size:12.5px;">📍 الخريطة</a>
                 </div>
-
-                ${hasSecondarySocial ? `
-                    <div style="margin-top:12px; padding-top:10px; border-top:1px dashed #e5e7eb;">
-                        <div style="font-size:11px; color:var(--text-sub); margin-bottom:6px;">صفحات خارجية اختيارية (يتم نسخ رسالة تعريف تلقائياً بأنك من التطبيق):</div>
-                        <div class="social-links" style="margin:0;">
-                            ${store.fb ? `<a href="${escapeHtmlText(store.fb)}" class="social-badge fb-badge" onclick="handleSocialReferralClick(event, '${escapeJsSingleQuote(store.id)}', 'فيسبوك', '')">🔵 فيسبوك</a>` : ''}
-                            ${store.insta ? `<a href="${escapeHtmlText(store.insta)}" class="social-badge insta-badge" onclick="handleSocialReferralClick(event, '${escapeJsSingleQuote(store.id)}', 'انستغرام', '')">📸 انستغرام</a>` : ''}
-                        </div>
-                    </div>
-                ` : ''}
             `;
 
             const adminActionsDiv = document.getElementById('adminStoreActions');
@@ -2823,13 +2608,13 @@
                     return `
                         <div style="background:#ffffff; padding:8px; border-radius:8px; margin-bottom:7px; border:1px solid #e5e7eb; font-size:11px;">
                             <b>${item.name}</b> (${item.category}) - الحالة: <b>${item.status === 'pending' ? 'بانتظار الموافقة' : 'معتمد'}</b> ${item.vip ? '| <b>VIP</b>' : ''}<br>
-                            📞 ${item.phone}${item.orderWhatsapp ? ` | 💬 واتساب طلبات: <b>${escapeHtmlText(item.orderWhatsapp)}</b>` : ''}${item.chatHandle ? ` | ✉️ يوزر: <b>${escapeHtmlText(item.chatHandle)}</b>` : ''}<br>
+                            📞 ${item.phone}${item.orderWhatsapp ? ` | 💬 واتساب طلبات: <b>${escapeHtmlText(item.orderWhatsapp)}</b>` : ' | 📱 قناة: <b>داخل التطبيق</b>'}<br>
                             🛒 طلبات: <b>${Number(item.ordersCount) || 0}</b> | 👆 تفاعل: <b>${Number(item.contactClicks) || 0}</b><br>
                             <div style="margin-top:6px; display:flex; gap:4px; flex-wrap:wrap;">
                                 ${item.status === 'pending' ? `<button type="button" onclick="approveListing('${safeId}')" style="background:var(--success-green); color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">قبول</button>` : `<button type="button" onclick="pendListing('${safeId}')" style="background:var(--brand-orange); color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">إخفاء</button>`}
                                 <button type="button" onclick="toggleVip('${safeId}', ${!item.vip})" style="background:#2563eb; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">${item.vip ? 'إلغاء VIP' : 'VIP'}</button>
                                 <button type="button" onclick="editListingData('${safeId}', '${safeName}', '${safePhone}', '${safeAddress}', '${safeCat}', '${safePrice}')" style="background:#4b5563; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">تعديل</button>
-                                <button type="button" onclick="notifyOwner('${safePhone}', '${escapeJsSingleQuote(item.fb || '')}', '${escapeJsSingleQuote(item.insta || '')}', '${safeName}')" style="background:var(--success-green); color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">إشعار</button>
+                                <button type="button" onclick="notifyOwner('${safePhone}', '${safeName}')" style="background:var(--success-green); color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">إشعار</button>
                                 <button type="button" onclick="deleteListing('${safeId}')" style="background:var(--danger-red); color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">حذف</button>
                             </div>
                         </div>
@@ -2862,17 +2647,13 @@
             loadApprovedListings();
         }
 
-        function notifyOwner(phone, fb, insta, storeName) {
+        function notifyOwner(phone, storeName) {
             let msg = `مرحباً بك يا ${storeName}، تم قبول ونشر إعلانك بنجاح في دليل "سهل الوصول". مبارك لكم! 🎉`;
-            if (phone && phone !== 'لا يوجد' && phone.length >= 10) {
-                let cleanPhone = phone.startsWith('0') ? '964' + phone.substring(1) : phone;
+            if (hasValidPhoneNumber(phone)) {
+                let cleanPhone = formatIraqWhatsappNumber(phone);
                 window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-            } else if (fb && fb.startsWith('http')) {
-                navigator.clipboard.writeText(msg);
-                alert('تم نسخ رسالة القبول!');
-                window.open(fb, '_blank');
             } else {
-                alert('تم قبول الإعلان.');
+                alert('تم قبول الإعلان ونشره داخل التطبيق.');
             }
         }
 
@@ -2893,7 +2674,6 @@
             const currentName = oldName !== undefined ? oldName : (store.name || '');
             const currentPhone = oldPhone !== undefined ? oldPhone : (store.phone || '');
             const currentOrderWa = store.orderWhatsapp || '';
-            const currentChatHandle = store.chatHandle || '';
             const currentAddress = oldAddress !== undefined ? oldAddress : (store.address || '');
             const currentCategory = oldCategory !== undefined ? oldCategory : (store.category || 'أشياء أخرى');
             const currentPrice = oldPrice !== undefined ? oldPrice : (store.price || '');
@@ -2906,9 +2686,6 @@
 
             const newOrderWa = prompt("تعديل رقم واتساب الطلبات (اختياري):", currentOrderWa);
             if (newOrderWa === null) return;
-
-            const newChatHandle = prompt("تعديل يوزر المراسلة المباشر (اختياري):", currentChatHandle);
-            if (newChatHandle === null) return;
 
             const newAddress = prompt("تعديل العنوان / الحي:", currentAddress);
             if (newAddress === null) return;
@@ -2925,13 +2702,12 @@
             const cleanName = newName.trim();
             const cleanPhone = newPhone.trim();
             const cleanOrderWa = newOrderWa.trim();
-            const cleanChatHandle = cleanHandleInput(newChatHandle.trim());
             const cleanAddress = newAddress.trim();
             const cleanCategory = newCategory.trim() || currentCategory;
             const cleanPrice = newPrice.trim();
 
-            if (!cleanName || !cleanPhone) {
-                alert('يرجى إدخال اسم ورقم هاتف صحيحين.');
+            if (!cleanName) {
+                alert('يرجى إدخال اسم صحيح.');
                 return;
             }
 
@@ -2941,7 +2717,6 @@
                         name: cleanName,
                         phone: cleanPhone,
                         orderWhatsapp: cleanOrderWa,
-                        chatHandle: cleanChatHandle,
                         address: cleanAddress,
                         category: cleanCategory,
                         price: cleanPrice
@@ -2951,7 +2726,6 @@
                     store.name = cleanName;
                     store.phone = cleanPhone;
                     store.orderWhatsapp = cleanOrderWa;
-                    store.chatHandle = cleanChatHandle;
                     store.address = cleanAddress;
                     store.category = cleanCategory;
                     store.price = cleanPrice;
