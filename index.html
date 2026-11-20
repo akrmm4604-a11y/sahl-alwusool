@@ -997,9 +997,6 @@
                 <label class="listing-field-label">💬 رقم واتساب للطلبات (موصى به لاستلام الطلبات مباشرة):</label>
                 <input type="text" id="reqOrderWhatsapp" placeholder="مثال: 07801234567">
 
-                <label class="listing-field-label">📞 رقم هاتف إضافي للتواصل:</label>
-                <input type="text" id="reqPhone" placeholder="07701234567">
-
                 <label class="listing-field-label">📸 رابط أو يوزر إنستغرام (للدخول المباشر للصفحة):</label>
                 <input type="text" id="reqInsta" placeholder="مثال: username أو https://instagram.com/username">
 
@@ -1481,7 +1478,6 @@
                 if (!parsed || typeof parsed !== 'object') return null;
                 const hasAnyData = Boolean(
                     (parsed.name && String(parsed.name).trim()) ||
-                    (parsed.phone && String(parsed.phone).trim()) ||
                     (parsed.orderWhatsapp && String(parsed.orderWhatsapp).trim()) ||
                     (parsed.insta && String(parsed.insta).trim()) ||
                     (parsed.address && String(parsed.address).trim())
@@ -1504,7 +1500,7 @@
                     address: profile.address && profile.address !== 'غير محدد' ? String(profile.address).trim() : ''
                 };
                 const hasAnyData = Boolean(
-                    cleanData.name || cleanData.phone || cleanData.orderWhatsapp || cleanData.insta || cleanData.address
+                    cleanData.name || cleanData.orderWhatsapp || cleanData.insta || cleanData.address
                 );
                 if (hasAnyData) {
                     localStorage.setItem(SAVED_OWNER_KEY, JSON.stringify(cleanData));
@@ -1525,7 +1521,6 @@
             }
 
             const nameEl = document.getElementById('reqName');
-            const phoneEl = document.getElementById('reqPhone');
             const orderWaEl = document.getElementById('reqOrderWhatsapp');
             const instaEl = document.getElementById('reqInsta');
             const fbEl = document.getElementById('reqFb');
@@ -1533,8 +1528,9 @@
             const addressEl = document.getElementById('reqAddress');
 
             if (nameEl && !nameEl.value && saved.name) nameEl.value = saved.name;
-            if (phoneEl && !phoneEl.value && saved.phone) phoneEl.value = saved.phone;
-            if (orderWaEl && !orderWaEl.value && saved.orderWhatsapp) orderWaEl.value = saved.orderWhatsapp;
+            if (orderWaEl && !orderWaEl.value && (saved.orderWhatsapp || saved.phone)) {
+                orderWaEl.value = saved.orderWhatsapp || saved.phone;
+            }
             if (instaEl && !instaEl.value && saved.insta) instaEl.value = saved.insta;
             if (fbEl && !fbEl.value && saved.fb) fbEl.value = saved.fb;
             if (catEl && saved.category) catEl.value = saved.category;
@@ -1552,7 +1548,6 @@
                 console.warn("Clear owner profile warning:", e);
             }
             document.getElementById('reqName').value = '';
-            document.getElementById('reqPhone').value = '';
             document.getElementById('reqOrderWhatsapp').value = '';
             document.getElementById('reqInsta').value = '';
             document.getElementById('reqFb').value = '';
@@ -1996,8 +1991,6 @@
             const safeName = escapeHtmlText(store.name || 'مشروع محلي');
             const safeCat = escapeHtmlText(store.category || 'أشياء أخرى');
             const safeAddress = escapeHtmlText(store.address || 'غير محدد');
-            const safePhone = escapeHtmlText(store.phone || 'غير متوفر');
-            const hasPhone = hasValidPhoneNumber(store.phone);
             const clicksCount = Number(store.contactClicks) || 0;
             const ordersCount = Number(store.ordersCount) || 0;
             const routing = resolveOrderRoutingTarget(store);
@@ -2019,10 +2012,6 @@
                    </div>`
                 : '';
 
-            const phoneLineHtml = hasPhone
-                ? `<div style="font-size:11.5px; margin-bottom:8px;">📞 <b>الهاتف:</b> <a href="tel:${safePhone}" style="color:var(--success-green); font-weight:700; text-decoration:none;">${safePhone}</a> • الطلب: <b>${escapeHtmlText(routing.channelLabel)}</b></div>`
-                : `<div style="font-size:11.5px; margin-bottom:8px;">🛒 <b>الطلب:</b> <b>${escapeHtmlText(routing.channelLabel)}</b></div>`;
-
             const instaBtnHtml = instaUrl
                 ? `<button type="button" class="social-direct-btn" style="flex:1;" onclick="openSocialWithSourceNotice('${escapeJsSingleQuote(store.id)}', 'instagram')">📸 إنستغرام</button>`
                 : '';
@@ -2036,7 +2025,7 @@
                     </div>
                 </div>
                 <div style="font-size:11.5px; margin-bottom:6px;">📍 <b>العنوان:</b> ${safeAddress}</div>
-                ${phoneLineHtml}
+                <div style="font-size:11.5px; margin-bottom:8px;">🛒 <b>الطلب:</b> <b>${escapeHtmlText(routing.channelLabel)}</b></div>
                 <div class="info-offer-box">
                     <div style="font-weight:800; color:#c2410c; margin-bottom:4px;">🎁 جميع إعلانات وعروض الصفحة:</div>
                     ${offersListHtml}
@@ -2282,8 +2271,8 @@
         document.getElementById('submitListingBtn').addEventListener('click', async function(e) {
             e.preventDefault();
             const name = document.getElementById('reqName').value.trim();
-            const phone = document.getElementById('reqPhone').value.trim() || 'لا يوجد';
             const orderWhatsapp = document.getElementById('reqOrderWhatsapp').value.trim() || '';
+            const phone = orderWhatsapp || 'لا يوجد';
             const insta = document.getElementById('reqInsta').value.trim() || '';
             const fb = document.getElementById('reqFb').value.trim() || '';
             const cat = document.getElementById('reqCat').value || 'أشياء أخرى';
@@ -2354,12 +2343,14 @@
                     if (logoUrl) updateData.logo = logoUrl;
                     if (price) updateData.price = price;
                     if (address && address !== 'غير محدد') updateData.address = address;
-                    if (orderWhatsapp) updateData.orderWhatsapp = orderWhatsapp;
+                    if (orderWhatsapp) {
+                        updateData.orderWhatsapp = orderWhatsapp;
+                        if (!existingStore.phone || existingStore.phone === 'لا يوجد') {
+                            updateData.phone = orderWhatsapp;
+                        }
+                    }
                     if (insta) updateData.insta = insta;
                     if (fb) updateData.fb = fb;
-                    if (phone && phone !== 'لا يوجد' && (!existingStore.phone || existingStore.phone === 'لا يوجد')) {
-                        updateData.phone = phone;
-                    }
 
                     await window.updateDoc(window.doc(window.db, "listings", existingStore.id), updateData);
                     modalTitle = 'تمت إضافة الإعلان إلى صفحتك بنجاح! 🎉';
@@ -2666,7 +2657,6 @@
                 const alreadyLiked = hasLikedStore(item.id);
                 const safeId = escapeJsSingleQuote(item.id);
                 const safeName = escapeJsSingleQuote(item.name);
-                const safePhone = escapeJsSingleQuote(item.phone);
                 const safeAddress = escapeJsSingleQuote(item.address || '');
                 const safeCat = escapeJsSingleQuote(item.category || '');
                 const safePrice = escapeJsSingleQuote(item.price || '');
@@ -2691,7 +2681,7 @@
                             </div>
                             ${isAdminLoggedIn ? `
                                 <div style="display:flex; gap:4px; margin-top:6px;" onclick="event.stopPropagation()">
-                                    <button type="button" onclick="editListingData('${safeId}', '${safeName}', '${safePhone}', '${safeAddress}', '${safeCat}', '${safePrice}')" style="flex:1; background:var(--brand-orange); color:#fff; border:none; border-radius:6px; padding:3px; font-size:10px; cursor:pointer;">تعديل</button>
+                                    <button type="button" onclick="editListingData('${safeId}', '${safeName}', '${safeAddress}', '${safeCat}', '${safePrice}')" style="flex:1; background:var(--brand-orange); color:#fff; border:none; border-radius:6px; padding:3px; font-size:10px; cursor:pointer;">تعديل</button>
                                     <button type="button" onclick="deleteListingFromMain('${safeId}')" style="flex:1; background:#dc2626; color:#fff; border:none; border-radius:6px; padding:3px; font-size:10px; cursor:pointer;">حذف</button>
                                 </div>
                             ` : ''}
@@ -2734,7 +2724,6 @@
             if (!store) return;
 
             const alreadyLiked = hasLikedStore(store.id);
-            const hasPhone = hasValidPhoneNumber(store.phone);
             const clicksCount = Number(store.contactClicks) || 0;
             const ordersCount = Number(store.ordersCount) || 0;
             const routing = resolveOrderRoutingTarget(store);
@@ -2781,10 +2770,6 @@
                 `;
             }).join('');
 
-            const phoneBtnHtml = hasPhone
-                ? `<a href="tel:${store.phone}" class="mini-call-link" style="text-align:center; padding:10px 12px; font-size:12.5px; font-weight:800;">📞 اتصال (${store.phone})</a>`
-                : '';
-
             const instaBtnHtml = instaUrl
                 ? `<button type="button" class="social-direct-btn" onclick="openSocialWithSourceNotice('${escapeJsSingleQuote(store.id)}', 'instagram')">📸 صفحة إنستغرام</button>`
                 : '';
@@ -2819,7 +2804,6 @@
                     <button type="button" class="in-app-order-btn" onclick="openInAppOrderModal('${escapeJsSingleQuote(store.id)}', '')">🛒 اطلب الآن (واتساب)</button>
                     ${instaBtnHtml}
                     ${fbBtnHtml}
-                    ${phoneBtnHtml}
                     <a href="https://maps.google.com/?q=${encodeURIComponent(store.address || '')}" target="_blank" class="mini-like-btn" style="text-align:center; text-decoration:none; padding:10px 12px; font-size:12.5px;">📍 الخريطة</a>
                 </div>
             `;
@@ -2828,13 +2812,12 @@
             if (isAdminLoggedIn) {
                 const safeId = escapeJsSingleQuote(store.id);
                 const safeName = escapeJsSingleQuote(store.name);
-                const safePhone = escapeJsSingleQuote(store.phone);
                 const safeAddress = escapeJsSingleQuote(store.address || '');
                 const safeCat = escapeJsSingleQuote(store.category || '');
                 const safePrice = escapeJsSingleQuote(store.price || '');
                 adminActionsDiv.style.display = 'flex';
                 adminActionsDiv.innerHTML = `
-                    <button type="button" onclick="editListingData('${safeId}', '${safeName}', '${safePhone}', '${safeAddress}', '${safeCat}', '${safePrice}')" style="background:var(--brand-orange); color:#fff; border:none; padding:6px 10px; border-radius:7px; cursor:pointer; font-size:11px; font-weight:700;">تعديل</button>
+                    <button type="button" onclick="editListingData('${safeId}', '${safeName}', '${safeAddress}', '${safeCat}', '${safePrice}')" style="background:var(--brand-orange); color:#fff; border:none; padding:6px 10px; border-radius:7px; cursor:pointer; font-size:11px; font-weight:700;">تعديل</button>
                     <button type="button" onclick="deleteListing('${safeId}')" style="background:#dc2626; color:#fff; border:none; padding:6px 10px; border-radius:7px; cursor:pointer; font-size:11px; font-weight:700;">حذف</button>
                 `;
             } else {
@@ -2928,20 +2911,20 @@
                 adminContainer.innerHTML = items.map(item => {
                     const safeId = escapeJsSingleQuote(item.id);
                     const safeName = escapeJsSingleQuote(item.name);
-                    const safePhone = escapeJsSingleQuote(item.phone);
                     const safeAddress = escapeJsSingleQuote(item.address || '');
                     const safeCat = escapeJsSingleQuote(item.category || '');
                     const safePrice = escapeJsSingleQuote(item.price || '');
+                    const waContact = item.orderWhatsapp || (hasValidPhoneNumber(item.phone) ? item.phone : '');
                     return `
                         <div style="background:#f9fafb; padding:8px; border-radius:8px; margin-bottom:7px; border:1px solid #e5e7eb; font-size:11px;">
                             <b>${item.name}</b> (${item.category}) - الحالة: <b>${item.status === 'pending' ? 'بانتظار الموافقة' : 'معتمد'}</b> ${item.vip ? '| <b>VIP</b>' : ''}<br>
-                            📞 ${item.phone}${item.orderWhatsapp ? ` | 💬 واتساب: <b>${escapeHtmlText(item.orderWhatsapp)}</b>` : ''}${item.insta ? ` | 📸 إنستا: <b>${escapeHtmlText(item.insta)}</b>` : ''}<br>
+                            ${waContact ? `💬 واتساب: <b>${escapeHtmlText(waContact)}</b>` : '💬 واتساب: غير مسجل'}${item.insta ? ` | 📸 إنستا: <b>${escapeHtmlText(item.insta)}</b>` : ''}<br>
                             🛒 طلبات: <b>${Number(item.ordersCount) || 0}</b> | 👆 زيارات المنصات: <b>${Number(item.contactClicks) || 0}</b><br>
                             <div style="margin-top:6px; display:flex; gap:4px; flex-wrap:wrap;">
                                 ${item.status === 'pending' ? `<button type="button" onclick="approveListing('${safeId}')" style="background:#16a34a; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">قبول</button>` : `<button type="button" onclick="pendListing('${safeId}')" style="background:var(--brand-orange); color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">إخفاء</button>`}
                                 <button type="button" onclick="toggleVip('${safeId}', ${!item.vip})" style="background:#2563eb; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">${item.vip ? 'إلغاء VIP' : 'VIP'}</button>
-                                <button type="button" onclick="editListingData('${safeId}', '${safeName}', '${safePhone}', '${safeAddress}', '${safeCat}', '${safePrice}')" style="background:#4b5563; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">تعديل</button>
-                                <button type="button" onclick="notifyOwner('${safePhone}', '${safeName}')" style="background:#16a34a; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">إشعار</button>
+                                <button type="button" onclick="editListingData('${safeId}', '${safeName}', '${safeAddress}', '${safeCat}', '${safePrice}')" style="background:#4b5563; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">تعديل</button>
+                                <button type="button" onclick="notifyOwner('${escapeJsSingleQuote(waContact)}', '${safeName}')" style="background:#16a34a; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">إشعار</button>
                                 <button type="button" onclick="deleteListing('${safeId}')" style="background:#dc2626; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">حذف</button>
                             </div>
                         </div>
@@ -2996,11 +2979,10 @@
             loadApprovedListings();
         }
 
-        async function editListingData(id, oldName, oldPhone, oldAddress, oldCategory, oldPrice) {
+        async function editListingData(id, oldName, oldAddress, oldCategory, oldPrice) {
             const store = (window.allListings || []).find(s => s.id === id) || {};
             const currentName = oldName !== undefined ? oldName : (store.name || '');
-            const currentPhone = oldPhone !== undefined ? oldPhone : (store.phone || '');
-            const currentOrderWa = store.orderWhatsapp || '';
+            const currentOrderWa = store.orderWhatsapp || (hasValidPhoneNumber(store.phone) ? store.phone : '');
             const currentInsta = store.insta || '';
             const currentFb = store.fb || '';
             const currentAddress = oldAddress !== undefined ? oldAddress : (store.address || '');
@@ -3012,9 +2994,6 @@
 
             const newOrderWa = prompt("تعديل رقم واتساب الطلبات:", currentOrderWa);
             if (newOrderWa === null) return;
-
-            const newPhone = prompt("تعديل رقم الهاتف الإضافي:", currentPhone);
-            if (newPhone === null) return;
 
             const newInsta = prompt("تعديل يوزر أو رابط إنستغرام:", currentInsta);
             if (newInsta === null) return;
@@ -3036,7 +3015,7 @@
 
             const cleanName = newName.trim();
             const cleanOrderWa = newOrderWa.trim();
-            const cleanPhone = newPhone.trim();
+            const cleanPhone = cleanOrderWa || (store.phone || 'لا يوجد');
             const cleanInsta = newInsta.trim();
             const cleanFb = newFb.trim();
             const cleanAddress = newAddress.trim();
