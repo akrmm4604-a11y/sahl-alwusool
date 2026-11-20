@@ -73,15 +73,15 @@
             --brand-orange: #ff5a00;
             --brand-orange-dark: #e64a00;
             --brand-purple: #6b21a8;
-            --page-bg: #09090b;
-            --card-bg: #111114;
-            --surface-2: #18181c;
-            --text-main: #f4f4f5;
-            --text-sub: #a1a1aa;
-            --border-soft: #27272a;
-            --success-green: #22c55e;
-            --danger-red: #f87171;
-            --vip-gold: #f59e0b;
+            --page-bg: #ffffff;
+            --card-bg: #ffffff;
+            --surface-2: #f8fafc;
+            --text-main: #111827;
+            --text-sub: #4b5563;
+            --border-soft: #e5e7eb;
+            --success-green: #16a34a;
+            --danger-red: #dc2626;
+            --vip-gold: #d97706;
         }
 
         * {
@@ -114,7 +114,7 @@
         }
 
         .top-tabs-bar {
-            background: #0d0d10;
+            background: #ffffff;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -139,13 +139,13 @@
         }
 
         .top-tab-item.active {
-            color: #ffffff;
+            color: var(--brand-orange-dark);
             font-weight: 800;
             border-bottom-color: var(--brand-orange);
         }
 
         .search-section {
-            background: #0d0d10;
+            background: #ffffff;
             padding: 10px 12px 10px;
             border-bottom: 1px solid var(--border-soft);
         }
@@ -155,7 +155,7 @@
             align-items: center;
             border: 2px solid var(--brand-orange);
             border-radius: 14px;
-            background: #141418;
+            background: #ffffff;
             padding: 3px 3px 3px 10px;
             gap: 8px;
         }
@@ -178,13 +178,13 @@
             outline: none;
             font-size: 12.5px;
             font-family: inherit;
-            color: #ffffff;
+            color: var(--text-main);
             background: transparent;
             min-width: 0;
         }
 
         .search-input-field::placeholder {
-            color: #71717a;
+            color: #9ca3af;
         }
 
         .search-quick-icons {
@@ -197,11 +197,11 @@
 
         .search-suggestions {
             display: none;
-            background: #141418;
+            background: #ffffff;
             border: 1px solid var(--border-soft);
             border-radius: 10px;
             margin-top: 6px;
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
             max-height: 220px;
             overflow-y: auto;
         }
@@ -209,7 +209,7 @@
         .suggestion-item {
             padding: 8px 10px;
             font-size: 11.5px;
-            border-bottom: 1px solid #27272a;
+            border-bottom: 1px solid #f3f4f6;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -218,13 +218,13 @@
         }
 
         .suggestion-item:hover {
-            background: #1f1b18;
+            background: #fff7ed;
         }
 
         .install-highlight-strip {
             margin: 8px 12px 4px;
-            background: #121216;
-            border: 1px solid #3f2818;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
             border-radius: 10px;
             padding: 7px 11px;
             display: flex;
@@ -236,7 +236,7 @@
         .install-highlight-text {
             font-size: 12px;
             font-weight: 800;
-            color: #ffffff;
+            color: var(--text-main);
             display: flex;
             align-items: center;
             gap: 6px;
@@ -268,7 +268,7 @@
         }
 
         .cat-chip {
-            background: #141418;
+            background: #f9fafb;
             border: 1px solid var(--border-soft);
             border-radius: 18px;
             padding: 6px 13px;
@@ -287,9 +287,9 @@
         }
 
         .cat-chip.home-chip {
-            background: #221433;
-            color: #d8b4fe;
-            border-color: #581c87;
+            background: #faf5ff;
+            color: var(--brand-purple);
+            border-color: #e9d5ff;
         }
 
         .cat-chip.home-chip.active {
@@ -306,7 +306,7 @@
         }
 
         .utility-btn {
-            background: #141418;
+            background: #f9fafb;
             border: 1px solid var(--border-soft);
             border-radius: 10px;
             padding: 8px 10px;
@@ -319,9 +319,9 @@
         }
 
         .utility-btn.primary-action {
-            background: #23160f;
-            border-color: #7c2d12;
-            color: #fb923c;
+            background: #fff7ed;
+            border-color: #fdba74;
+            color: var(--brand-orange-dark);
             font-weight: 800;
         }
 
@@ -337,6 +337,7 @@
             border-radius: 12px;
             overflow: hidden;
             border: 1px solid var(--border-soft);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
             display: flex;
             flex-direction: column;
             cursor: pointer;
@@ -350,7 +351,7 @@
             position: relative;
             width: 100%;
             aspect-ratio: 1 / 1.05;
-            background: #141418;
+            background: #f3f4f6;
             overflow: hidden;
         }
 
@@ -362,8 +363,8 @@
         }
 
         .grid-ribbon {
-            background: #3b0764;
-            color: #f3e8ff;
+            background: #f3e8ff;
+            color: #581c87;
             font-size: 10.5px;
             font-weight: 700;
             padding: 4px 8px;
@@ -381,9 +382,9 @@
 
         .grid-title {
             margin: 0 0 6px 0;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 900;
-            color: #ff6b6b;
+            color: #b91c1c;
             line-height: 1.3;
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -392,9 +393,9 @@
         }
 
         .grid-price {
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 800;
-            color: #ffffff;
+            color: var(--text-main);
             margin-bottom: 4px;
         }
 
@@ -412,13 +413,13 @@
             justify-content: space-between;
             gap: 4px;
             padding-top: 6px;
-            border-top: 1px solid #27272a;
+            border-top: 1px solid #f3f4f6;
         }
 
         .mini-like-btn {
-            background: #1f1712;
-            border: 1px solid #5c2d16;
-            color: #fdba74;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: var(--brand-orange-dark);
             border-radius: 7px;
             padding: 4px 7px;
             font-size: 10.5px;
@@ -428,16 +429,16 @@
         }
 
         .mini-like-btn.liked {
-            background: #331d10;
+            background: #ffedd5;
             border-color: var(--brand-orange);
-            color: #fb923c;
+            color: #c2410c;
             font-weight: 800;
         }
 
         .mini-plus-btn {
-            background: #231433;
-            border: 1.5px solid #7e22ce;
-            color: #e9d5ff;
+            background: #f3e8ff;
+            border: 1.5px solid #a855f7;
+            color: #581c87;
             border-radius: 8px;
             padding: 5px 12px;
             font-size: 17px;
@@ -449,9 +450,9 @@
 
         .mini-call-link {
             text-decoration: none;
-            background: #0f2417;
-            color: #4ade80;
-            border: 1px solid #166534;
+            background: #ecfdf5;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
             border-radius: 7px;
             padding: 4px 8px;
             font-size: 10.5px;
@@ -459,9 +460,9 @@
         }
 
         .social-direct-btn {
-            background: #271222;
-            color: #f9a8d4;
-            border: 1px solid #9d174d;
+            background: #fdf2f8;
+            color: #be185d;
+            border: 1px solid #fbcfe8;
             border-radius: 9px;
             padding: 9px 11px;
             font-size: 12px;
@@ -475,9 +476,9 @@
         }
 
         .social-fb-btn {
-            background: #111e38;
-            color: #93c5fd;
-            border: 1px solid #1d4ed8;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
             border-radius: 9px;
             padding: 9px 11px;
             font-size: 12px;
@@ -509,7 +510,7 @@
 
         .form-container {
             display: none;
-            background: #121216;
+            background: #ffffff;
             margin: 0 12px 12px;
             border-radius: 12px;
             padding: 12px;
@@ -522,32 +523,43 @@
             width: 100%;
             padding: 8px 10px;
             margin-bottom: 8px;
-            border: 1px solid #3f3f46;
+            border: 1px solid #d1d5db;
             border-radius: 8px;
             font-size: 12px;
             font-family: inherit;
-            background: #18181d;
-            color: #ffffff;
+            background: #ffffff;
+            color: var(--text-main);
+        }
+
+        .whatsapp-priority-tip {
+            background: #fff7ed;
+            border: 1px solid #fdba74;
+            border-radius: 9px;
+            padding: 8px 10px;
+            margin-bottom: 8px;
+            font-size: 11px;
+            color: #9a3412;
+            line-height: 1.5;
         }
 
         .saved-profile-bar {
             display: none;
-            background: #23160f;
-            border: 1px solid #7c2d12;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
             border-radius: 8px;
             padding: 7px 10px;
             margin-bottom: 8px;
             font-size: 11px;
-            color: #fdba74;
+            color: #9a3412;
             align-items: center;
             justify-content: space-between;
             gap: 8px;
         }
 
         .clear-saved-btn {
-            background: #18181d;
-            border: 1px solid #9a3412;
-            color: #f87171;
+            background: #ffffff;
+            border: 1px solid #fca5a5;
+            color: #dc2626;
             border-radius: 6px;
             padding: 3px 8px;
             font-size: 10.5px;
@@ -560,9 +572,9 @@
         .custom-file-upload {
             display: block;
             width: 100%;
-            background: #1c140f;
+            background: #fff7ed;
             border: 1.5px dashed var(--brand-orange);
-            color: #fdba74;
+            color: var(--brand-orange-dark);
             padding: 8px;
             border-radius: 8px;
             text-align: center;
@@ -628,7 +640,7 @@
 
         #storeProfileView {
             display: none;
-            background: #111114;
+            background: #ffffff;
             margin: 12px;
             border-radius: 14px;
             padding: 14px;
@@ -667,16 +679,16 @@
         }
 
         .profile-post-item {
-            background: #15151a;
-            border: 1px solid #27272a;
+            background: #f9fafb;
+            border: 1px solid var(--border-soft);
             border-radius: 10px;
             padding: 10px;
             margin-bottom: 10px;
         }
 
         .profile-post-info-box {
-            background: #1c1c22;
-            border: 1px solid #2e2e36;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
             border-radius: 9px;
             padding: 9px 10px;
         }
@@ -684,7 +696,7 @@
         .profile-post-title {
             font-size: 14px;
             font-weight: 900;
-            color: #ff6b6b;
+            color: #b91c1c;
             margin-bottom: 4px;
             line-height: 1.4;
         }
@@ -694,7 +706,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: #0d0d10;
+            background: #ffffff;
             border-top: 1px solid var(--border-soft);
             display: flex;
             justify-content: space-around;
@@ -739,7 +751,7 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.92);
+            background: rgba(0, 0, 0, 0.9);
             z-index: 3000;
             justify-content: center;
             align-items: center;
@@ -773,7 +785,7 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.78);
+            background: rgba(0, 0, 0, 0.55);
             z-index: 2500;
             justify-content: center;
             align-items: center;
@@ -782,7 +794,7 @@
         }
 
         .custom-modal-content {
-            background: #121216;
+            background: #ffffff;
             color: var(--text-main);
             border: 1px solid var(--border-soft);
             width: 100%;
@@ -798,14 +810,14 @@
 
         .custom-modal-content input,
         .custom-modal-content textarea {
-            background: #18181d;
-            color: #ffffff;
-            border-color: #3f3f46;
+            background: #ffffff;
+            color: var(--text-main);
+            border-color: #d1d5db;
         }
 
         .info-offer-box {
-            background: #1d140e;
-            border: 1px solid #6b2d12;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
             border-radius: 10px;
             padding: 10px;
             margin: 8px 0 10px;
@@ -815,8 +827,8 @@
         }
 
         .in-app-receipt-box {
-            background: #0d2215;
-            border: 1px solid #166534;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
             border-radius: 10px;
             padding: 10px;
             margin-top: 10px;
@@ -831,8 +843,7 @@
             bottom: 76px;
             left: 50%;
             transform: translateX(-50%);
-            background: #18181b;
-            border: 1px solid #3f3f46;
+            background: #111827;
             color: #ffffff;
             padding: 9px 14px;
             border-radius: 10px;
@@ -841,7 +852,7 @@
             z-index: 3500;
             max-width: 92%;
             text-align: center;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
         }
     </style>
 </head>
@@ -894,8 +905,12 @@
 
             <div id="addFormContainer" class="form-container">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <h3 style="margin:0; color:#fb923c; font-size:13.5px; font-weight:800;">تقديم طلب إضافة إعلان أو بضاعة</h3>
-                    <button type="button" onclick="closeListingsFormDrawer()" style="background:#27272a; color:#fff; border:none; border-radius:6px; padding:3px 8px; font-size:11px; font-weight:700; cursor:pointer;">إغلاق ✕</button>
+                    <h3 style="margin:0; color:#e64a00; font-size:13.5px; font-weight:800;">تقديم طلب إضافة إعلان أو بضاعة</h3>
+                    <button type="button" onclick="closeListingsFormDrawer()" style="background:#f3f4f6; color:#111827; border:none; border-radius:6px; padding:3px 8px; font-size:11px; font-weight:700; cursor:pointer;">إغلاق ✕</button>
+                </div>
+
+                <div class="whatsapp-priority-tip">
+                    💡 <b>نصيحة مهمة لصاحب المشروع:</b> أدخل <b>رقم واتساب للطلبات</b> لتصلك طلبات الزبائن مباشرة على هاتفك دون تأخير أو وساطة. (إذا لم يتوفر واتساب، يُحفظ الطلب في سجل الإدارة كمتابعة احتياطية).
                 </div>
 
                 <div id="savedOwnerNotice" class="saved-profile-bar">
@@ -906,11 +921,11 @@
                 <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">🏷️ اسم المحل أو صاحب المشروع (إجباري):</label>
                 <input type="text" id="reqName" placeholder="أدخل اسم المحل أو اسمك هنا...">
 
-                <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">📞 رقم الهاتف للتواصل:</label>
-                <input type="text" id="reqPhone" placeholder="07701234567">
-
-                <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">💬 رقم واتساب للطلبات (يفتح واتساب مباشرة):</label>
+                <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">💬 رقم واتساب للطلبات (موصى به لاستلام الطلبات مباشرة):</label>
                 <input type="text" id="reqOrderWhatsapp" placeholder="مثال: 07801234567">
+
+                <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">📞 رقم هاتف إضافي للتواصل:</label>
+                <input type="text" id="reqPhone" placeholder="07701234567">
 
                 <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">📸 رابط أو يوزر إنستغرام (للدخول المباشر للصفحة):</label>
                 <input type="text" id="reqInsta" placeholder="مثال: username أو https://instagram.com/username">
@@ -956,7 +971,7 @@
         <div id="storeProfileView">
             <button class="back-main-btn" type="button" onclick="goBackToCatalog()">⬅ العودة إلى القائمة</button>
             <div id="storeProfileContent"></div>
-            <div id="adminStoreActions" style="display: none; margin-top: 12px; padding-top: 10px; border-top: 1px dashed #3f3f46; gap: 6px;"></div>
+            <div id="adminStoreActions" style="display: none; margin-top: 12px; padding-top: 10px; border-top: 1px dashed #d1d5db; gap: 6px;"></div>
         </div>
 
         <div class="footer">جميع الحقوق محفوظة © سهل الوصول 2026</div>
@@ -985,24 +1000,24 @@
         </button>
     </nav>
 
-    <!-- نافذة الطلب عبر واتساب فقط + إمكانية فتح صفحة إنستغرام مباشرة -->
+    <!-- نافذة الطلب عبر واتساب أولاً + سجل احتياطي عند غياب واتساب + دخول إنستغرام -->
     <div class="custom-modal" id="inAppOrderModal">
         <div class="custom-modal-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h3 style="margin:0; color:#fb923c; font-size:14px; font-weight:800;">🛒 طلب مباشر عبر واتساب</h3>
-                <button type="button" onclick="closeModal('inAppOrderModal')" style="background:none; color:#fff; border:none; font-size:15px; cursor:pointer;">✕</button>
+                <h3 style="margin:0; color:#e64a00; font-size:14px; font-weight:800;">🛒 طلب عبر واتساب</h3>
+                <button type="button" onclick="closeModal('inAppOrderModal')" style="background:none; color:#111827; border:none; font-size:15px; cursor:pointer;">✕</button>
             </div>
             <div id="orderStoreBanner" class="info-offer-box" style="margin-top:0;"></div>
-            <p style="font-size:11px; color:var(--text-sub); margin:0 0 8px 0;">يُرسل الطلب عبر <b>واتساب</b> مع توضيح واضح أنك قادم من <b>تطبيق سهل الوصول</b>، ويمكنك أيضاً الدخول إلى صفحة إنستغرام مباشرة.</p>
+            <p style="font-size:11px; color:var(--text-sub); margin:0 0 8px 0;">يُوجَّه الطلب أولاً إلى <b>واتساب</b> مع توضيح أنك قادم من <b>تطبيق سهل الوصول</b>، ويُحفظ في سجل المتابعة كخيار احتياطي إذا لم يتوفر واتساب.</p>
 
             <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">👤 اسمك (اختياري):</label>
-            <input type="text" id="orderCustomerName" placeholder="مثال: ابراهيم" style="width:100%; padding:8px; font-size:11.5px; border:1px solid #3f3f46; border-radius:8px; margin-bottom:6px; font-family:inherit;">
+            <input type="text" id="orderCustomerName" placeholder="مثال: ابراهيم" style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:6px; font-family:inherit;">
 
             <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">📞 رقم هاتفك (إجباري للتواصل):</label>
-            <input type="text" id="orderCustomerPhone" placeholder="0770..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #3f3f46; border-radius:8px; margin-bottom:6px; font-family:inherit;">
+            <input type="text" id="orderCustomerPhone" placeholder="0770..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:6px; font-family:inherit;">
 
             <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">📝 تفاصيل الطلب / الكمية / العنوان:</label>
-            <textarea id="orderDetailsInput" rows="3" placeholder="مثال: قالب كيك أو صينية معجنات..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #3f3f46; border-radius:8px; margin-bottom:8px; font-family:inherit;"></textarea>
+            <textarea id="orderDetailsInput" rows="3" placeholder="مثال: قالب كيك أو صينية معجنات..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:8px; font-family:inherit;"></textarea>
 
             <button class="submit-btn" id="confirmInAppOrderBtn" type="button" onclick="submitInAppOrder()">تأكيد وإرسال الطلب عبر واتساب ✅</button>
             <div id="orderModalInstaArea" style="margin-top:8px;"></div>
@@ -1012,7 +1027,7 @@
 
     <div class="custom-modal" id="afterSubmitCloseModal">
         <div class="custom-modal-content" style="text-align:center;">
-            <h3 id="afterSubmitTitle" style="margin:0 0 8px 0; color:#fb923c; font-size:15px; font-weight:800;">تم تقديم إعلانك بنجاح ✅</h3>
+            <h3 id="afterSubmitTitle" style="margin:0 0 8px 0; color:#e64a00; font-size:15px; font-weight:800;">تم تقديم إعلانك بنجاح ✅</h3>
             <p id="afterSubmitMessage" style="font-size:12px; color:var(--text-sub); line-height:1.6; margin:0 0 14px 0;">
                 تم استلام طلبك بنجاح. اضغط على إغلاق لإغلاق قائمة الإعلانات والعودة إلى تصفح المحلات.
             </p>
@@ -1023,8 +1038,8 @@
     <div class="custom-modal" id="plusInfoOffersModal">
         <div class="custom-modal-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h3 style="margin:0; color:#e9d5ff; font-size:14px; font-weight:800;">📌 معلومات وعروض الصفحة</h3>
-                <button type="button" onclick="closeModal('plusInfoOffersModal')" style="background:none; color:#fff; border:none; font-size:15px; cursor:pointer;">✕</button>
+                <h3 style="margin:0; color:#6b21a8; font-size:14px; font-weight:800;">📌 معلومات وعروض الصفحة</h3>
+                <button type="button" onclick="closeModal('plusInfoOffersModal')" style="background:none; color:#111827; border:none; font-size:15px; cursor:pointer;">✕</button>
             </div>
             <div id="plusInfoOffersBody"></div>
             <button type="button" class="submit-btn" style="margin-top:10px;" onclick="closeModal('plusInfoOffersModal')">إغلاق</button>
@@ -1039,13 +1054,13 @@
     <div class="custom-modal" id="installGuideModal">
         <div class="custom-modal-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h3 style="margin:0; color:#fb923c; font-size:14px; font-weight:800;">📱 تثبيت تطبيق "سهل الوصول"</h3>
-                <button type="button" onclick="closeModal('installGuideModal')" style="background:none; color:#fff; border:none; font-size:15px; cursor:pointer;">✕</button>
+                <h3 style="margin:0; color:#e64a00; font-size:14px; font-weight:800;">📱 تثبيت تطبيق "سهل الوصول"</h3>
+                <button type="button" onclick="closeModal('installGuideModal')" style="background:none; color:#111827; border:none; font-size:15px; cursor:pointer;">✕</button>
             </div>
             <p style="font-size:11px; line-height:1.6; color:var(--text-main); margin-bottom:10px;">
-                1️⃣ اضغط على <b>النقاط الثلاث (⋮)</b> في أعلى المتصفح.<br>
-                2️⃣ اختر <b>"إضافة إلى الشاشة الرئيسية"</b> أو <b>"إنشاء اختصار"</b>.<br>
-                3️⃣ اضغط <b>"إضافة"</b> ليظهر التطبيق على شاشة هاتفك.
+                1️⃣ إذا كنت داخل Messenger أو تطبيق آخر: اضغط <b>النقاط الثلاث (⋮)</b> واختر <b>"فتح في المتصفح"</b> أولاً.<br>
+                2️⃣ في المتصفح: اضغط على <b>النقاط الثلاث (⋮)</b> في أعلى المتصفح.<br>
+                3️⃣ اختر <b>"إضافة إلى الشاشة الرئيسية"</b> أو <b>"إنشاء اختصار"</b> ثم اضغط <b>"إضافة"</b>.
             </p>
             <button class="submit-btn" type="button" onclick="closeModal('installGuideModal')">حسناً</button>
         </div>
@@ -1054,15 +1069,15 @@
     <div class="custom-modal" id="quickRequestsModal">
         <div class="custom-modal-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h3 style="margin:0; color:#fb923c; font-size:14px; font-weight:800;">⚡ شريط الطلبات السريعة (24 ساعة)</h3>
-                <button type="button" onclick="closeModal('quickRequestsModal')" style="background:none; color:#fff; border:none; font-size:15px; cursor:pointer;">✕</button>
+                <h3 style="margin:0; color:#e64a00; font-size:14px; font-weight:800;">⚡ شريط الطلبات السريعة (24 ساعة)</h3>
+                <button type="button" onclick="closeModal('quickRequestsModal')" style="background:none; color:#111827; border:none; font-size:15px; cursor:pointer;">✕</button>
             </div>
             <p style="font-size:11px; color:var(--text-sub); margin-bottom:8px;">اكتب الغرض أو الخدمة التي تبحث عنها مع رقم هاتفك.</p>
-            <input type="text" id="qrText" placeholder="مثال: مطلوب شاحن أصلي أو فني صيانة..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #3f3f46; border-radius:8px; margin-bottom:6px; font-family:inherit;">
-            <input type="text" id="qrPhone" placeholder="رقم الهاتف (0770...)" style="width:100%; padding:8px; font-size:11.5px; border:1px solid #3f3f46; border-radius:8px; margin-bottom:8px; font-family:inherit;">
+            <input type="text" id="qrText" placeholder="مثال: مطلوب شاحن أصلي أو فني صيانة..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:6px; font-family:inherit;">
+            <input type="text" id="qrPhone" placeholder="رقم الهاتف (0770...)" style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:8px; font-family:inherit;">
             <button class="submit-btn" type="button" onclick="submitQuickRequest()" style="margin-bottom:12px;">نشر الطلب فوراً</button>
-            <hr style="border:0; border-top:1px solid #27272a; margin-bottom:8px;">
-            <h4 style="font-size:11.5px; color:#fb923c; margin:0 0 6px 0;">الطلبات الحالية:</h4>
+            <hr style="border:0; border-top:1px solid #e5e7eb; margin-bottom:8px;">
+            <h4 style="font-size:11.5px; color:#e64a00; margin:0 0 6px 0;">الطلبات الحالية:</h4>
             <div id="quickRequestsList" style="max-height:170px; overflow-y:auto;">
                 <p style="font-size:10.5px; color:var(--text-sub); text-align:center;">جاري تحميل الطلبات...</p>
             </div>
@@ -1072,16 +1087,16 @@
     <div class="custom-modal" id="charityShelfModal">
         <div class="custom-modal-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h3 style="margin:0; color:#fb923c; font-size:14px; font-weight:800;">🤝 رفّ الخير والمستعمل</h3>
-                <button type="button" onclick="closeModal('charityShelfModal')" style="background:none; color:#fff; border:none; font-size:15px; cursor:pointer;">✕</button>
+                <h3 style="margin:0; color:#e64a00; font-size:14px; font-weight:800;">🤝 رفّ الخير والمستعمل</h3>
+                <button type="button" onclick="closeModal('charityShelfModal')" style="background:none; color:#111827; border:none; font-size:15px; cursor:pointer;">✕</button>
             </div>
             <p style="font-size:11px; color:var(--text-sub); margin-bottom:8px;">اعرض أغراضاً مستعملة نظيفة أو تبرعات لتستفيد منها عائلة أخرى.</p>
-            <input type="text" id="csTitle" placeholder="اسم الغرض..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #3f3f46; border-radius:8px; margin-bottom:6px; font-family:inherit;">
-            <input type="text" id="csDetails" placeholder="التفاصيل أو السعر الرمزي / مجاني..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #3f3f46; border-radius:8px; margin-bottom:6px; font-family:inherit;">
-            <input type="text" id="csPhone" placeholder="رقم الهاتف..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #3f3f46; border-radius:8px; margin-bottom:8px; font-family:inherit;">
+            <input type="text" id="csTitle" placeholder="اسم الغرض..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:6px; font-family:inherit;">
+            <input type="text" id="csDetails" placeholder="التفاصيل أو السعر الرمزي / مجاني..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:6px; font-family:inherit;">
+            <input type="text" id="csPhone" placeholder="رقم الهاتف..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:8px; font-family:inherit;">
             <button class="submit-btn" type="button" onclick="submitCharityItem()" style="margin-bottom:12px;">إضافة للرف الخيري</button>
-            <hr style="border:0; border-top:1px solid #27272a; margin-bottom:8px;">
-            <h4 style="font-size:11.5px; color:#fb923c; margin:0 0 6px 0;">الأغراض المتوفرة:</h4>
+            <hr style="border:0; border-top:1px solid #e5e7eb; margin-bottom:8px;">
+            <h4 style="font-size:11.5px; color:#e64a00; margin:0 0 6px 0;">الأغراض المتوفرة:</h4>
             <div id="charityItemsList" style="max-height:170px; overflow-y:auto;">
                 <p style="font-size:10.5px; color:var(--text-sub); text-align:center;">جاري تحميل الأغراض...</p>
             </div>
@@ -1091,18 +1106,18 @@
     <div class="custom-modal" id="adminModal">
         <div class="custom-modal-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <h3 style="margin:0; color:#fb923c; font-size:14px; font-weight:800;">لوحة تحكم المشرف</h3>
-                <button type="button" onclick="closeAdminModal()" style="background:none; color:#fff; border:none; font-size:15px; cursor:pointer;">✕</button>
+                <h3 style="margin:0; color:#e64a00; font-size:14px; font-weight:800;">لوحة تحكم المشرف</h3>
+                <button type="button" onclick="closeAdminModal()" style="background:none; color:#111827; border:none; font-size:15px; cursor:pointer;">✕</button>
             </div>
             <div id="adminLoginView">
-                <input type="password" id="adminPinInput" placeholder="أدخل الرمز السري للإدارة" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #3f3f46; border-radius:8px; font-size:12px; font-family:inherit;">
+                <input type="password" id="adminPinInput" placeholder="أدخل الرمز السري للإدارة" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #d1d5db; border-radius:8px; font-size:12px; font-family:inherit;">
                 <button class="submit-btn" type="button" onclick="checkAdminPin()">تسجيل الدخول</button>
             </div>
             <div id="adminDashboardView" style="display:none;">
                 <p style="color:var(--success-green); font-weight:700; font-size:11.5px; margin-bottom:8px;">تم تسجيل الدخول بنجاح ✅</p>
                 <div style="display:flex; gap:6px; margin-bottom:8px;">
                     <button type="button" id="adminTabListingsBtn" onclick="switchAdminSection('listings')" style="flex:1; background:var(--brand-orange); color:#fff; border:none; border-radius:7px; padding:6px; font-size:11px; font-weight:800; cursor:pointer; font-family:inherit;">الإعلانات</button>
-                    <button type="button" id="adminTabOrdersBtn" onclick="switchAdminSection('orders')" style="flex:1; background:#27272a; color:var(--text-main); border:none; border-radius:7px; padding:6px; font-size:11px; font-weight:800; cursor:pointer; font-family:inherit;">سجل الطلبات والزيارات</button>
+                    <button type="button" id="adminTabOrdersBtn" onclick="switchAdminSection('orders')" style="flex:1; background:#f3f4f6; color:var(--text-main); border:none; border-radius:7px; padding:6px; font-size:11px; font-weight:800; cursor:pointer; font-family:inherit;">سجل الطلبات والزيارات</button>
                 </div>
                 <div id="adminPendingList" style="max-height:280px; overflow-y:auto;"></div>
                 <div id="adminOrdersList" style="display:none; max-height:280px; overflow-y:auto;"></div>
@@ -1256,7 +1271,7 @@
             if (hasValidPhoneNumber(orderWaRaw)) {
                 return {
                     type: 'whatsapp',
-                    channelLabel: 'واتساب فقط (رقم الطلبات)',
+                    channelLabel: 'واتساب أولاً (رقم الطلبات)',
                     url: `https://wa.me/${formatIraqWhatsappNumber(orderWaRaw)}`
                 };
             }
@@ -1264,14 +1279,14 @@
             if (hasValidPhoneNumber(phoneRaw)) {
                 return {
                     type: 'whatsapp',
-                    channelLabel: 'واتساب فقط',
+                    channelLabel: 'واتساب أولاً',
                     url: `https://wa.me/${formatIraqWhatsappNumber(phoneRaw)}`
                 };
             }
 
             return {
-                type: 'no_whatsapp',
-                channelLabel: 'بدون رقم واتساب مسجل (يُحفظ في السجل)',
+                type: 'app_backup',
+                channelLabel: 'سجل احتياطي داخل التطبيق (بانتظار إضافة واتساب)',
                 url: ''
             };
         }
@@ -1603,9 +1618,9 @@
 
             if (bannerEl) {
                 bannerEl.innerHTML = `
-                    <div style="font-weight:900; color:#ff6b6b; font-size:13.5px;">📌 ${escapeHtmlText(store.name)}</div>
+                    <div style="font-weight:900; color:#b91c1c; font-size:13.5px;">📌 ${escapeHtmlText(store.name)}</div>
                     <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">📍 ${escapeHtmlText(store.address || 'غير محدد')} • المسار: <b>${escapeHtmlText(routing.channelLabel)}</b></div>
-                    ${store.price ? `<div style="font-size:11.5px; font-weight:800; color:#fb923c; margin-top:3px;">💰 ${escapeHtmlText(store.price)}</div>` : ''}
+                    ${store.price ? `<div style="font-size:11.5px; font-weight:800; color:#c2410c; margin-top:3px;">💰 ${escapeHtmlText(store.price)}</div>` : ''}
                 `;
             }
 
@@ -1652,7 +1667,7 @@
             const orderDetails = (document.getElementById('orderDetailsInput').value || '').trim();
 
             if (!customerPhone) {
-                alert('يرجى إدخال رقم هاتفك لكي يتمكن صاحب المشروع من التواصل معك عبر واتساب.');
+                alert('يرجى إدخال رقم هاتفك لكي يتمكن صاحب المشروع من التواصل معك.');
                 document.getElementById('orderCustomerPhone').focus();
                 return;
             }
@@ -1664,7 +1679,7 @@
 
             const btn = document.getElementById('confirmInAppOrderBtn');
             btn.disabled = true;
-            btn.textContent = 'جاري تجهيز طلب واتساب...';
+            btn.textContent = 'جاري تجهيز الطلب...';
 
             saveCustomerProfile({ name: customerName, phone: customerPhone });
 
@@ -1682,7 +1697,7 @@
             const timeText = new Date().toLocaleTimeString('ar-IQ', { hour: '2-digit', minute: '2-digit' });
             const compactDoneLog = {
                 id: 'ord_' + Date.now(),
-                statusLabel: 'طلب واتساب',
+                statusLabel: routing.type === 'whatsapp' ? 'طلب واتساب' : 'طلب احتياطي (بدون واتساب)',
                 storeId: activeOrderTargetStore.id,
                 storeName: activeOrderTargetStore.name || 'مشروع محلي',
                 customerName,
@@ -1725,9 +1740,9 @@
             if (receiptEl) {
                 receiptEl.innerHTML = `
                     <div class="in-app-receipt-box">
-                        <div style="font-weight:900; color:#fb923c; margin-bottom:4px;">⚠️ لا يوجد رقم واتساب مسجل لهذه الجهة حالياً</div>
-                        <div style="font-size:11px; color:var(--text-sub); margin-bottom:6px;">تم حفظ الطلب في سجل التطبيق • الوقت: <b>${escapeHtmlText(timeText)}</b></div>
-                        <pre style="white-space:pre-wrap; font-family:inherit; background:#141418; border:1px solid #27272a; border-radius:8px; padding:7px; margin:0 0 8px 0; font-size:11px; color:#f4f4f5;">${escapeHtmlText(orderMessageText)}</pre>
+                        <div style="font-weight:900; color:#c2410c; margin-bottom:4px;">📌 لا يوجد رقم واتساب مسجل لهذه الجهة حالياً</div>
+                        <div style="font-size:11px; color:var(--text-sub); margin-bottom:6px;">تم حفظ الطلب كسجل احتياطي للمتابعة • الوقت: <b>${escapeHtmlText(timeText)}</b></div>
+                        <pre style="white-space:pre-wrap; font-family:inherit; background:#ffffff; border:1px solid #d1d5db; border-radius:8px; padding:7px; margin:0 0 8px 0; font-size:11px; color:#111827;">${escapeHtmlText(orderMessageText)}</pre>
                         <div style="display:flex; gap:6px;">
                             <button type="button" class="mini-like-btn" style="flex:1; padding:7px; font-weight:800;" onclick="copyLastOrderText()">📋 نسخ نص الطلب</button>
                             <button type="button" class="mini-call-link" style="flex:1; cursor:pointer; font-family:inherit; font-weight:800;" onclick="closeModal('inAppOrderModal')">إغلاق</button>
@@ -1735,7 +1750,7 @@
                     </div>
                 `;
             }
-            showToastNotice('تم حفظ الطلب في السجل؛ لا يوجد رقم واتساب مسجل لهذه الجهة.');
+            showToastNotice('تم حفظ الطلب في السجل الاحتياطي لعدم توفر رقم واتساب للجهة.');
         }
 
         function switchAdminSection(section) {
@@ -1747,14 +1762,14 @@
             if (section === 'orders') {
                 if (listingsDiv) listingsDiv.style.display = 'none';
                 if (ordersDiv) ordersDiv.style.display = 'block';
-                if (tabListings) { tabListings.style.background = '#27272a'; tabListings.style.color = 'var(--text-main)'; }
+                if (tabListings) { tabListings.style.background = '#f3f4f6'; tabListings.style.color = 'var(--text-main)'; }
                 if (tabOrders) { tabOrders.style.background = 'var(--brand-orange)'; tabOrders.style.color = '#fff'; }
                 loadAdminOrders();
             } else {
                 if (listingsDiv) listingsDiv.style.display = 'block';
                 if (ordersDiv) ordersDiv.style.display = 'none';
                 if (tabListings) { tabListings.style.background = 'var(--brand-orange)'; tabListings.style.color = '#fff'; }
-                if (tabOrders) { tabOrders.style.background = '#27272a'; tabOrders.style.color = 'var(--text-main)'; }
+                if (tabOrders) { tabOrders.style.background = '#f3f4f6'; tabOrders.style.color = 'var(--text-main)'; }
                 loadAdminListings();
             }
         }
@@ -1785,11 +1800,11 @@
             }
 
             ordersDiv.innerHTML = `
-                <div style="background:#1d140e; border:1px solid #6b2d12; border-radius:8px; padding:7px 10px; margin-bottom:8px; font-size:11px; font-weight:800; color:#fb923c;">
-                    📊 إجمالي الحركات المسجلة (واتساب + إنستغرام/فيسبوك): ${logs.length}
+                <div style="background:#fff7ed; border:1px solid #fed7aa; border-radius:8px; padding:7px 10px; margin-bottom:8px; font-size:11px; font-weight:800; color:#9a3412;">
+                    📊 إجمالي الحركات المسجلة (واتساب + سجل احتياطي + إنستغرام/فيسبوك): ${logs.length}
                 </div>
                 ${logs.slice(0, 40).map(o => `
-                    <div style="background:#18181d; padding:8px 9px; border-radius:8px; margin-bottom:6px; border:1px solid #27272a; font-size:11px;">
+                    <div style="background:#f9fafb; padding:8px 9px; border-radius:8px; margin-bottom:6px; border:1px solid #e5e7eb; font-size:11px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
                             <div>
                                 <b style="color:var(--success-green);">✓ ${escapeHtmlText(o.statusLabel || 'تم')}</b> — <b>${escapeHtmlText(o.storeName || '')}</b>
@@ -1849,12 +1864,12 @@
             const offersListHtml = posts.map((post, idx) => {
                 const label = escapeHtmlText(post.price || `إعلان رقم ${idx + 1}`);
                 const loc = post.address ? ` — ${escapeHtmlText(post.address)}` : '';
-                return `<div style="padding:4px 0; border-bottom:1px dashed #3f2818;">• <b>إعلان ${idx + 1}:</b> ${label}${loc}</div>`;
+                return `<div style="padding:4px 0; border-bottom:1px dashed #fed7aa;">• <b>إعلان ${idx + 1}:</b> ${label}${loc}</div>`;
             }).join('');
 
             const galleryHtml = Array.isArray(store.images) && store.images.length > 0
                 ? `<div style="display:grid; grid-template-columns:repeat(2,1fr); gap:6px; margin-top:8px;">
-                    ${store.images.slice(0, 6).map(img => `<img src="${img}" alt="${safeName}" onclick="openImageModal('${img}')" style="width:100%; height:90px; object-fit:cover; border-radius:8px; border:1px solid #27272a; cursor:pointer;">`).join('')}
+                    ${store.images.slice(0, 6).map(img => `<img src="${img}" alt="${safeName}" onclick="openImageModal('${img}')" style="width:100%; height:90px; object-fit:cover; border-radius:8px; border:1px solid #e5e7eb; cursor:pointer;">`).join('')}
                    </div>`
                 : '';
 
@@ -1870,14 +1885,14 @@
                 <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
                     <img src="${store.logo || (store.images && store.images[0]) || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'}" alt="${safeName}" style="width:46px; height:46px; border-radius:50%; object-fit:cover; border:1.5px solid #a855f7;">
                     <div>
-                        <div style="font-size:15px; font-weight:900; color:#ff6b6b;">${safeName} ${store.vip ? '⭐' : ''}</div>
+                        <div style="font-size:15px; font-weight:900; color:#b91c1c;">${safeName} ${store.vip ? '⭐' : ''}</div>
                         <div style="font-size:11px; color:var(--text-sub);">القسم: <b>${safeCat}</b> • الطلبات: <b>${ordersCount}</b> • التفاعل: <b>${clicksCount}</b></div>
                     </div>
                 </div>
                 <div style="font-size:11.5px; margin-bottom:6px;">📍 <b>العنوان:</b> ${safeAddress}</div>
                 ${phoneLineHtml}
                 <div class="info-offer-box">
-                    <div style="font-weight:800; color:#fb923c; margin-bottom:4px;">🎁 جميع إعلانات وعروض الصفحة:</div>
+                    <div style="font-weight:800; color:#c2410c; margin-bottom:4px;">🎁 جميع إعلانات وعروض الصفحة:</div>
                     ${offersListHtml}
                 </div>
                 ${galleryHtml}
@@ -2292,7 +2307,7 @@
                 }
 
                 listDiv.innerHTML = requests.map(r => `
-                    <div style="background:#18181d; padding:8px; border-radius:8px; margin-bottom:6px; border:1px solid #27272a; font-size:11px;">
+                    <div style="background:#f9fafb; padding:8px; border-radius:8px; margin-bottom:6px; border:1px solid #e5e7eb; font-size:11px;">
                         <b>طلب:</b> ${r.text}<br>
                         📞 <a href="tel:${r.phone}" style="color:var(--success-green); font-weight:700;">${r.phone}</a>
                         ${isAdminLoggedIn ? `<button type="button" onclick="deleteQuickReq('${r.id}')" style="float:left; background:#dc2626; color:#fff; border:none; padding:2px 6px; border-radius:4px; font-size:9.5px; cursor:pointer;">حذف</button>` : ''}
@@ -2437,7 +2452,7 @@
             }
 
             listDiv.innerHTML = items.map(i => `
-                <div style="background:#18181d; padding:8px; border-radius:8px; margin-bottom:6px; border:1px solid #27272a; font-size:11px;">
+                <div style="background:#f9fafb; padding:8px; border-radius:8px; margin-bottom:6px; border:1px solid #e5e7eb; font-size:11px;">
                     <b>🎁 ${i.title}</b><br>
                     📝 ${i.details || 'بدون تفاصيل'}<br>
                     📞 <a href="tel:${i.phone}" style="color:var(--success-green); font-weight:700;">${i.phone}</a>
@@ -2526,7 +2541,7 @@
                             <div class="grid-actions" onclick="event.stopPropagation()">
                                 <button type="button" class="mini-like-btn ${alreadyLiked ? 'liked' : ''}" onclick="addLike('${safeId}')">${alreadyLiked ? '🧡' : '❤️'} ${item.likes || 0}</button>
                                 <button type="button" class="mini-plus-btn" title="معلومات وعروض" onclick="openPlusInfoOffersModal('${safeId}')">+</button>
-                                <button type="button" class="mini-call-link" style="background:#23160f; color:#fb923c; border-color:#7c2d12; cursor:pointer; font-family:inherit; font-weight:800;" onclick="openInAppOrderModal('${safeId}', '')">🛒 اطلب</button>
+                                <button type="button" class="mini-call-link" style="background:#fff7ed; color:#c2410c; border-color:#fdba74; cursor:pointer; font-family:inherit; font-weight:800;" onclick="openInAppOrderModal('${safeId}', '')">🛒 اطلب</button>
                             </div>
                             ${isAdminLoggedIn ? `
                                 <div style="display:flex; gap:4px; margin-top:6px;" onclick="event.stopPropagation()">
@@ -2600,14 +2615,14 @@
                     <div class="profile-post-item">
                         ${imgs.length > 0
                             ? `<div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px; margin-bottom:10px;">
-                                ${imgs.map(img => `<img src="${img}" style="width:100%; height:140px; border-radius:10px; object-fit:cover; border:1px solid #27272a; cursor:pointer;" alt="${fullPostName}" onclick="openImageModal('${img}')">`).join('')}
+                                ${imgs.map(img => `<img src="${img}" style="width:100%; height:140px; border-radius:10px; object-fit:cover; border:1px solid #e5e7eb; cursor:pointer;" alt="${fullPostName}" onclick="openImageModal('${img}')">`).join('')}
                                </div>`
                             : ''
                         }
                         <div class="profile-post-info-box">
                             <div class="profile-post-title">📌 إعلان ${idx + 1}: ${fullPostName}</div>
                             ${postPrice
-                                ? `<div style="font-size:13px; font-weight:800; color:#ffffff; margin-bottom:4px;">💰 السعر والملاحظات: <span style="color:#fb923c;">${postPrice}</span></div>`
+                                ? `<div style="font-size:13px; font-weight:800; color:#111827; margin-bottom:4px;">💰 السعر والملاحظات: <span style="color:#c2410c;">${postPrice}</span></div>`
                                 : ''
                             }
                             ${postAddr
@@ -2641,7 +2656,7 @@
                 <div class="profile-header">
                     <img src="${store.logo || (store.images && store.images[0]) || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'}" class="profile-logo" alt="شعار" onclick="openImageModal('${store.logo || (store.images && store.images[0]) || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'}')">
                     <div>
-                        <h2 style="margin:0 0 2px 0; font-size:17px; font-weight:900; color:#ff6b6b;">${store.name} ${store.vip ? '⭐' : ''}</h2>
+                        <h2 style="margin:0 0 2px 0; font-size:17px; font-weight:900; color:#b91c1c;">${store.name} ${store.vip ? '⭐' : ''}</h2>
                         <p style="margin:0; font-size:11.5px; color:var(--text-sub);">القسم: <b>${store.category}</b> • الطلبات: <b>${ordersCount}</b> • زيارات المنصات: <b>${clicksCount}</b></p>
                     </div>
                 </div>
@@ -2649,7 +2664,7 @@
                     <button type="button" class="mini-like-btn ${alreadyLiked ? 'liked' : ''}" onclick="addLike('${escapeJsSingleQuote(store.id)}');">${alreadyLiked ? '🧡 تم الإعجاب' : '❤️ إعجاب'} (${store.likes || 0})</button>
                 </div>
                 <p style="font-size:12px; margin-bottom:4px;"><b>العنوان:</b> ${store.address || 'غير محدد'}</p>
-                <p style="font-size:11.5px; color:var(--text-sub); margin-bottom:10px;"><b>طريقة الطلب:</b> ${escapeHtmlText(routing.channelLabel)}</p>
+                <p style="font-size:11.5px; color:var(--text-sub); margin-bottom:10px;"><b>مسار الطلب:</b> ${escapeHtmlText(routing.channelLabel)}</p>
 
                 <h4 style="font-size:12.5px; font-weight:800; margin:12px 0 6px 0;">إعلانات ومنتجات الصفحة (${posts.length}):</h4>
                 ${postsHtml}
@@ -2715,7 +2730,7 @@
 
             if (matches.length === 0) {
                 suggestionsBox.innerHTML = `
-                    <div class="suggestion-item" onmousedown="openQuickRequestsModal()" ontouchstart="openQuickRequestsModal()" style="color:#fb923c; font-weight:700;">
+                    <div class="suggestion-item" onmousedown="openQuickRequestsModal()" ontouchstart="openQuickRequestsModal()" style="color:#c2410c; font-weight:700;">
                         ⚡ لا توجد نتائج لـ "${rawQuery}".. اضغط لنشره كطلب سريع
                     </div>
                 `;
@@ -2733,8 +2748,8 @@
                     <div class="suggestion-item" onmousedown="selectSuggestion('${escapeJsSingleQuote(item.id)}')" ontouchstart="selectSuggestion('${escapeJsSingleQuote(item.id)}')">
                         <div style="flex:1;">
                             <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
-                                <b style="color:#ff6b6b; font-size:13px;">${item.name}</b>
-                                <span style="background:#23160f; color:#fb923c; border:1px solid #7c2d12; border-radius:6px; padding:1px 6px; font-size:9.5px; font-weight:700;">${badge}</span>
+                                <b style="color:#b91c1c; font-size:13px;">${item.name}</b>
+                                <span style="background:#fff7ed; color:#c2410c; border:1px solid #fed7aa; border-radius:6px; padding:1px 6px; font-size:9.5px; font-weight:700;">${badge}</span>
                             </div>
                             <div style="font-size:10px; color:var(--text-sub); margin-top:2px;">
                                 ${item.address || 'غير محدد'} ${(item.allOffersText || item.price) ? ' • ' + (item.allOffersText || item.price) : ''}
@@ -2772,7 +2787,7 @@
                     const safeCat = escapeJsSingleQuote(item.category || '');
                     const safePrice = escapeJsSingleQuote(item.price || '');
                     return `
-                        <div style="background:#18181d; padding:8px; border-radius:8px; margin-bottom:7px; border:1px solid #27272a; font-size:11px;">
+                        <div style="background:#f9fafb; padding:8px; border-radius:8px; margin-bottom:7px; border:1px solid #e5e7eb; font-size:11px;">
                             <b>${item.name}</b> (${item.category}) - الحالة: <b>${item.status === 'pending' ? 'بانتظار الموافقة' : 'معتمد'}</b> ${item.vip ? '| <b>VIP</b>' : ''}<br>
                             📞 ${item.phone}${item.orderWhatsapp ? ` | 💬 واتساب: <b>${escapeHtmlText(item.orderWhatsapp)}</b>` : ''}${item.insta ? ` | 📸 إنستا: <b>${escapeHtmlText(item.insta)}</b>` : ''}<br>
                             🛒 طلبات: <b>${Number(item.ordersCount) || 0}</b> | 👆 زيارات المنصات: <b>${Number(item.contactClicks) || 0}</b><br>
@@ -2849,11 +2864,11 @@
             const newName = prompt("تعديل اسم المحل أو صاحب المشروع:", currentName);
             if (newName === null) return;
 
-            const newPhone = prompt("تعديل رقم الهاتف:", currentPhone);
-            if (newPhone === null) return;
-
             const newOrderWa = prompt("تعديل رقم واتساب الطلبات:", currentOrderWa);
             if (newOrderWa === null) return;
+
+            const newPhone = prompt("تعديل رقم الهاتف الإضافي:", currentPhone);
+            if (newPhone === null) return;
 
             const newInsta = prompt("تعديل يوزر أو رابط إنستغرام:", currentInsta);
             if (newInsta === null) return;
@@ -2874,8 +2889,8 @@
             if (newPrice === null) return;
 
             const cleanName = newName.trim();
-            const cleanPhone = newPhone.trim();
             const cleanOrderWa = newOrderWa.trim();
+            const cleanPhone = newPhone.trim();
             const cleanInsta = newInsta.trim();
             const cleanFb = newFb.trim();
             const cleanAddress = newAddress.trim();
