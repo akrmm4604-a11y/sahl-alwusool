@@ -891,6 +891,18 @@
                 <div id="searchSuggestions" class="search-suggestions"></div>
             </div>
 
+            <!-- شريط توجيه لفتح الصفحة في المتصفح الخارجي عند الفتح من داخل تطبيق آخر -->
+            <div id="externalBrowserGuideBar" style="display:none; margin:8px 12px 4px; background:#fff7ed; border:1.5px solid #fdba74; border-radius:10px; padding:10px 11px; font-size:11.5px; color:#111827;">
+                <div style="font-weight:900; color:#c2410c; margin-bottom:4px;">🌐 لسهولة تثبيت التطبيق: افتحه من متصفح الهاتف</div>
+                <div style="font-size:11px; color:#4b5563; line-height:1.5; margin-bottom:8px;">
+                    يبدو أنك فتحت الرابط من داخل تطبيق آخر. اضغط على <b>النقاط الثلاث (⋮)</b> في أعلى الشاشة واختر <b>"فتح في المتصفح" (Open in browser)</b> ثم ثبّت التطبيق.
+                </div>
+                <div style="display:flex; gap:6px;">
+                    <button type="button" class="install-highlight-btn" style="flex:1;" onclick="copyAppDirectLink()">📋 نسخ رابط المتصفح</button>
+                    <button type="button" class="mini-like-btn" style="padding:5px 10px; font-weight:800;" onclick="document.getElementById('externalBrowserGuideBar').style.display='none'">إخفاء</button>
+                </div>
+            </div>
+
             <div class="install-highlight-strip">
                 <div class="install-highlight-text">
                     <span>📲</span>
@@ -928,7 +940,7 @@
 
             <div class="utility-actions-bar">
                 <button class="utility-btn primary-action" id="toggleFormBtn" type="button">📢 إضافة إعلان أو بضاعة</button>
-                <button class="utility-btn" type="button" onclick="openOrdersHistoryModal()">📋 سجل الطلبات</button>
+                <button class="utility-btn" type="button" onclick="openOrdersHistoryModal()">🔐 سجل الطلبات (الإدارة)</button>
             </div>
 
             <div id="addFormContainer" class="form-container">
@@ -1028,30 +1040,42 @@
         </button>
     </nav>
 
-    <!-- نافذة سجل الطلبات الكامل -->
+    <!-- نافذة سجل الطلبات الكامل (مخصصة للمدير) -->
     <div class="custom-modal" id="ordersHistoryModal">
         <div class="custom-modal-content" style="max-width: 440px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h3 style="margin:0; color:#e64a00; font-size:14px; font-weight:800;">📋 سجل الطلبات التفصيلي</h3>
+                <h3 style="margin:0; color:#e64a00; font-size:14px; font-weight:800;">📋 سجل الطلبات التفصيلي (للمدير)</h3>
                 <button type="button" onclick="closeModal('ordersHistoryModal')" style="background:none; color:#111827; border:none; font-size:15px; cursor:pointer;">✕</button>
             </div>
 
-            <input type="text" id="orderSearchInput" oninput="renderOrdersHistory()" placeholder="ابحث باسم الزبون، رقم الهاتف، أو اسم المحل..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:8px; font-family:inherit;">
-
-            <div style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px;">
-                <button type="button" class="cat-chip active" data-order-filter="all" onclick="setOrderFilter('all', this)">الكل</button>
-                <button type="button" class="cat-chip" data-order-filter="new" onclick="setOrderFilter('new', this)">جديد / واتساب</button>
-                <button type="button" class="cat-chip" data-order-filter="processing" onclick="setOrderFilter('processing', this)">قيد التجهيز</button>
-                <button type="button" class="cat-chip" data-order-filter="completed" onclick="setOrderFilter('completed', this)">مكتمل</button>
+            <div class="info-offer-box" style="margin-top:0; margin-bottom:8px; font-size:11px;">
+                <b>كيف يعمل هذا السجل لك كمدير؟</b> يسجّل جميع الطلبات والزيارات (سواء وُجد واتساب لدى الجهة أو لم يتوفر كمتابعة احتياطية، إضافة إلى زيارات إنستغرام/فيسبوك من التطبيق) لمتابعة الحالات، معرفة أكثر الجهات طلباً، وتصدير التقارير.
             </div>
 
-            <div style="display:flex; gap:6px; margin-bottom:10px;">
-                <button type="button" class="mini-like-btn" style="flex:1; padding:6px;" onclick="refreshOrdersHistory()">🔄 تحديث السجل</button>
-                <button type="button" class="mini-call-link" style="flex:1; cursor:pointer; font-family:inherit;" onclick="exportOrdersCsv()">📥 تصدير CSV</button>
+            <div id="ordersHistoryAuthBox" style="display:none; background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; padding:10px; margin-bottom:8px;">
+                <div style="font-size:11.5px; font-weight:800; color:#c2410c; margin-bottom:6px;">🔐 أدخل رمز الإدارة لعرض سجل الطلبات:</div>
+                <input type="password" id="ordersHistoryPinInput" placeholder="أدخل الرمز السري للإدارة" style="width:100%; padding:8px; font-size:12px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:6px; font-family:inherit;">
+                <button type="button" class="submit-btn" onclick="unlockOrdersHistoryWithPin()">فتح سجل الطلبات</button>
             </div>
 
-            <div id="ordersHistoryStats" class="info-offer-box" style="margin-top:0; font-size:11px;"></div>
-            <div id="ordersHistoryList" style="max-height:300px; overflow-y:auto;"></div>
+            <div id="ordersHistoryContentArea">
+                <input type="text" id="orderSearchInput" oninput="renderOrdersHistory()" placeholder="ابحث باسم الزبون، رقم الهاتف، أو اسم المحل..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:8px; font-family:inherit;">
+
+                <div style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px;">
+                    <button type="button" class="cat-chip active" data-order-filter="all" onclick="setOrderFilter('all', this)">الكل</button>
+                    <button type="button" class="cat-chip" data-order-filter="new" onclick="setOrderFilter('new', this)">جديد / واتساب</button>
+                    <button type="button" class="cat-chip" data-order-filter="processing" onclick="setOrderFilter('processing', this)">قيد التجهيز</button>
+                    <button type="button" class="cat-chip" data-order-filter="completed" onclick="setOrderFilter('completed', this)">مكتمل</button>
+                </div>
+
+                <div style="display:flex; gap:6px; margin-bottom:10px;">
+                    <button type="button" class="mini-like-btn" style="flex:1; padding:6px;" onclick="refreshOrdersHistory()">🔄 تحديث السجل</button>
+                    <button type="button" class="mini-call-link" style="flex:1; cursor:pointer; font-family:inherit;" onclick="exportOrdersCsv()">📥 تصدير CSV</button>
+                </div>
+
+                <div id="ordersHistoryStats" class="info-offer-box" style="margin-top:0; font-size:11px;"></div>
+                <div id="ordersHistoryList" style="max-height:260px; overflow-y:auto;"></div>
+            </div>
         </div>
     </div>
 
@@ -1192,6 +1216,8 @@
     </div>
 
     <script>
+        const ADMIN_PIN_CODE = "334455ff";
+        const APP_DIRECT_URL = "https://akrmm4604-a11y.github.io/sahl-alwusool/";
         let isAdminLoggedIn = false;
         let selectedFilesArray = [];
         let currentCat = 'all';
@@ -1210,6 +1236,22 @@
         const LOCAL_ORDERS_KEY = "sahl_alwusool_local_orders_v1";
         const TWO_DAY_REMINDER_KEY = "sahl_alwusool_two_day_reminder_ts_v1";
         const TWO_DAY_MS = 48 * 60 * 60 * 1000;
+
+        function isInsideInAppBrowser() {
+            const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+            return /FBAN|FBAV|Instagram|Line|Twitter|Snapchat|MicroMessenger|WV/i.test(ua);
+        }
+
+        function evaluateInAppBrowserGuide() {
+            const bar = document.getElementById('externalBrowserGuideBar');
+            if (!bar) return;
+            bar.style.display = isInsideInAppBrowser() ? 'block' : 'none';
+        }
+
+        async function copyAppDirectLink() {
+            const ok = await copyTextSafe(APP_DIRECT_URL);
+            showToastNotice(ok ? 'تم نسخ رابط المتصفح المباشر. الصقه في متصفح الهاتف لتثبيت التطبيق ✅' : 'انسخ الرابط: ' + APP_DIRECT_URL);
+        }
 
         function evaluateTwoDayReminder() {
             const banner = document.getElementById('periodicReminderBanner');
@@ -1246,7 +1288,7 @@
         async function copyAdminReminderMessage() {
             const area = document.getElementById('adminReminderText');
             const msg = (area && area.value.trim()) ||
-                'تذكير بتطبيق سهل الوصول: تصفح أحدث المحلات، قسم شغل بيوت، والطلبات السريعة في القيارة والموصل: https://akrmm4604-a11y.github.io/sahl-alwusool/';
+                `تذكير بتطبيق سهل الوصول: تصفح أحدث المحلات، قسم شغل بيوت، والطلبات السريعة في القيارة والموصل: ${APP_DIRECT_URL}`;
             const ok = await copyTextSafe(msg);
             showToastNotice(ok ? 'تم نسخ رسالة التذكير بنجاح ✅' : 'تعذر النسخ تلقائياً');
         }
@@ -1865,12 +1907,43 @@
             showToastNotice('تم حفظ الطلب في السجل الاحتياطي لعدم توفر رقم واتساب للجهة.');
         }
 
+        function syncOrdersHistoryAccessView() {
+            const authBox = document.getElementById('ordersHistoryAuthBox');
+            const contentArea = document.getElementById('ordersHistoryContentArea');
+            if (!authBox || !contentArea) return;
+
+            if (isAdminLoggedIn) {
+                authBox.style.display = 'none';
+                contentArea.style.display = 'block';
+            } else {
+                authBox.style.display = 'block';
+                contentArea.style.display = 'none';
+            }
+        }
+
+        function unlockOrdersHistoryWithPin() {
+            const pinInput = document.getElementById('ordersHistoryPinInput');
+            const entered = pinInput ? pinInput.value : '';
+            if (entered === ADMIN_PIN_CODE) {
+                isAdminLoggedIn = true;
+                if (pinInput) pinInput.value = '';
+                syncOrdersHistoryAccessView();
+                refreshOrdersHistory();
+                showToastNotice('تم فتح سجل الطلبات للإدارة ✅');
+            } else {
+                alert('الرمز السري غير صحيح!');
+            }
+        }
+
         function openOrdersHistoryModal() {
             const modal = document.getElementById('ordersHistoryModal');
             if (!modal) return;
             modal.style.display = 'flex';
             syncModalScrollLock();
-            refreshOrdersHistory();
+            syncOrdersHistoryAccessView();
+            if (isAdminLoggedIn) {
+                refreshOrdersHistory();
+            }
         }
 
         function setOrderFilter(filterKey, btn) {
@@ -1881,6 +1954,11 @@
         }
 
         async function refreshOrdersHistory() {
+            if (!isAdminLoggedIn) {
+                syncOrdersHistoryAccessView();
+                return;
+            }
+
             const listEl = document.getElementById('ordersHistoryList');
             if (listEl) {
                 listEl.innerHTML = '<p style="font-size:11px; color:var(--text-sub); text-align:center;">جاري جلب سجل الطلبات...</p>';
@@ -1977,16 +2055,19 @@
             listEl.innerHTML = filtered.map(o => {
                 const currentState = o.orderState || 'new';
                 const dateStr = o.timeText || new Date(o.timestamp || Date.now()).toLocaleString('ar-IQ');
+                const typeBadge = o.statusLabel || o.channel || 'طلب';
                 return `
                     <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:9px; padding:8px 10px; margin-bottom:7px; font-size:11px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:4px;">
                             <b style="color:#b91c1c;">${escapeHtmlText(o.storeName || 'جهة غير محددة')}</b>
                             <span style="color:var(--text-sub); font-size:10px;">${escapeHtmlText(dateStr)}</span>
                         </div>
+                        <div style="margin-bottom:4px; color:#c2410c; font-weight:700; font-size:10.5px;">
+                            📌 ${escapeHtmlText(typeBadge)} • الحالة: <b>${escapeHtmlText(stateLabels[currentState] || 'جديد')}</b>
+                        </div>
                         <div style="margin-bottom:4px;">
                             👤 <b>${escapeHtmlText(o.customerName || 'زبون')}</b>
                             ${o.customerPhone ? `• 📞 <a href="tel:${escapeHtmlText(o.customerPhone)}" style="color:var(--success-green); font-weight:700; text-decoration:none;">${escapeHtmlText(o.customerPhone)}</a>` : ''}
-                            • <b>${escapeHtmlText(stateLabels[currentState] || 'جديد')}</b>
                         </div>
                         <div style="color:var(--text-main); margin-bottom:6px;">📝 ${escapeHtmlText(o.orderDetails || '')}</div>
                         <div style="display:flex; gap:4px; flex-wrap:wrap;">
@@ -2313,7 +2394,7 @@
 
         function checkAdminPin() {
             let pin = document.getElementById('adminPinInput').value;
-            if (pin === "334455ff") {
+            if (pin === ADMIN_PIN_CODE) {
                 isAdminLoggedIn = true;
                 document.getElementById('adminLoginView').style.display = 'none';
                 document.getElementById('adminDashboardView').style.display = 'block';
@@ -3261,12 +3342,14 @@
 
         document.addEventListener('visibilitychange', function() {
             if (document.visibilityState === 'visible') {
+                evaluateInAppBrowserGuide();
                 evaluateTwoDayReminder();
                 loadApprovedListings();
             }
         });
 
         window.onload = function() {
+            evaluateInAppBrowserGuide();
             evaluateTwoDayReminder();
             applySavedOwnerProfileToForm();
             window.allListings = getDemoListings();
@@ -3276,6 +3359,7 @@
             if (!autoSyncInterval) {
                 autoSyncInterval = setInterval(() => {
                     if (document.visibilityState === 'visible') {
+                        evaluateInAppBrowserGuide();
                         evaluateTwoDayReminder();
                         loadApprovedListings();
                     }
