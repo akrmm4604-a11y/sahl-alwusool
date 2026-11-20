@@ -255,6 +255,17 @@
             font-family: inherit;
         }
 
+        .reminder-banner {
+            display: none;
+            margin: 6px 12px 6px;
+            background: #fff7ed;
+            border: 1.5px solid #fdba74;
+            border-radius: 10px;
+            padding: 9px 11px;
+            font-size: 11.5px;
+            color: var(--text-main);
+        }
+
         .categories-strip {
             display: flex;
             gap: 7px;
@@ -888,6 +899,23 @@
                 <button type="button" class="install-highlight-btn" onclick="openCustomInstallGuide()">ثبّت التطبيق</button>
             </div>
 
+            <!-- تذكير كل يومين داخل التطبيق -->
+            <div id="periodicReminderBanner" class="reminder-banner">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                    <div>
+                        <div style="font-weight:900; color:#c2410c; margin-bottom:2px;">🔔 تذكير تطبيق سهل الوصول (كل يومين)</div>
+                        <div style="font-size:11px; color:var(--text-sub); line-height:1.45;">
+                            تصفح أحدث المحلات، قسم شغل بيوت، والطلبات السريعة في القيارة والموصل، أو ثبّت التطبيق ليبقى بمتناول يدك.
+                        </div>
+                    </div>
+                    <button type="button" onclick="dismissTwoDayReminder()" style="background:none; border:none; color:var(--text-sub); font-size:14px; font-weight:800; cursor:pointer; padding:0;">✕</button>
+                </div>
+                <div style="display:flex; gap:6px; margin-top:7px;">
+                    <button type="button" class="mini-call-link" style="cursor:pointer; font-family:inherit; font-weight:800;" onclick="dismissTwoDayReminder(); window.scrollTo({ top: document.getElementById('vendorsList').offsetTop - 80, behavior: 'smooth' });">تصفح العروض الآن</button>
+                    <button type="button" class="mini-like-btn" style="font-weight:800;" onclick="dismissTwoDayReminder(); openCustomInstallGuide();">📲 تثبيت التطبيق</button>
+                </div>
+            </div>
+
             <div class="categories-strip">
                 <button class="cat-chip active" onclick="filterCat('all', this)">الكل</button>
                 <button class="cat-chip home-chip" onclick="filterCat('شغل بيوت', this)">🏠 شغل بيوت</button>
@@ -900,7 +928,7 @@
 
             <div class="utility-actions-bar">
                 <button class="utility-btn primary-action" id="toggleFormBtn" type="button">📢 إضافة إعلان أو بضاعة</button>
-                <a href="https://wa.me/9647765171407" target="_blank" class="utility-btn" style="text-decoration:none;">💬 تواصل الإدارة (07765171407)</a>
+                <button class="utility-btn" type="button" onclick="openOrdersHistoryModal()">📋 سجل الطلبات</button>
             </div>
 
             <div id="addFormContainer" class="form-container">
@@ -999,6 +1027,33 @@
             <span>الإدارة</span>
         </button>
     </nav>
+
+    <!-- نافذة سجل الطلبات الكامل -->
+    <div class="custom-modal" id="ordersHistoryModal">
+        <div class="custom-modal-content" style="max-width: 440px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <h3 style="margin:0; color:#e64a00; font-size:14px; font-weight:800;">📋 سجل الطلبات التفصيلي</h3>
+                <button type="button" onclick="closeModal('ordersHistoryModal')" style="background:none; color:#111827; border:none; font-size:15px; cursor:pointer;">✕</button>
+            </div>
+
+            <input type="text" id="orderSearchInput" oninput="renderOrdersHistory()" placeholder="ابحث باسم الزبون، رقم الهاتف، أو اسم المحل..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:8px; font-family:inherit;">
+
+            <div style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px;">
+                <button type="button" class="cat-chip active" data-order-filter="all" onclick="setOrderFilter('all', this)">الكل</button>
+                <button type="button" class="cat-chip" data-order-filter="new" onclick="setOrderFilter('new', this)">جديد / واتساب</button>
+                <button type="button" class="cat-chip" data-order-filter="processing" onclick="setOrderFilter('processing', this)">قيد التجهيز</button>
+                <button type="button" class="cat-chip" data-order-filter="completed" onclick="setOrderFilter('completed', this)">مكتمل</button>
+            </div>
+
+            <div style="display:flex; gap:6px; margin-bottom:10px;">
+                <button type="button" class="mini-like-btn" style="flex:1; padding:6px;" onclick="refreshOrdersHistory()">🔄 تحديث السجل</button>
+                <button type="button" class="mini-call-link" style="flex:1; cursor:pointer; font-family:inherit;" onclick="exportOrdersCsv()">📥 تصدير CSV</button>
+            </div>
+
+            <div id="ordersHistoryStats" class="info-offer-box" style="margin-top:0; font-size:11px;"></div>
+            <div id="ordersHistoryList" style="max-height:300px; overflow-y:auto;"></div>
+        </div>
+    </div>
 
     <!-- نافذة الطلب عبر واتساب أولاً + سجل احتياطي عند غياب واتساب + دخول إنستغرام -->
     <div class="custom-modal" id="inAppOrderModal">
@@ -1115,12 +1170,23 @@
             </div>
             <div id="adminDashboardView" style="display:none;">
                 <p style="color:var(--success-green); font-weight:700; font-size:11.5px; margin-bottom:8px;">تم تسجيل الدخول بنجاح ✅</p>
+
+                <!-- أداة رسالة التذكير الدورية للتطبيق -->
+                <div class="info-offer-box" style="margin-top:0; margin-bottom:10px; font-size:11px;">
+                    <div style="font-weight:800; color:#c2410c; margin-bottom:4px;">🔔 رسالة تذكير التطبيق (كل يومين)</div>
+                    <textarea id="adminReminderText" rows="3" style="width:100%; padding:6px; font-size:11px; border:1px solid #fed7aa; border-radius:7px; font-family:inherit; background:#ffffff; color:#111827; margin-bottom:6px;">تذكير بتطبيق سهل الوصول: تصفح أحدث المحلات، قسم شغل بيوت، والطلبات السريعة في القيارة والموصل، وثبّت التطبيق على هاتفك لسهولة الوصول: https://akrmm4604-a11y.github.io/sahl-alwusool/</textarea>
+                    <div style="display:flex; gap:6px;">
+                        <button type="button" class="mini-like-btn" style="flex:1; padding:6px; font-weight:800;" onclick="copyAdminReminderMessage()">📋 نسخ رسالة التذكير</button>
+                        <button type="button" class="mini-call-link" style="flex:1; cursor:pointer; font-family:inherit; font-weight:800;" onclick="triggerTwoDayReminderNow()">🔔 إظهار التنبيه الآن</button>
+                    </div>
+                </div>
+
                 <div style="display:flex; gap:6px; margin-bottom:8px;">
                     <button type="button" id="adminTabListingsBtn" onclick="switchAdminSection('listings')" style="flex:1; background:var(--brand-orange); color:#fff; border:none; border-radius:7px; padding:6px; font-size:11px; font-weight:800; cursor:pointer; font-family:inherit;">الإعلانات</button>
                     <button type="button" id="adminTabOrdersBtn" onclick="switchAdminSection('orders')" style="flex:1; background:#f3f4f6; color:var(--text-main); border:none; border-radius:7px; padding:6px; font-size:11px; font-weight:800; cursor:pointer; font-family:inherit;">سجل الطلبات والزيارات</button>
                 </div>
-                <div id="adminPendingList" style="max-height:280px; overflow-y:auto;"></div>
-                <div id="adminOrdersList" style="display:none; max-height:280px; overflow-y:auto;"></div>
+                <div id="adminPendingList" style="max-height:240px; overflow-y:auto;"></div>
+                <div id="adminOrdersList" style="display:none; max-height:240px; overflow-y:auto;"></div>
             </div>
         </div>
     </div>
@@ -1133,6 +1199,8 @@
         let lastOrderMessageText = '';
         let toastTimer = null;
         let autoSyncInterval = null;
+        let allOrdersCache = [];
+        let currentOrderFilter = 'all';
         window.allListings = [];
         window.groupedPages = [];
         const CHARITY_LOCAL_KEY = "sahl_alwusool_charity_items_v1";
@@ -1140,6 +1208,48 @@
         const SAVED_OWNER_KEY = "sahl_alwusool_saved_owner_v1";
         const SAVED_CUSTOMER_KEY = "sahl_alwusool_saved_customer_v1";
         const LOCAL_ORDERS_KEY = "sahl_alwusool_local_orders_v1";
+        const TWO_DAY_REMINDER_KEY = "sahl_alwusool_two_day_reminder_ts_v1";
+        const TWO_DAY_MS = 48 * 60 * 60 * 1000;
+
+        function evaluateTwoDayReminder() {
+            const banner = document.getElementById('periodicReminderBanner');
+            if (!banner) return;
+            try {
+                const lastTs = Number(localStorage.getItem(TWO_DAY_REMINDER_KEY) || 0);
+                const now = Date.now();
+                if (!lastTs || (now - lastTs) >= TWO_DAY_MS) {
+                    banner.style.display = 'block';
+                }
+            } catch (e) {
+                banner.style.display = 'block';
+            }
+        }
+
+        function dismissTwoDayReminder() {
+            const banner = document.getElementById('periodicReminderBanner');
+            if (banner) banner.style.display = 'none';
+            try {
+                localStorage.setItem(TWO_DAY_REMINDER_KEY, String(Date.now()));
+            } catch (e) {}
+        }
+
+        function triggerTwoDayReminderNow() {
+            closeAdminModal();
+            const banner = document.getElementById('periodicReminderBanner');
+            if (banner) {
+                banner.style.display = 'block';
+                banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            showToastNotice('تم عرض تنبيه التذكير داخل التطبيق ✅');
+        }
+
+        async function copyAdminReminderMessage() {
+            const area = document.getElementById('adminReminderText');
+            const msg = (area && area.value.trim()) ||
+                'تذكير بتطبيق سهل الوصول: تصفح أحدث المحلات، قسم شغل بيوت، والطلبات السريعة في القيارة والموصل: https://akrmm4604-a11y.github.io/sahl-alwusool/';
+            const ok = await copyTextSafe(msg);
+            showToastNotice(ok ? 'تم نسخ رسالة التذكير بنجاح ✅' : 'تعذر النسخ تلقائياً');
+        }
 
         function showToastNotice(message) {
             const toastEl = document.getElementById('toastNotice');
@@ -1240,6 +1350,7 @@
                 customerPhone: '',
                 orderDetails: `دخل إلى صفحة ${platformLabel} قادماً من تطبيق سهل الوصول`,
                 channel: `${platformLabel} (من التطبيق)`,
+                orderState: 'new',
                 timeText,
                 timestamp: Date.now()
             };
@@ -1704,6 +1815,7 @@
                 customerPhone,
                 orderDetails,
                 channel: routing.channelLabel,
+                orderState: 'new',
                 timeText,
                 timestamp: Date.now()
             };
@@ -1751,6 +1863,168 @@
                 `;
             }
             showToastNotice('تم حفظ الطلب في السجل الاحتياطي لعدم توفر رقم واتساب للجهة.');
+        }
+
+        function openOrdersHistoryModal() {
+            const modal = document.getElementById('ordersHistoryModal');
+            if (!modal) return;
+            modal.style.display = 'flex';
+            syncModalScrollLock();
+            refreshOrdersHistory();
+        }
+
+        function setOrderFilter(filterKey, btn) {
+            currentOrderFilter = filterKey;
+            document.querySelectorAll('#ordersHistoryModal .cat-chip').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderOrdersHistory();
+        }
+
+        async function refreshOrdersHistory() {
+            const listEl = document.getElementById('ordersHistoryList');
+            if (listEl) {
+                listEl.innerHTML = '<p style="font-size:11px; color:var(--text-sub); text-align:center;">جاري جلب سجل الطلبات...</p>';
+            }
+
+            const merged = new Map();
+            (getLocalOrders() || []).forEach(item => {
+                merged.set(String(item.id), {
+                    ...item,
+                    orderState: item.orderState || 'new',
+                    timestamp: Number(item.timestamp || Date.now())
+                });
+            });
+
+            try {
+                await waitForFirebase();
+                const snap = await window.getDocs(window.collection(window.db, "app_orders"));
+                snap.forEach(docSnap => {
+                    const data = docSnap.data() || {};
+                    const prev = merged.get(String(docSnap.id)) || {};
+                    merged.set(String(docSnap.id), {
+                        ...prev,
+                        id: docSnap.id,
+                        ...data,
+                        orderState: data.orderState || prev.orderState || 'new',
+                        timestamp: Number(data.timestamp || prev.timestamp || Date.now())
+                    });
+                });
+            } catch (err) {
+                console.warn("Firestore orders fetch warning:", err);
+            }
+
+            allOrdersCache = Array.from(merged.values()).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            renderOrdersHistory();
+        }
+
+        async function updateOrderState(orderId, nextState) {
+            const target = allOrdersCache.find(o => String(o.id) === String(orderId));
+            if (!target) return;
+            target.orderState = nextState;
+
+            try {
+                const localList = getLocalOrders().map(item =>
+                    String(item.id) === String(orderId) ? { ...item, orderState: nextState } : item
+                );
+                localStorage.setItem(LOCAL_ORDERS_KEY, JSON.stringify(localList));
+            } catch (e) {}
+
+            if (!String(orderId).startsWith('ord_') && !String(orderId).startsWith('soc_') && window.db && window.updateDoc) {
+                try {
+                    await window.updateDoc(window.doc(window.db, "app_orders", String(orderId)), { orderState: nextState });
+                } catch (e) {
+                    console.warn("Update orderState warning:", e);
+                }
+            }
+
+            renderOrdersHistory();
+            showToastNotice('تم تحديث حالة الطلب ✅');
+        }
+
+        function renderOrdersHistory() {
+            const listEl = document.getElementById('ordersHistoryList');
+            const statsEl = document.getElementById('ordersHistoryStats');
+            const query = normalizeArabicText((document.getElementById('orderSearchInput')?.value || ''));
+            if (!listEl) return;
+
+            const filtered = allOrdersCache.filter(order => {
+                const state = order.orderState || 'new';
+                const matchesState = currentOrderFilter === 'all' || state === currentOrderFilter;
+                const hay = normalizeArabicText(`${order.storeName || ''} ${order.customerName || ''} ${order.customerPhone || ''} ${order.orderDetails || ''} ${order.channel || ''}`);
+                const matchesText = !query || hay.includes(query);
+                return matchesState && matchesText;
+            });
+
+            const totalCount = allOrdersCache.length;
+            const completedCount = allOrdersCache.filter(o => o.orderState === 'completed').length;
+            const newCount = allOrdersCache.filter(o => (o.orderState || 'new') === 'new').length;
+
+            if (statsEl) {
+                statsEl.innerHTML = `إجمالي السجل: <b>${totalCount}</b> • جديد: <b>${newCount}</b> • مكتمل: <b>${completedCount}</b> • المعروض: <b>${filtered.length}</b>`;
+            }
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = '<p style="font-size:11px; color:var(--text-sub); text-align:center;">لا توجد طلبات مطابقة للبحث أو الفلتر.</p>';
+                return;
+            }
+
+            const stateLabels = {
+                new: 'جديد',
+                processing: 'قيد التجهيز',
+                completed: 'مكتمل'
+            };
+
+            listEl.innerHTML = filtered.map(o => {
+                const currentState = o.orderState || 'new';
+                const dateStr = o.timeText || new Date(o.timestamp || Date.now()).toLocaleString('ar-IQ');
+                return `
+                    <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:9px; padding:8px 10px; margin-bottom:7px; font-size:11px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:4px;">
+                            <b style="color:#b91c1c;">${escapeHtmlText(o.storeName || 'جهة غير محددة')}</b>
+                            <span style="color:var(--text-sub); font-size:10px;">${escapeHtmlText(dateStr)}</span>
+                        </div>
+                        <div style="margin-bottom:4px;">
+                            👤 <b>${escapeHtmlText(o.customerName || 'زبون')}</b>
+                            ${o.customerPhone ? `• 📞 <a href="tel:${escapeHtmlText(o.customerPhone)}" style="color:var(--success-green); font-weight:700; text-decoration:none;">${escapeHtmlText(o.customerPhone)}</a>` : ''}
+                            • <b>${escapeHtmlText(stateLabels[currentState] || 'جديد')}</b>
+                        </div>
+                        <div style="color:var(--text-main); margin-bottom:6px;">📝 ${escapeHtmlText(o.orderDetails || '')}</div>
+                        <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                            <button type="button" class="mini-like-btn" onclick="updateOrderState('${escapeJsSingleQuote(o.id)}', 'new')">جديد</button>
+                            <button type="button" class="mini-like-btn" onclick="updateOrderState('${escapeJsSingleQuote(o.id)}', 'processing')">قيد التجهيز</button>
+                            <button type="button" class="mini-call-link" style="cursor:pointer; font-family:inherit;" onclick="updateOrderState('${escapeJsSingleQuote(o.id)}', 'completed')">مكتمل</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function exportOrdersCsv() {
+            if (!allOrdersCache.length) {
+                alert('لا توجد بيانات طلبات لتصديرها.');
+                return;
+            }
+            const headers = ['الجهة', 'الزبون', 'الهاتف', 'التفاصيل', 'المسار', 'الحالة', 'الوقت'];
+            const rows = allOrdersCache.map(o => [
+                o.storeName || '',
+                o.customerName || '',
+                o.customerPhone || '',
+                o.orderDetails || '',
+                o.channel || '',
+                o.orderState || 'new',
+                o.timeText || new Date(o.timestamp || Date.now()).toLocaleString('ar-IQ')
+            ]);
+            const csvContent = '\uFEFF' + [headers, ...rows]
+                .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+                .join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'sahl-alwusool-orders.csv';
+            link.click();
+            URL.revokeObjectURL(url);
         }
 
         function switchAdminSection(section) {
@@ -2987,11 +3261,13 @@
 
         document.addEventListener('visibilitychange', function() {
             if (document.visibilityState === 'visible') {
+                evaluateTwoDayReminder();
                 loadApprovedListings();
             }
         });
 
         window.onload = function() {
+            evaluateTwoDayReminder();
             applySavedOwnerProfileToForm();
             window.allListings = getDemoListings();
             sortAndRenderListings();
@@ -3000,6 +3276,7 @@
             if (!autoSyncInterval) {
                 autoSyncInterval = setInterval(() => {
                     if (document.visibilityState === 'visible') {
+                        evaluateTwoDayReminder();
                         loadApprovedListings();
                     }
                 }, 60000);
