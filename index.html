@@ -402,6 +402,31 @@
             align-items: center;
         }
 
+        .status-badge-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 4px;
+            margin-bottom: 5px;
+            flex-wrap: wrap;
+        }
+
+        .avail-badge {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 6px;
+            background: #ecfdf5;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        .avail-badge.closed {
+            background: #fef2f2;
+            color: #b91c1c;
+            border-color: #fecaca;
+        }
+
         .grid-card-body {
             padding: 8px 9px 10px;
             display: flex;
@@ -443,6 +468,7 @@
             gap: 4px;
             padding-top: 6px;
             border-top: 1px solid #f3f4f6;
+            flex-wrap: wrap;
         }
 
         .mini-like-btn {
@@ -469,8 +495,8 @@
             border: 1.5px solid #a855f7;
             color: #581c87;
             border-radius: 8px;
-            padding: 5px 12px;
-            font-size: 17px;
+            padding: 5px 10px;
+            font-size: 15px;
             font-weight: 900;
             line-height: 1;
             cursor: pointer;
@@ -1246,8 +1272,8 @@
                     <div style="font-weight:800; color:#15803d; margin-bottom:4px;">🛡️ حماية النسخ الاحتياطي والاستعادة</div>
                     <div style="display:flex; gap:6px; flex-wrap:wrap;">
                         <button type="button" class="mini-call-link" style="flex:1; cursor:pointer; font-family:inherit; font-weight:800; padding:6px;" onclick="exportListingsBackupJson()">⬇️ تصدير نسخة (JSON)</button>
-                        <label for="importBackupFileInput" class="mini-like-btn" style="flex:1; text-align:center; cursor:pointer; font-weight:800; padding:6px;">⬆️ استيراد نسخة</label>
-                        <input type="file" id="importBackupFileInput" accept="application/json,.json" style="display:none;" onchange="importListingsBackupJson(event)">
+                        <button type="button" class="mini-like-btn" style="flex:1; text-align:center; cursor:pointer; font-weight:800; padding:6px;" onclick="triggerImportBackupFile()">⬆️ استيراد نسخة</button>
+                        <input type="file" id="importBackupFileInput" accept="*/*" style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;" onchange="importListingsBackupJson(event)">
                     </div>
                 </div>
 
@@ -1316,7 +1342,7 @@
                 if (cleanItems.length > 0) {
                     localStorage.setItem(LISTINGS_BACKUP_KEY, JSON.stringify({
                         savedAt: new Date().toISOString(),
-                        items: cleanItems.slice(0, 100)
+                        items: cleanItems.slice(0, 120)
                     }));
                 }
             } catch (e) {
@@ -1333,6 +1359,65 @@
             } catch (e) {
                 return [];
             }
+        }
+
+        function mergeListingsPreservingLocal(cloudItems, localItems) {
+            const map = new Map();
+            (localItems || []).forEach(item => {
+                if (item && item.id && !String(item.id).startsWith('demo')) {
+                    map.set(String(item.id), item);
+                }
+            });
+            (cloudItems || []).forEach(item => {
+                if (item && item.id && !String(item.id).startsWith('demo')) {
+                    const prev = map.get(String(item.id));
+                    map.set(String(item.id), prev ? { ...prev, ...item } : item);
+                }
+            });
+            return Array.from(map.values());
+        }
+
+        function getAvailabilityBadgeInfo(item) {
+            const txt = normalizeArabicText(`${item.price || ''} ${item.address || ''} ${item.category || ''}`);
+            if (txt.includes('مغلق') || txt.includes('متوقف')) {
+                return { label: '⛔ مغلق حالياً', isClosed: true };
+            }
+            if (txt.includes('توصيل')) {
+                return { label: '🟢 متاح • توصيل', isClosed: false };
+            }
+            if (item.category === 'أفران وصمون') {
+                return { label: '🥖 مخبز / طلب سريع', isClosed: false };
+            }
+            return { label: '🟢 متاح للطلب', isClosed: false };
+        }
+
+        async function shareListingCard(id, event) {
+            if (event) event.stopPropagation();
+            const store = findPageByAnyId(id) || (window.allListings || []).find(s => String(s.id) === String(id));
+            if (!store) return;
+
+            const shareText =
+                `📌 ${store.name || 'مشروع محلي'} (${store.category || ''})\n` +
+                `📍 ${store.address || 'القيارة والموصل'}\n` +
+                (store.price ? `💰 ${store.price}\n` : '') +
+                `عبر تطبيق سهل الوصول:\n${APP_DIRECT_URL}`;
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: store.name || 'سهل الوصول',
+                        text: shareText,
+                        url: APP_DIRECT_URL
+                    });
+                    showToastNotice('تمت مشاركة الإعلان بنجاح ✅');
+                    return;
+                } catch (e) {
+                    if (e && e.name === 'AbortError') return;
+                }
+            }
+
+            const copied = await copyTextSafe(shareText);
+            showToastNotice(copied ? 'تم نسخ تفاصيل الإعلان ورابط التطبيق للمشاركة على واتساب ✅' : 'تعذر النسخ تلقائياً');
         }
 
         function exportListingsBackupJson() {
@@ -1359,27 +1444,38 @@
             showToastNotice(`تم تصدير نسخة احتياطية (${items.length} إعلان) ✅`);
         }
 
+        function triggerImportBackupFile() {
+            const inputEl = document.getElementById('importBackupFileInput');
+            if (!inputEl) {
+                alert('تعذر العثور على حقل اختيار الملف.');
+                return;
+            }
+            inputEl.value = '';
+            inputEl.click();
+        }
+
         async function importListingsBackupJson(event) {
             const file = event && event.target && event.target.files && event.target.files[0];
-            if (!file) return;
+            if (!file) {
+                showToastNotice('لم يتم اختيار أي ملف.');
+                return;
+            }
 
             try {
-                const text = await file.text();
-                const parsed = JSON.parse(text);
+                const rawText = await file.text();
+                const cleanText = rawText.replace(/^\uFEFF/, '').trim();
+                const parsed = JSON.parse(cleanText);
                 const items = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.items) ? parsed.items : []);
                 if (items.length === 0) {
                     alert('الملف لا يحتوي على إعلانات صالحة للاستيراد.');
                     return;
                 }
 
-                await waitForFirebase();
-                let restoredCount = 0;
-
-                for (const item of items) {
-                    if (!item || !item.name) continue;
-                    const docId = String(item.id || ('restored_' + Date.now() + '_' + restoredCount));
-                    const cleanDoc = {
-                        name: item.name,
+                const normalizedItems = items
+                    .filter(item => item && item.name)
+                    .map((item, idx) => ({
+                        id: String(item.id || ('restored_' + Date.now() + '_' + idx)),
+                        name: String(item.name).trim(),
                         category: item.category || 'أشياء أخرى',
                         address: item.address || 'غير محدد',
                         price: item.price || '',
@@ -1397,22 +1493,44 @@
                         ordersCount: Number(item.ordersCount) || 0,
                         createdAt: item.createdAt || new Date().toISOString(),
                         restoredAt: new Date().toISOString()
-                    };
+                    }));
 
-                    if (window.setDoc) {
-                        await window.setDoc(window.doc(window.db, "listings", docId), cleanDoc, { merge: true });
-                    } else {
-                        await window.addDoc(window.collection(window.db, "listings"), cleanDoc);
-                    }
-                    restoredCount++;
+                if (normalizedItems.length === 0) {
+                    alert('لا توجد إعلانات مكتملة البيانات داخل الملف.');
+                    return;
                 }
 
-                event.target.value = '';
-                alert(`تم استيراد واستعادة ${restoredCount} إعلان بنجاح ✅`);
+                window.allListings = mergeListingsPreservingLocal(normalizedItems, window.allListings);
+                saveListingsLocalBackup(window.allListings);
+                sortAndRenderListings();
+
+                try {
+                    await waitForFirebase();
+                    for (const cleanDoc of normalizedItems) {
+                        const docPayload = { ...cleanDoc };
+                        delete docPayload.id;
+                        if (window.setDoc) {
+                            await window.setDoc(window.doc(window.db, "listings", cleanDoc.id), docPayload, { merge: true });
+                        } else if (window.addDoc) {
+                            await window.addDoc(window.collection(window.db, "listings"), docPayload);
+                        }
+                    }
+                } catch (cloudErr) {
+                    console.warn("Cloud sync after import warning:", cloudErr);
+                }
+
+                if (isAdminLoggedIn) {
+                    loadAdminListings();
+                    loadAdminTrash();
+                }
+
+                alert(`تم استيراد واستعادة ${normalizedItems.length} إعلان بنجاح ✅`);
                 await loadApprovedListings();
             } catch (e) {
                 console.error("Import backup error:", e);
-                alert('تعذر استيراد الملف: ' + (e.message || 'تأكد من صحة ملف JSON وصلاحيات قاعدة البيانات.'));
+                alert('تعذر قراءة ملف النسخة الاحتياطية: تأكد أنه ملف JSON سليم تم تصديره من التطبيق.');
+            } finally {
+                if (event && event.target) event.target.value = '';
             }
         }
 
@@ -2147,7 +2265,7 @@
             } else {
                 if (listingsDiv) listingsDiv.style.display = 'block';
                 if (tabListings) { tabListings.style.background = 'var(--brand-orange)'; tabListings.style.color = '#fff'; }
-                loadAdminListings();
+                loadApprovedListings().then(() => loadAdminListings());
             }
         }
 
@@ -2404,7 +2522,6 @@
             document.getElementById('adminDashboardView').style.display = isAdminLoggedIn ? 'block' : 'none';
             if (isAdminLoggedIn) {
                 switchAdminSection('listings');
-                loadApprovedListings();
             }
         }
 
@@ -2413,6 +2530,9 @@
             if (errEl) errEl.textContent = '';
             document.getElementById('adminModal').style.display = 'flex';
             syncModalScrollLock();
+            if (isAdminLoggedIn) {
+                switchAdminSection('listings');
+            }
         }
 
         function closeAdminModal() {
@@ -2632,6 +2752,7 @@
                     if (fb) updateData.fb = fb;
 
                     await window.updateDoc(window.doc(window.db, "listings", existingStore.id), updateData);
+                    Object.assign(existingStore, updateData);
                     modalTitle = 'تمت إضافة الإعلان إلى صفحتك بنجاح! 🎉';
                     modalMsg = 'تم ربط الإعلان الجديد بحسابك وإضافته داخل صفحتك دون تكرار بطاقة جديدة. اضغط إغلاق لإغلاق قائمة الإعلانات.';
                 } else {
@@ -2645,15 +2766,22 @@
                         createdAt: new Date().toISOString()
                     };
 
-                    await window.addDoc(window.collection(window.db, "listings"), {
+                    const newRecord = {
                         name, category: cat, address, price, fb, insta, phone,
                         orderWhatsapp,
                         logo: logoUrl, images: newImagesUrls, posts: [initialPost],
                         status: 'pending', vip: false,
                         likes: 0, contactClicks: 0, ordersCount: 0, createdAt: new Date().toISOString()
-                    });
+                    };
+
+                    const docRef = await window.addDoc(window.collection(window.db, "listings"), newRecord);
+                    window.allListings = [
+                        { id: docRef && docRef.id ? docRef.id : ('local_' + Date.now()), ...newRecord },
+                        ...(window.allListings || []).filter(i => !String(i.id).startsWith('demo'))
+                    ];
                 }
 
+                saveListingsLocalBackup(window.allListings);
                 saveOwnerProfile({ name, phone, orderWhatsapp, insta, fb, category: cat, address });
                 document.getElementById('reqPrice').value = '';
                 document.getElementById('reqLogoFile').value = '';
@@ -2663,7 +2791,7 @@
                 selectedFilesArray = [];
                 document.getElementById('selectedImagesPreview').innerHTML = '';
                 applySavedOwnerProfileToForm();
-                await loadApprovedListings();
+                sortAndRenderListings();
                 openAfterSubmitCloseModal(modalTitle, modalMsg);
             } catch (error) {
                 console.error("خطأ إرسال الإعلان: ", error);
@@ -2891,6 +3019,10 @@
         }
 
         async function loadApprovedListings() {
+            const localBackup = getListingsLocalBackup();
+            const currentNonDemo = (window.allListings || []).filter(i => i && i.id && !String(i.id).startsWith('demo'));
+            const combinedLocal = mergeListingsPreservingLocal(localBackup, currentNonDemo);
+
             try {
                 await waitForFirebase();
                 const querySnapshot = await window.getDocs(window.collection(window.db, "listings"));
@@ -2902,17 +3034,16 @@
                 setDbStatusBanner('');
 
                 if (loaded.length > 0) {
-                    window.allListings = loaded;
-                    saveListingsLocalBackup(loaded);
+                    const merged = mergeListingsPreservingLocal(loaded, combinedLocal);
+                    window.allListings = merged;
+                    saveListingsLocalBackup(merged);
+                } else if (combinedLocal.length > 0) {
+                    window.allListings = combinedLocal;
+                    saveListingsLocalBackup(combinedLocal);
+                    setDbStatusBanner('⚠️ قاعدة البيانات السحابية فارغة حالياً؛ يتم الحفاظ على النسخة المحفوظة محلياً. يمكنك تصدير نسخة JSON من لوحة الإدارة.', false);
                 } else {
-                    const localBackup = getListingsLocalBackup();
-                    if (localBackup.length > 0) {
-                        window.allListings = localBackup;
-                        setDbStatusBanner('⚠️ قاعدة البيانات السحابية فارغة حالياً؛ يتم عرض النسخة الاحتياطية المحفوظة على جهازك. يمكنك تصديرها أو إعادة مزامنتها.', false);
-                    } else {
-                        window.allListings = getDemoListings();
-                        setDbStatusBanner('ℹ️ لا توجد إعلانات مسجلة في قاعدة البيانات حالياً؛ يُعرض إعلان تجريبي لحين إضافة إعلاناتك أو استيراد نسخة احتياطية.', false);
-                    }
+                    window.allListings = getDemoListings();
+                    setDbStatusBanner('ℹ️ لا توجد إعلانات مسجلة في قاعدة البيانات حالياً؛ يُعرض إعلان تجريبي لحين إضافة إعلاناتك أو استيراد نسخة احتياطية.', false);
                 }
 
                 sortAndRenderListings();
@@ -2922,9 +3053,8 @@
                 }
             } catch (err) {
                 console.error("Load listings error:", err);
-                const localBackup = getListingsLocalBackup();
-                if (localBackup.length > 0) {
-                    window.allListings = localBackup;
+                if (combinedLocal.length > 0) {
+                    window.allListings = combinedLocal;
                 } else if (!window.allListings || window.allListings.length === 0) {
                     window.allListings = getDemoListings();
                 }
@@ -2950,6 +3080,7 @@
                 const mainImg = (item.images && item.images[0]) || item.logo || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg';
                 const postsCount = Array.isArray(item.posts) && item.posts.length > 1 ? ` (${item.posts.length} إعلانات)` : '';
                 const statusLabel = item.vip ? '⭐ مميز VIP' : '✓ معتمد';
+                const avail = getAvailabilityBadgeInfo(item);
                 const alreadyLiked = hasLikedStore(item.id);
                 const safeId = escapeJsSingleQuote(item.id);
                 const safeName = escapeJsSingleQuote(item.name);
@@ -2967,11 +3098,15 @@
                             <span>${item.category || 'أشياء أخرى'}</span>
                         </div>
                         <div class="grid-card-body">
+                            <div class="status-badge-row">
+                                <span class="avail-badge ${avail.isClosed ? 'closed' : ''}">${avail.label}</span>
+                            </div>
                             <h3 class="grid-title">${item.name}${postsCount}</h3>
                             ${item.price ? `<div class="grid-price">${item.price}</div>` : `<div class="grid-price" style="font-size:11.5px; color:var(--text-sub);">${item.category}</div>`}
                             <div class="grid-meta">📍 ${item.address || 'غير محدد'}</div>
                             <div class="grid-actions" onclick="event.stopPropagation()">
                                 <button type="button" class="mini-like-btn ${alreadyLiked ? 'liked' : ''}" onclick="addLike('${safeId}')">${alreadyLiked ? '🧡' : '❤️'} ${item.likes || 0}</button>
+                                <button type="button" class="mini-like-btn" title="مشاركة الإعلان" onclick="shareListingCard('${safeId}', event)">🔗</button>
                                 <button type="button" class="mini-plus-btn" title="معلومات وعروض" onclick="openPlusInfoOffersModal('${safeId}')">+</button>
                                 <button type="button" class="mini-call-link" style="background:#fff7ed; color:#c2410c; border-color:#fdba74; cursor:pointer; font-family:inherit; font-weight:800;" onclick="openInAppOrderModal('${safeId}', '')">🛒 اطلب</button>
                             </div>
@@ -3023,6 +3158,7 @@
             const clicksCount = Number(store.contactClicks) || 0;
             const ordersCount = Number(store.ordersCount) || 0;
             const routing = resolveOrderRoutingTarget(store);
+            const avail = getAvailabilityBadgeInfo(store);
             const instaUrl = buildInstagramPageUrl(store.insta);
             const fbUrl = buildFacebookPageUrl(store.fb);
 
@@ -3084,11 +3220,13 @@
                     <img src="${store.logo || (store.images && store.images[0]) || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'}" class="profile-logo" alt="شعار" onclick="openImageModal('${store.logo || (store.images && store.images[0]) || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'}')">
                     <div>
                         <h2 style="margin:0 0 2px 0; font-size:17px; font-weight:900; color:#b91c1c;">${store.name} ${store.vip ? '⭐' : ''}</h2>
-                        <p style="margin:0; font-size:11.5px; color:var(--text-sub);">القسم: <b>${store.category}</b> • الطلبات: <b>${ordersCount}</b> • زيارات المنصات: <b>${clicksCount}</b></p>
+                        <p style="margin:0; font-size:11.5px; color:var(--text-sub);">القسم: <b>${store.category}</b> • <span class="avail-badge ${avail.isClosed ? 'closed' : ''}">${avail.label}</span></p>
+                        <p style="margin:3px 0 0 0; font-size:11px; color:var(--text-sub);">الطلبات: <b>${ordersCount}</b> • زيارات المنصات: <b>${clicksCount}</b></p>
                     </div>
                 </div>
-                <div style="margin-bottom:8px;">
+                <div style="margin-bottom:8px; display:flex; gap:6px; flex-wrap:wrap;">
                     <button type="button" class="mini-like-btn ${alreadyLiked ? 'liked' : ''}" onclick="addLike('${escapeJsSingleQuote(store.id)}');">${alreadyLiked ? '🧡 تم الإعجاب' : '❤️ إعجاب'} (${store.likes || 0})</button>
+                    <button type="button" class="mini-like-btn" onclick="shareListingCard('${escapeJsSingleQuote(store.id)}', event)">🔗 مشاركة الصفحة</button>
                 </div>
                 <p style="font-size:12px; margin-bottom:4px;"><b>العنوان:</b> ${store.address || 'غير محدد'}</p>
                 <p style="font-size:11.5px; color:var(--text-sub); margin-bottom:10px;"><b>مسار الطلب:</b> ${escapeHtmlText(routing.channelLabel)}</p>
@@ -3289,7 +3427,7 @@
             saveListingsLocalBackup(window.allListings);
             alert('تم اعتماد ونشر الإعلان بنجاح!');
             loadAdminListings();
-            loadApprovedListings();
+            sortAndRenderListings();
         }
 
         async function pendListing(id) {
@@ -3302,7 +3440,7 @@
             saveListingsLocalBackup(window.allListings);
             alert('تم إخفاء الإعلان.');
             loadAdminListings();
-            loadApprovedListings();
+            sortAndRenderListings();
         }
 
         function notifyOwner(phone, storeName) {
@@ -3325,7 +3463,7 @@
             saveListingsLocalBackup(window.allListings);
             alert(makeVip ? 'تم تعيين المحل كمتجر VIP!' : 'تم إزالة VIP.');
             loadAdminListings();
-            loadApprovedListings();
+            sortAndRenderListings();
         }
 
         async function editListingData(id, oldName, oldAddress, oldCategory, oldPrice) {
@@ -3405,7 +3543,7 @@
                     openStoreProfile(id);
                 }
                 loadAdminListings();
-                loadApprovedListings();
+                sortAndRenderListings();
             } catch (e) {
                 console.error("Edit listing error:", e);
                 alert('حدث خطأ أثناء التعديل: ' + (e.code || e.message || 'تحقق من الاتصال.'));
