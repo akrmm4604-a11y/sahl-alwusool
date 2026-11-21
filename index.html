@@ -3,80 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- منع التخزين المؤقت لضمان وصول التحديثات فوراً -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 
-    <title>ثبّت تطبيق سهل الوصول - الدليل المحلي الشامل في القيارة والموصل</title>
-    
-    <meta property="og:title" content="ثبّت تطبيق سهل الوصول - دليل التسوق في العراق">
-    <meta property="og:description" content="ثبّت تطبيق سهل الوصول الآن على هاتفك: دليلك المحلي الأول للمحلات، الأسواق، وخدمات التوصيل، وقسم شغل بيوت للأسر المنتجة.">
-    <meta property="og:image" content="https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg">
-    <meta property="og:image:secure_url" content="https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg">
-    <meta property="og:image:type" content="image/jpeg">
-    <meta property="og:url" content="https://akrmm4604-a11y.github.io/sahl-alwusool/">
-    <meta property="og:type" content="website">
-
-    <link rel="apple-touch-icon" href="https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg">
-    <link rel="icon" type="image/jpeg" href="https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg">
-
-    <link rel="manifest" href="manifest.json">
+    <title>تطبيق سهل الوصول - الدليل المحلي الشامل في القيارة والموصل</title>
     <meta name="theme-color" content="#ff5a00">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-
-    <!-- تضمين مكتبات Firebase SDK بأمان -->
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-      import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-      import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-      import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
-
-      const firebaseConfig = {
-        apiKey: "AIzaSyB7riqtl...",
-        authDomain: "sahlalwusool.firebaseapp.com",
-        projectId: "sahlalwusool",
-        storageBucket: "sahlalwusool.appspot.com",
-        messagingSenderId: "442219840408",
-        appId: "1:442219840408:web:...",
-        measurementId: "G-9VDBPZ5Y9..."
-      };
-
-      try {
-        const app = initializeApp(firebaseConfig);
-        window.auth = getAuth(app);
-        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-        window.signOut = signOut;
-        window.onAuthStateChanged = onAuthStateChanged;
-
-        window.db = getFirestore(app);
-        window.collection = collection;
-        window.addDoc = addDoc;
-        window.getDocs = getDocs;
-        window.deleteDoc = deleteDoc;
-        window.doc = doc;
-        window.updateDoc = updateDoc;
-        window.increment = increment;
-
-        try {
-          window.messaging = getMessaging(app);
-          window.getToken = getToken;
-          window.onMessage = onMessage;
-        } catch (msgErr) {
-          console.warn("Messaging warning:", msgErr);
-        }
-
-        if (typeof window.initAdminAuthListener === "function") {
-          window.initAdminAuthListener();
-        }
-      } catch (err) {
-        console.error("Firebase init error:", err);
-      }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -85,7 +21,6 @@
             --brand-purple: #6b21a8;
             --page-bg: #ffffff;
             --card-bg: #ffffff;
-            --surface-2: #f8fafc;
             --text-main: #111827;
             --text-sub: #4b5563;
             --border-soft: #e5e7eb;
@@ -104,11 +39,10 @@
             background-color: var(--page-bg);
             color: var(--text-main);
             margin: 0;
-            padding: 0 0 74px 0;
+            padding: 0 0 76px 0;
             direction: rtl;
             text-align: right;
             min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
         }
 
         body.modal-open-scroll-lock {
@@ -154,9 +88,20 @@
             border-bottom-color: var(--brand-orange);
         }
 
+        .status-strip {
+            margin: 8px 12px 0;
+            padding: 7px 11px;
+            border-radius: 10px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            font-size: 11.5px;
+            font-weight: 700;
+        }
+
         .search-section {
             background: #ffffff;
-            padding: 10px 12px 10px;
+            padding: 10px 12px;
             border-bottom: 1px solid var(--border-soft);
         }
 
@@ -193,87 +138,11 @@
             min-width: 0;
         }
 
-        .search-input-field::placeholder {
-            color: #9ca3af;
-        }
-
         .search-quick-icons {
             display: flex;
             align-items: center;
             gap: 8px;
-            color: var(--text-main);
             font-size: 14px;
-        }
-
-        .search-suggestions {
-            display: none;
-            background: #ffffff;
-            border: 1px solid var(--border-soft);
-            border-radius: 10px;
-            margin-top: 6px;
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
-            max-height: 220px;
-            overflow-y: auto;
-        }
-
-        .suggestion-item {
-            padding: 8px 10px;
-            font-size: 11.5px;
-            border-bottom: 1px solid #f3f4f6;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-main);
-        }
-
-        .suggestion-item:hover {
-            background: #fff7ed;
-        }
-
-        .install-highlight-strip {
-            margin: 8px 12px 4px;
-            background: #fff7ed;
-            border: 1px solid #fed7aa;
-            border-radius: 10px;
-            padding: 7px 11px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-        }
-
-        .install-highlight-text {
-            font-size: 12px;
-            font-weight: 800;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .install-highlight-btn {
-            background: var(--brand-orange);
-            color: #ffffff;
-            border: none;
-            border-radius: 8px;
-            padding: 5px 11px;
-            font-size: 11.5px;
-            font-weight: 800;
-            cursor: pointer;
-            white-space: nowrap;
-            font-family: inherit;
-        }
-
-        .reminder-banner {
-            display: none;
-            margin: 6px 12px 6px;
-            background: #fff7ed;
-            border: 1.5px solid #fdba74;
-            border-radius: 10px;
-            padding: 9px 11px;
-            font-size: 11.5px;
-            color: var(--text-main);
         }
 
         .categories-strip {
@@ -327,13 +196,9 @@
         }
 
         .utility-btn {
-            background: #f9fafb;
-            border: 1px solid var(--border-soft);
             border-radius: 10px;
-            padding: 8px 10px;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-main);
+            padding: 9px 10px;
+            font-size: 12px;
             cursor: pointer;
             text-align: center;
             font-family: inherit;
@@ -341,9 +206,57 @@
 
         .utility-btn.primary-action {
             background: #fff7ed;
-            border-color: #fdba74;
+            border: 1px solid #fdba74;
             color: var(--brand-orange-dark);
             font-weight: 800;
+        }
+
+        .form-container {
+            display: none;
+            background: #ffffff;
+            margin: 0 12px 14px;
+            border-radius: 14px;
+            padding: 16px 14px;
+            border: 2px solid var(--brand-orange);
+            box-shadow: 0 6px 18px rgba(255, 90, 0, 0.08);
+        }
+
+        .form-container .listing-field-label {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-main);
+            display: block;
+            margin: 4px 0 6px 0;
+        }
+
+        .form-container input,
+        .form-container select,
+        .form-container textarea {
+            width: 100%;
+            min-height: 44px;
+            padding: 10px 12px;
+            margin-bottom: 11px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 13.5px;
+            font-weight: 600;
+            font-family: inherit;
+            background: #ffffff;
+            color: var(--text-main);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #ff7a00, #ff4d00);
+            color: #ffffff;
+            border: none;
+            border-radius: 11px;
+            padding: 11px 14px;
+            min-height: 46px;
+            width: 100%;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: inherit;
         }
 
         .grid-two-col {
@@ -361,7 +274,6 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
             display: flex;
             flex-direction: column;
-            cursor: pointer;
         }
 
         .grid-item-card.vip-card {
@@ -369,7 +281,6 @@
         }
 
         .grid-img-box {
-            position: relative;
             width: 100%;
             aspect-ratio: 1 / 1.05;
             background: #f3f4f6;
@@ -383,17 +294,6 @@
             display: block;
         }
 
-        .grid-ribbon {
-            background: #f3e8ff;
-            color: #581c87;
-            font-size: 10.5px;
-            font-weight: 700;
-            padding: 4px 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
         .grid-card-body {
             padding: 8px 9px 10px;
             display: flex;
@@ -402,19 +302,15 @@
         }
 
         .grid-title {
-            margin: 0 0 6px 0;
-            font-size: 15px;
+            margin: 0 0 5px 0;
+            font-size: 14.5px;
             font-weight: 900;
             color: #b91c1c;
             line-height: 1.3;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
         }
 
         .grid-price {
-            font-size: 12.5px;
+            font-size: 12px;
             font-weight: 800;
             color: var(--text-main);
             margin-bottom: 4px;
@@ -442,317 +338,23 @@
             border: 1px solid #fed7aa;
             color: var(--brand-orange-dark);
             border-radius: 7px;
-            padding: 4px 7px;
-            font-size: 10.5px;
+            padding: 4px 8px;
+            font-size: 11px;
             font-weight: 700;
             cursor: pointer;
             font-family: inherit;
         }
 
-        .mini-like-btn.liked {
-            background: #ffedd5;
-            border-color: var(--brand-orange);
-            color: #c2410c;
-            font-weight: 800;
-        }
-
-        .mini-plus-btn {
-            background: #f3e8ff;
-            border: 1.5px solid #a855f7;
-            color: #581c87;
-            border-radius: 8px;
-            padding: 5px 12px;
-            font-size: 17px;
-            font-weight: 900;
-            line-height: 1;
-            cursor: pointer;
-            font-family: inherit;
-        }
-
-        .mini-call-link {
-            text-decoration: none;
+        .mini-order-btn {
             background: #ecfdf5;
             color: #15803d;
             border: 1px solid #bbf7d0;
             border-radius: 7px;
-            padding: 4px 8px;
-            font-size: 10.5px;
-            font-weight: 700;
-        }
-
-        .social-direct-btn {
-            background: #fdf2f8;
-            color: #be185d;
-            border: 1px solid #fbcfe8;
-            border-radius: 9px;
-            padding: 9px 11px;
-            font-size: 12px;
-            font-weight: 800;
-            cursor: pointer;
-            font-family: inherit;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .social-fb-btn {
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
-            border-radius: 9px;
-            padding: 9px 11px;
-            font-size: 12px;
-            font-weight: 800;
-            cursor: pointer;
-            font-family: inherit;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .in-app-order-btn {
-            background: linear-gradient(135deg, #ff7a00, #ff4d00);
-            color: #ffffff;
-            border: none;
-            border-radius: 10px;
-            padding: 10px 14px;
-            font-size: 13px;
-            font-weight: 800;
-            cursor: pointer;
-            font-family: inherit;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            flex: 1;
-        }
-
-        .form-container {
-            display: none;
-            background: #ffffff;
-            margin: 0 12px 14px;
-            border-radius: 14px;
-            padding: 16px 14px;
-            border: 2px solid var(--brand-orange);
-            box-shadow: 0 6px 18px rgba(255, 90, 0, 0.08);
-        }
-
-        .form-container .listing-field-label {
-            font-size: 13.5px;
-            font-weight: 800;
-            color: var(--text-main);
-            display: block;
-            margin: 4px 0 6px 0;
-            line-height: 1.45;
-        }
-
-        .form-container input,
-        .form-container select,
-        .form-container textarea {
-            width: 100%;
-            min-height: 46px;
-            padding: 11px 13px;
-            margin-bottom: 12px;
-            border: 1.5px solid #cbd5e1;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            font-family: inherit;
-            background: #ffffff;
-            color: var(--text-main);
-            line-height: 1.45;
-            transition: border-color 0.15s ease, box-shadow 0.15s ease;
-        }
-
-        .form-container input:focus,
-        .form-container select:focus,
-        .form-container textarea:focus {
-            outline: none;
-            font-size: 16px;
-            border-color: var(--brand-orange);
-            box-shadow: 0 0 0 3px rgba(255, 90, 0, 0.14);
-        }
-
-        .form-container input::placeholder,
-        .form-container textarea::placeholder {
-            font-size: 13px;
-            font-weight: 500;
-            color: #9ca3af;
-        }
-
-        .whatsapp-priority-tip {
-            background: #fff7ed;
-            border: 1px solid #fdba74;
-            border-radius: 10px;
-            padding: 10px 12px;
-            margin-bottom: 12px;
-            font-size: 12.5px;
-            color: #9a3412;
-            line-height: 1.6;
-        }
-
-        .saved-profile-bar {
-            display: none;
-            background: #fff7ed;
-            border: 1px solid #fed7aa;
-            border-radius: 10px;
-            padding: 9px 12px;
-            margin-bottom: 12px;
-            font-size: 12.5px;
-            font-weight: 700;
-            color: #9a3412;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-        }
-
-        .clear-saved-btn {
-            background: #ffffff;
-            border: 1px solid #fca5a5;
-            color: #dc2626;
-            border-radius: 7px;
-            padding: 5px 10px;
-            font-size: 12px;
-            font-weight: 800;
-            cursor: pointer;
-            font-family: inherit;
-            white-space: nowrap;
-        }
-
-        .custom-file-upload {
-            display: block;
-            width: 100%;
-            background: #fff7ed;
-            border: 1.5px dashed var(--brand-orange);
-            color: var(--brand-orange-dark);
-            padding: 12px 10px;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 13.5px;
-            font-weight: 800;
-            cursor: pointer;
-            margin-bottom: 6px;
-        }
-
-        .file-name-display {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-sub);
-            margin-bottom: 12px;
-        }
-
-        .preview-container {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 12px;
-        }
-
-        .preview-thumb-box {
-            position: relative;
-            width: 64px;
-            height: 64px;
-        }
-
-        .preview-thumb-box img {
-            width: 100%;
-            height: 100%;
-            border-radius: 8px;
-            object-fit: cover;
-        }
-
-        .remove-img-btn {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #dc2626;
-            color: #ffffff;
-            border: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
+            padding: 4px 9px;
             font-size: 11px;
-            cursor: pointer;
-            font-weight: 800;
-        }
-
-        .submit-btn {
-            background: linear-gradient(135deg, #ff7a00, #ff4d00);
-            color: #ffffff;
-            border: none;
-            border-radius: 11px;
-            padding: 12px 14px;
-            min-height: 48px;
-            width: 100%;
-            font-size: 14.5px;
             font-weight: 800;
             cursor: pointer;
             font-family: inherit;
-        }
-
-        #storeProfileView {
-            display: none;
-            background: #ffffff;
-            margin: 12px;
-            border-radius: 14px;
-            padding: 14px;
-            border: 1px solid var(--border-soft);
-        }
-
-        .back-main-btn {
-            background: var(--brand-orange);
-            color: #ffffff;
-            border: none;
-            border-radius: 8px;
-            padding: 7px 12px;
-            font-size: 11.5px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-bottom: 12px;
-            font-family: inherit;
-        }
-
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border-soft);
-            margin-bottom: 10px;
-        }
-
-        .profile-logo {
-            width: 54px;
-            height: 54px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--brand-orange);
-            cursor: pointer;
-        }
-
-        .profile-post-item {
-            background: #f9fafb;
-            border: 1px solid var(--border-soft);
-            border-radius: 10px;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-
-        .profile-post-info-box {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 9px;
-            padding: 9px 10px;
-        }
-
-        .profile-post-title {
-            font-size: 14px;
-            font-weight: 900;
-            color: #b91c1c;
-            margin-bottom: 4px;
-            line-height: 1.4;
         }
 
         .bottom-nav-bar {
@@ -801,40 +403,6 @@
             padding: 10px 12px 18px;
         }
 
-        .image-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 3000;
-            justify-content: center;
-            align-items: center;
-            padding: 12px;
-            overscroll-behavior: contain;
-        }
-
-        .image-modal img {
-            max-width: 100%;
-            max-height: 88vh;
-            border-radius: 10px;
-            object-fit: contain;
-        }
-
-        .image-modal-close {
-            position: absolute;
-            top: 16px;
-            left: 16px;
-            background: #dc2626;
-            color: #ffffff;
-            border: none;
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            font-size: 15px;
-            font-weight: 800;
-            cursor: pointer;
-        }
-
         .custom-modal {
             display: none;
             position: fixed;
@@ -844,7 +412,6 @@
             justify-content: center;
             align-items: center;
             padding: 12px;
-            overscroll-behavior: contain;
         }
 
         .custom-modal-content {
@@ -852,43 +419,11 @@
             color: var(--text-main);
             border: 1px solid var(--border-soft);
             width: 100%;
-            max-width: 380px;
+            max-width: 390px;
             border-radius: 14px;
             padding: 15px;
             max-height: 88vh;
             overflow-y: auto;
-            overscroll-behavior: contain;
-            -webkit-overflow-scrolling: touch;
-            touch-action: pan-y;
-        }
-
-        .custom-modal-content input,
-        .custom-modal-content textarea {
-            background: #ffffff;
-            color: var(--text-main);
-            border-color: #d1d5db;
-        }
-
-        .info-offer-box {
-            background: #fff7ed;
-            border: 1px solid #fed7aa;
-            border-radius: 10px;
-            padding: 10px;
-            margin: 8px 0 10px;
-            font-size: 12px;
-            color: var(--text-main);
-            line-height: 1.5;
-        }
-
-        .in-app-receipt-box {
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            border-radius: 10px;
-            padding: 10px;
-            margin-top: 10px;
-            font-size: 11.5px;
-            color: var(--text-main);
-            line-height: 1.55;
         }
 
         .toast-notice {
@@ -906,7 +441,6 @@
             z-index: 3500;
             max-width: 92%;
             text-align: center;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
         }
     </style>
 </head>
@@ -915,68 +449,34 @@
 
     <div class="container">
         <div class="top-tabs-bar">
-            <div class="top-tab-item" onclick="switchTopTab(this, 'homejobs')">شغل بيوت</div>
-            <div class="top-tab-item active" onclick="switchTopTab(this, 'all')">المحلات والمنتجات</div>
-            <div class="top-tab-item" onclick="switchTopTab(this, 'requests')">الطلبات (24س)</div>
-            <div class="top-tab-item" onclick="switchTopTab(this, 'charity')">رفّ الخير</div>
+            <div class="top-tab-item" data-tab="homejobs">شغل بيوت</div>
+            <div class="top-tab-item active" data-tab="all">المحلات والمنتجات</div>
+            <div class="top-tab-item" data-tab="requests">الطلبات (24س)</div>
+            <div class="top-tab-item" data-tab="charity">رفّ الخير</div>
         </div>
+
+        <div id="statusStrip" class="status-strip">جاري تحميل المحلات والخدمات...</div>
 
         <div id="mainCatalogView">
             <div class="search-section">
                 <div class="search-box-frame">
-                    <button class="search-go-btn" type="button" onclick="applyFilters()">بحث</button>
-                    <input type="text" id="searchInput" class="search-input-field" placeholder="ابحث عن منطقة، حي، محل، معجنات، أو منتج..." oninput="handleSearch()" onkeyup="handleSearch()" autocomplete="off">
+                    <button class="search-go-btn" id="searchGoBtn" type="button">بحث</button>
+                    <input type="text" id="searchInput" class="search-input-field" placeholder="ابحث عن منطقة، حي، محل، معجنات، أو منتج..." autocomplete="off">
                     <div class="search-quick-icons">
-                        <span style="cursor:pointer;" onclick="openQuickRequestsModal()" title="طلب سريع">⚡</span>
-                        <span style="cursor:pointer;" onclick="openCustomInstallGuide()" title="تثبيت التطبيق">📥</span>
+                        <span style="cursor:pointer;" id="quickReqIcon" title="طلب سريع">⚡</span>
+                        <span style="cursor:pointer;" id="installGuideIcon" title="تثبيت التطبيق">📥</span>
                     </div>
-                </div>
-                <div id="searchSuggestions" class="search-suggestions"></div>
-            </div>
-
-            <div id="externalBrowserGuideBar" style="display:none; margin:8px 12px 4px; background:#fff7ed; border:1.5px solid #fdba74; border-radius:10px; padding:10px 11px; font-size:11.5px; color:#111827;">
-                <div style="font-weight:900; color:#c2410c; margin-bottom:4px;">🌐 لسهولة تثبيت التطبيق: افتحه من متصفح الهاتف</div>
-                <div style="font-size:11px; color:#4b5563; line-height:1.5; margin-bottom:8px;">
-                    يبدو أنك فتحت الرابط من داخل تطبيق آخر. اضغط على <b>النقاط الثلاث (⋮)</b> في أعلى الشاشة واختر <b>"فتح في المتصفح" (Open in browser)</b> ثم ثبّت التطبيق.
-                </div>
-                <div style="display:flex; gap:6px;">
-                    <button type="button" class="install-highlight-btn" style="flex:1;" onclick="copyAppDirectLink()">📋 نسخ رابط المتصفح</button>
-                    <button type="button" class="mini-like-btn" style="padding:5px 10px; font-weight:800;" onclick="document.getElementById('externalBrowserGuideBar').style.display='none'">إخفاء</button>
-                </div>
-            </div>
-
-            <div class="install-highlight-strip">
-                <div class="install-highlight-text">
-                    <span>📲</span>
-                    <span>ثبّت التطبيق على هاتفك للوصول السريع</span>
-                </div>
-                <button type="button" class="install-highlight-btn" onclick="openCustomInstallGuide()">ثبّت التطبيق</button>
-            </div>
-
-            <div id="periodicReminderBanner" class="reminder-banner">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
-                    <div>
-                        <div style="font-weight:900; color:#c2410c; margin-bottom:2px;">🔔 تذكير تطبيق سهل الوصول (كل يومين)</div>
-                        <div style="font-size:11px; color:var(--text-sub); line-height:1.45;">
-                            تصفح أحدث المحلات، قسم شغل بيوت، والطلبات السريعة في القيارة والموصل، أو ثبّت التطبيق ليبقى بمتناول يدك.
-                        </div>
-                    </div>
-                    <button type="button" onclick="dismissTwoDayReminder()" style="background:none; border:none; color:var(--text-sub); font-size:14px; font-weight:800; cursor:pointer; padding:0;">✕</button>
-                </div>
-                <div style="display:flex; gap:6px; margin-top:7px;">
-                    <button type="button" class="mini-call-link" style="cursor:pointer; font-family:inherit; font-weight:800;" onclick="dismissTwoDayReminder(); window.scrollTo({ top: document.getElementById('vendorsList').offsetTop - 80, behavior: 'smooth' });">تصفح العروض الآن</button>
-                    <button type="button" class="mini-like-btn" style="font-weight:800;" onclick="dismissTwoDayReminder(); openCustomInstallGuide();">📲 تثبيت التطبيق</button>
                 </div>
             </div>
 
             <div class="categories-strip">
-                <button class="cat-chip active" onclick="filterCat('all', this)">الكل</button>
-                <button class="cat-chip home-chip" onclick="filterCat('شغل بيوت', this)">🏠 شغل بيوت</button>
-                <button class="cat-chip" onclick="filterCat('غذائية وحلويات', this)">🛒 غذائية وحلويات</button>
-                <button class="cat-chip" onclick="filterCat('ملابس وكوزمتك', this)">👗 ملابس وكوزمتك</button>
-                <button class="cat-chip" onclick="filterCat('مطاعم', this)">🍽️ مطاعم</button>
-                <button class="cat-chip" onclick="filterCat('خضار وفواكه', this)">🍎 خضار وفواكه</button>
-                <button class="cat-chip" onclick="filterCat('أشياء أخرى', this)">📦 أشياء أخرى</button>
+                <button type="button" class="cat-chip active" data-cat="all">الكل</button>
+                <button type="button" class="cat-chip home-chip" data-cat="شغل بيوت">🏠 شغل بيوت</button>
+                <button type="button" class="cat-chip" data-cat="غذائية وحلويات">🛒 غذائية وحلويات</button>
+                <button type="button" class="cat-chip" data-cat="ملابس وكوزمتك">👗 ملابس وكوزمتك</button>
+                <button type="button" class="cat-chip" data-cat="مطاعم">🍽️ مطاعم</button>
+                <button type="button" class="cat-chip" data-cat="خضار وفواكه">🍎 خضار وفواكه</button>
+                <button type="button" class="cat-chip" data-cat="أشياء أخرى">📦 أشياء أخرى</button>
             </div>
 
             <div class="utility-actions-bar">
@@ -985,34 +485,18 @@
 
             <div id="addFormContainer" class="form-container">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <h3 style="margin:0; color:#e64a00; font-size:16px; font-weight:900;">تقديم طلب إضافة إعلان أو بضاعة</h3>
-                    <button type="button" onclick="closeListingsFormDrawer()" style="background:#f3f4f6; color:#111827; border:none; border-radius:8px; padding:5px 10px; font-size:12.5px; font-weight:800; cursor:pointer;">إغلاق ✕</button>
+                    <h3 style="margin:0; color:#e64a00; font-size:15.5px; font-weight:900;">تقديم طلب إضافة إعلان أو بضاعة</h3>
+                    <button type="button" id="closeFormBtn" style="background:#f3f4f6; color:#111827; border:none; border-radius:8px; padding:5px 10px; font-size:12px; font-weight:800; cursor:pointer;">إغلاق ✕</button>
                 </div>
 
-                <div class="whatsapp-priority-tip">
-                    💡 <b>نصيحة مهمة لصاحب المشروع:</b> أدخل <b>رقم واتساب للطلبات</b> لتصلك طلبات الزبائن مباشرة على هاتفك دون تأخير أو وساطة. (إذا لم يتوفر واتساب، يُحفظ الطلب في سجل الإدارة كمتابعة احتياطية).
-                </div>
-
-                <div id="savedOwnerNotice" class="saved-profile-bar">
-                    <span>💾 تم استرجاع بيانات حسابك الأساسية تلقائياً.</span>
-                    <button type="button" class="clear-saved-btn" onclick="clearSavedOwnerProfile()">مسح بياناتي</button>
-                </div>
-                
                 <label class="listing-field-label">🏷️ اسم المحل أو صاحب المشروع (إجباري):</label>
                 <input type="text" id="reqName" placeholder="أدخل اسم المحل أو اسمك هنا...">
 
-                <label class="listing-field-label">💬 رقم واتساب للطلبات (موصى به لاستلام الطلبات مباشرة):</label>
+                <label class="listing-field-label">💬 رقم واتساب للطلبات (اختياري):</label>
                 <input type="text" id="reqOrderWhatsapp" placeholder="مثال: 07801234567">
-
-                <label class="listing-field-label">📸 رابط أو يوزر إنستغرام (للدخول المباشر للصفحة):</label>
-                <input type="text" id="reqInsta" placeholder="مثال: username أو https://instagram.com/username">
-
-                <label class="listing-field-label">📘 رابط فيسبوك (اختياري):</label>
-                <input type="text" id="reqFb" placeholder="https://facebook.com/...">
 
                 <label class="listing-field-label">📂 القسم:</label>
                 <select id="reqCat">
-                    <option value="أشياء أخرى">-- اختر القسم المناسب --</option>
                     <option value="شغل بيوت">🏠 شغل بيوت (أسر منتجة ومعجنات)</option>
                     <option value="غذائية وحلويات">غذائية وحلويات</option>
                     <option value="ملابس وكوزمتك">ملابس وكوزمتك</option>
@@ -1021,1139 +505,475 @@
                     <option value="أشياء أخرى">أشياء أخرى</option>
                 </select>
 
-                <label class="listing-field-label">👤 صورة الشعار (اختياري):</label>
-                <label for="reqLogoFile" class="custom-file-upload">📷 اختر صورة الشعار</label>
-                <input type="file" id="reqLogoFile" accept="image/*" style="display:none;" onchange="updateLogoFileName(this)">
-                <div id="logoFileNameDisplay" class="file-name-display">لم يتم اختيار أي صورة</div>
-                
-                <label class="listing-field-label">🖼️ صور المنتج أو العمل (اختياري):</label>
-                <label for="reqImagesFiles" class="custom-file-upload">🖼️ اختر صور المنتجات</label>
-                <input type="file" id="reqImagesFiles" accept="image/*" multiple style="display:none;" onchange="handleImageSelection(event)">
-                <div id="selectedImagesPreview" class="preview-container"></div>
-
                 <label class="listing-field-label">📍 العنوان / الحي:</label>
                 <input type="text" id="reqAddress" placeholder="مثال: القيارة - حي الحيالي (يوجد توصيل)">
 
                 <label class="listing-field-label">💰 السعر والملاحظات:</label>
                 <input type="text" id="reqPrice" placeholder="مثال: 15,000 د.ع أو حسب الطلب">
 
-                <button class="submit-btn" id="submitListingBtn" type="button">إرسال الطلب للإدارة</button>
+                <button class="submit-btn" id="submitListingBtn" type="button">إرسال الطلب</button>
             </div>
 
-            <div id="vendorsList" class="grid-two-col">
-                <p style="grid-column:1/-1; text-align:center; color:var(--text-sub); font-size:12px; padding:18px;">جاري تحميل المحلات والخدمات...</p>
-            </div>
-        </div>
-
-        <div id="storeProfileView">
-            <button class="back-main-btn" type="button" onclick="goBackToCatalog()">⬅ العودة إلى القائمة</button>
-            <div id="storeProfileContent"></div>
-            <div id="adminStoreActions" style="display: none; margin-top: 12px; padding-top: 10px; border-top: 1px dashed #d1d5db; gap: 6px;"></div>
+            <div id="vendorsList" class="grid-two-col"></div>
         </div>
 
         <div class="footer">جميع الحقوق محفوظة © سهل الوصول 2026</div>
     </div>
 
     <nav class="bottom-nav-bar">
-        <button class="bottom-nav-btn active" type="button" onclick="setBottomNav(this, 'home')">
+        <button class="bottom-nav-btn active" type="button" data-nav="home">
             <span class="bottom-nav-icon">🏠</span>
             <span>الرئيسية</span>
         </button>
-        <button class="bottom-nav-btn" type="button" onclick="setBottomNav(this, 'categories')">
+        <button class="bottom-nav-btn" type="button" data-nav="categories">
             <span class="bottom-nav-icon">⊞</span>
             <span>الفئات</span>
         </button>
-        <button class="bottom-nav-btn" type="button" onclick="setBottomNav(this, 'requests')">
+        <button class="bottom-nav-btn" type="button" data-nav="requests">
             <span class="bottom-nav-icon">⚡</span>
             <span>الطلبات</span>
         </button>
-        <button class="bottom-nav-btn" type="button" onclick="setBottomNav(this, 'charity')">
+        <button class="bottom-nav-btn" type="button" data-nav="charity">
             <span class="bottom-nav-icon">🤝</span>
             <span>رفّ الخير</span>
         </button>
-        <button class="bottom-nav-btn" type="button" onclick="setBottomNav(this, 'admin')">
+        <button class="bottom-nav-btn" type="button" data-nav="admin">
             <span class="bottom-nav-icon">⚙️</span>
             <span>الإدارة</span>
         </button>
     </nav>
 
-    <!-- نافذة الطلب عبر واتساب أولاً + سجل احتياطي عند غياب واتساب + دخول إنستغرام -->
-    <div class="custom-modal" id="inAppOrderModal">
+    <!-- نافذة الطلبات السريعة / رف الخير -->
+    <div class="custom-modal" id="communityModal">
         <div class="custom-modal-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h3 style="margin:0; color:#e64a00; font-size:14px; font-weight:800;">🛒 طلب عبر واتساب</h3>
-                <button type="button" onclick="closeModal('inAppOrderModal')" style="background:none; color:#111827; border:none; font-size:15px; cursor:pointer;">✕</button>
+                <h3 id="communityModalTitle" style="margin:0; color:#e64a00; font-size:14.5px; font-weight:800;">القسم</h3>
+                <button type="button" id="closeCommunityModalBtn" style="background:none; color:#111827; border:none; font-size:16px; cursor:pointer;">✕</button>
             </div>
-            <div id="orderStoreBanner" class="info-offer-box" style="margin-top:0;"></div>
-            <p style="font-size:11px; color:var(--text-sub); margin:0 0 8px 0;">يُوجَّه الطلب أولاً إلى <b>واتساب</b> مع توضيح أنك قادم من <b>تطبيق سهل الوصول</b>، ويُحفظ في سجل المتابعة كخيار احتياطي إذا لم يتوفر واتساب.</p>
-
-            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">👤 اسمك (اختياري):</label>
-            <input type="text" id="orderCustomerName" placeholder="مثال: ابراهيم" style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:6px; font-family:inherit;">
-
-            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">📞 رقم هاتفك (إجباري للتواصل):</label>
-            <input type="text" id="orderCustomerPhone" placeholder="0770..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:6px; font-family:inherit;">
-
-            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">📝 تفاصيل الطلب / الكمية / العنوان:</label>
-            <textarea id="orderDetailsInput" rows="3" placeholder="مثال: قالب كيك أو صينية معجنات..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:8px; font-family:inherit;"></textarea>
-
-            <button class="submit-btn" id="confirmInAppOrderBtn" type="button" onclick="submitInAppOrder()">تأكيد وإرسال الطلب عبر واتساب ✅</button>
-            <div id="orderModalInstaArea" style="margin-top:8px;"></div>
-            <div id="orderReceiptBanner"></div>
+            <input type="text" id="commTextInput" placeholder="اكتب التفاصيل..." style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #d1d5db; border-radius:8px; font-family:inherit; font-size:12.5px;">
+            <input type="text" id="commPhoneInput" placeholder="رقم للتواصل (اختياري)..." style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #d1d5db; border-radius:8px; font-family:inherit; font-size:12.5px;">
+            <button type="button" class="submit-btn" id="commSaveBtn" style="margin-bottom:10px;">إضافة</button>
+            <div id="communityItemsBox" style="max-height:200px; overflow-y:auto;"></div>
         </div>
     </div>
 
-    <div class="custom-modal" id="afterSubmitCloseModal">
-        <div class="custom-modal-content" style="text-align:center;">
-            <h3 id="afterSubmitTitle" style="margin:0 0 8px 0; color:#e64a00; font-size:15px; font-weight:800;">تم تقديم إعلانك بنجاح ✅</h3>
-            <p id="afterSubmitMessage" style="font-size:12px; color:var(--text-sub); line-height:1.6; margin:0 0 14px 0;">
-                تم استلام طلبك بنجاح. اضغط على إغلاق لإغلاق قائمة الإعلانات والعودة إلى تصفح المحلات.
-            </p>
-            <button type="button" class="submit-btn" onclick="closeAfterSubmitAndListings()">إغلاق قائمة الإعلانات</button>
-        </div>
-    </div>
-
-    <div class="custom-modal" id="plusInfoOffersModal">
-        <div class="custom-modal-content">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h3 style="margin:0; color:#6b21a8; font-size:14px; font-weight:800;">📌 معلومات وعروض الصفحة</h3>
-                <button type="button" onclick="closeModal('plusInfoOffersModal')" style="background:none; color:#111827; border:none; font-size:15px; cursor:pointer;">✕</button>
-            </div>
-            <div id="plusInfoOffersBody"></div>
-            <button type="button" class="submit-btn" style="margin-top:10px;" onclick="closeModal('plusInfoOffersModal')">إغلاق</button>
-        </div>
-    </div>
-
-    <div class="image-modal" id="imageModal" onclick="closeImageModal()">
-        <button class="image-modal-close" type="button" onclick="closeImageModal()">✕</button>
-        <img id="modalFullImage" src="" alt="صورة مكبرة">
-    </div>
-
-    <div class="custom-modal" id="installGuideModal">
-        <div class="custom-modal-content">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h3 style="margin:0; color:#e64a00; font-size:14px; font-weight:800;">📱 تثبيت تطبيق "سهل الوصول"</h3>
-                <button type="button" onclick="closeModal('installGuideModal')" style="background:none; color:#111827; border:none; font-size:15px; cursor:pointer;">✕</button>
-            </div>
-            <p style="font-size:11px; line-height:1.6; color:var(--text-main); margin-bottom:10px;">
-                1️⃣ إذا كنت داخل Messenger أو تطبيق آخر: اضغط <b>النقاط الثلاث (⋮)</b> واختر <b>"فتح في المتصفح"</b> أولاً.<br>
-                2️⃣ في المتصفح: اضغط على <b>النقاط الثلاث (⋮)</b> في أعلى المتصفح.<br>
-                3️⃣ اختر <b>"إضافة إلى الشاشة الرئيسية"</b> أو <b>"إنشاء اختصار"</b> ثم اضغط <b>"إضافة"</b>.
-            </p>
-            <button class="submit-btn" type="button" onclick="closeModal('installGuideModal')">حسناً</button>
-        </div>
-    </div>
-
-    <div class="custom-modal" id="quickRequestsModal">
-        <div class="custom-modal-content">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h3 style="margin:0; color:#e64a00; font-size:14px; font-weight:800;">⚡ شريط الطلبات السريعة (24 ساعة)</h3>
-                <button type="button" onclick="closeModal('quickRequestsModal')" style="background:none; color:#111827; border:none; font-size:15px; cursor:pointer;">✕</button>
-            </div>
-            <p style="font-size:11px; color:var(--text-sub); margin-bottom:8px;">اكتب الغرض أو الخدمة التي تبحث عنها مع رقم هاتفك.</p>
-            <input type="text" id="qrText" placeholder="مثال: مطلوب شاحن أصلي أو فني صيانة..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:6px; font-family:inherit;">
-            <input type="text" id="qrPhone" placeholder="رقم الهاتف (0770...)" style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:8px; font-family:inherit;">
-            <button class="submit-btn" type="button" onclick="submitQuickRequest()" style="margin-bottom:12px;">نشر الطلب فوراً</button>
-            <hr style="border:0; border-top:1px solid #e5e7eb; margin-bottom:8px;">
-            <h4 style="font-size:11.5px; color:#e64a00; margin:0 0 6px 0;">الطلبات الحالية:</h4>
-            <div id="quickRequestsList" style="max-height:170px; overflow-y:auto;">
-                <p style="font-size:10.5px; color:var(--text-sub); text-align:center;">جاري تحميل الطلبات...</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="custom-modal" id="charityShelfModal">
-        <div class="custom-modal-content">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h3 style="margin:0; color:#e64a00; font-size:14px; font-weight:800;">🤝 رفّ الخير والمستعمل</h3>
-                <button type="button" onclick="closeModal('charityShelfModal')" style="background:none; color:#111827; border:none; font-size:15px; cursor:pointer;">✕</button>
-            </div>
-            <p style="font-size:11px; color:var(--text-sub); margin-bottom:8px;">اعرض أغراضاً مستعملة نظيفة أو تبرعات لتستفيد منها عائلة أخرى.</p>
-            <input type="text" id="csTitle" placeholder="اسم الغرض..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:6px; font-family:inherit;">
-            <input type="text" id="csDetails" placeholder="التفاصيل أو السعر الرمزي / مجاني..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:6px; font-family:inherit;">
-            <input type="text" id="csPhone" placeholder="رقم الهاتف..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:8px; font-family:inherit;">
-            <button class="submit-btn" type="button" onclick="submitCharityItem()" style="margin-bottom:12px;">إضافة للرف الخيري</button>
-            <hr style="border:0; border-top:1px solid #e5e7eb; margin-bottom:8px;">
-            <h4 style="font-size:11.5px; color:#e64a00; margin:0 0 6px 0;">الأغراض المتوفرة:</h4>
-            <div id="charityItemsList" style="max-height:170px; overflow-y:auto;">
-                <p style="font-size:10.5px; color:var(--text-sub); text-align:center;">جاري تحميل الأغراض...</p>
-            </div>
-        </div>
-    </div>
-
+    <!-- نافذة الإدارة المحمية بالبريد وكلمة المرور فقط -->
     <div class="custom-modal" id="adminModal">
         <div class="custom-modal-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <h3 style="margin:0; color:#e64a00; font-size:14px; font-weight:800;">لوحة تحكم المشرف</h3>
-                <button type="button" onclick="closeAdminModal()" style="background:none; color:#111827; border:none; font-size:15px; cursor:pointer;">✕</button>
+                <h3 style="margin:0; color:#e64a00; font-size:14.5px; font-weight:800;">لوحة تحكم المشرف</h3>
+                <button type="button" id="closeAdminModalBtn" style="background:none; color:#111827; border:none; font-size:16px; cursor:pointer;">✕</button>
             </div>
+
             <div id="adminLoginView">
-                <p style="font-size:11px; color:var(--text-sub); margin:0 0 8px 0;">تسجيل الدخول محصور بحساب الإدارة المعتمد عبر البريد وكلمة المرور.</p>
-                <input type="email" id="adminEmailInput" value="akrmm4604@gmail.com" placeholder="البريد الإلكتروني للإدارة" autocomplete="username" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #d1d5db; border-radius:8px; font-size:12px; font-family:inherit;">
-                <input type="password" id="adminPasswordInput" placeholder="أدخل كلمة المرور" autocomplete="current-password" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #d1d5db; border-radius:8px; font-size:12px; font-family:inherit;">
-                <button class="submit-btn" id="adminLoginBtn" type="button" onclick="loginAdminWithEmail()">تسجيل الدخول</button>
-                <div id="adminLoginError" style="color:var(--danger-red); font-size:11px; font-weight:700; margin-top:6px;"></div>
+                <p style="font-size:11.5px; color:var(--text-sub); margin:0 0 8px 0;">الدخول محصور بالبريد المعتمد وكلمة المرور فقط.</p>
+                <label style="font-size:12px; font-weight:700; display:block; margin-bottom:4px;">البريد الإلكتروني:</label>
+                <input type="email" id="adminEmailInput" value="akrmm4604@gmail.com" autocomplete="username" style="width:100%; padding:9px; margin-bottom:8px; border:1px solid #d1d5db; border-radius:8px; font-size:12.5px; font-family:inherit;">
+
+                <label style="font-size:12px; font-weight:700; display:block; margin-bottom:4px;">كلمة المرور:</label>
+                <input type="password" id="adminPasswordInput" placeholder="أدخل كلمة المرور" autocomplete="current-password" style="width:100%; padding:9px; margin-bottom:8px; border:1px solid #d1d5db; border-radius:8px; font-size:12.5px; font-family:inherit;">
+
+                <button type="button" class="submit-btn" id="adminLoginBtn">تسجيل الدخول</button>
+                <div id="adminLoginError" style="color:var(--danger-red); font-size:11.5px; font-weight:700; margin-top:7px;"></div>
             </div>
+
             <div id="adminDashboardView" style="display:none;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:6px;">
-                    <span style="color:var(--success-green); font-weight:700; font-size:11.5px;">تم تسجيل الدخول بنجاح ✅ (akrmm4604@gmail.com)</span>
-                    <button type="button" onclick="logoutAdminAccount()" style="background:#f3f4f6; color:var(--text-main); border:1px solid #d1d5db; border-radius:6px; padding:4px 8px; font-size:10.5px; font-weight:700; cursor:pointer; font-family:inherit;">خروج</button>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:6px;">
+                    <span style="color:var(--success-green); font-weight:800; font-size:11.5px;">تم الدخول بنجاح ✅ (akrmm4604@gmail.com)</span>
+                    <button type="button" id="adminLogoutBtn" style="background:#f3f4f6; color:#111827; border:1px solid #d1d5db; border-radius:7px; padding:4px 9px; font-size:11px; font-weight:700; cursor:pointer; font-family:inherit;">خروج</button>
                 </div>
-
-                <!-- أداة رسالة التذكير الدورية للتطبيق -->
-                <div class="info-offer-box" style="margin-top:0; margin-bottom:10px; font-size:11px;">
-                    <div style="font-weight:800; color:#c2410c; margin-bottom:4px;">🔔 رسالة تذكير التطبيق (كل يومين)</div>
-                    <textarea id="adminReminderText" rows="3" style="width:100%; padding:6px; font-size:11px; border:1px solid #fed7aa; border-radius:7px; font-family:inherit; background:#ffffff; color:#111827; margin-bottom:6px;">تذكير بتطبيق سهل الوصول: تصفح أحدث المحلات، قسم شغل بيوت، والطلبات السريعة في القيارة والموصل، وثبّت التطبيق على هاتفك لسهولة الوصول: https://akrmm4604-a11y.github.io/sahl-alwusool/</textarea>
-                    <div style="display:flex; gap:6px;">
-                        <button type="button" class="mini-like-btn" style="flex:1; padding:6px; font-weight:800;" onclick="copyAdminReminderMessage()">📋 نسخ رسالة التذكير</button>
-                        <button type="button" class="mini-call-link" style="flex:1; cursor:pointer; font-family:inherit; font-weight:800;" onclick="triggerTwoDayReminderNow()">🔔 إظهار التنبيه الآن</button>
-                    </div>
-                </div>
-
-                <div style="display:flex; gap:6px; margin-bottom:8px;">
-                    <button type="button" id="adminTabListingsBtn" onclick="switchAdminSection('listings')" style="flex:1; background:var(--brand-orange); color:#fff; border:none; border-radius:7px; padding:6px; font-size:11px; font-weight:800; cursor:pointer; font-family:inherit;">الإعلانات</button>
-                    <button type="button" id="adminTabOrdersBtn" onclick="switchAdminSection('orders')" style="flex:1; background:#f3f4f6; color:var(--text-main); border:none; border-radius:7px; padding:6px; font-size:11px; font-weight:800; cursor:pointer; font-family:inherit;">سجل الطلبات والزيارات</button>
-                </div>
-                <div id="adminPendingList" style="max-height:240px; overflow-y:auto;"></div>
-                <div id="adminOrdersList" style="display:none; max-height:240px; overflow-y:auto;"></div>
+                <div id="adminListingsManage" style="max-height:260px; overflow-y:auto;"></div>
             </div>
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
         const ADMIN_EMAIL = "akrmm4604@gmail.com";
-        const APP_DIRECT_URL = "https://akrmm4604-a11y.github.io/sahl-alwusool/";
-        let isAdminLoggedIn = false;
-        let selectedFilesArray = [];
-        let currentCat = 'all';
-        let activeOrderTargetStore = null;
-        let lastOrderMessageText = '';
-        let toastTimer = null;
-        let autoSyncInterval = null;
-        window.allListings = [];
-        window.groupedPages = [];
-        const CHARITY_LOCAL_KEY = "sahl_alwusool_charity_items_v1";
-        const LIKED_STORES_KEY = "sahl_alwusool_liked_stores_v1";
-        const SAVED_OWNER_KEY = "sahl_alwusool_saved_owner_v1";
-        const SAVED_CUSTOMER_KEY = "sahl_alwusool_saved_customer_v1";
-        const LOCAL_ORDERS_KEY = "sahl_alwusool_local_orders_v1";
-        const TWO_DAY_REMINDER_KEY = "sahl_alwusool_two_day_reminder_ts_v1";
-        const TWO_DAY_MS = 48 * 60 * 60 * 1000;
 
-        function syncAdminDashboardVisibility(authorized) {
-            isAdminLoggedIn = Boolean(authorized);
-            const loginView = document.getElementById('adminLoginView');
-            const dashView = document.getElementById('adminDashboardView');
-            if (loginView) loginView.style.display = isAdminLoggedIn ? 'none' : 'block';
-            if (dashView) dashView.style.display = isAdminLoggedIn ? 'block' : 'none';
-            if (isAdminLoggedIn) {
-                switchAdminSection('listings');
-                loadApprovedListings();
-            } else {
-                applyFilters();
-            }
-        }
-
-        window.initAdminAuthListener = function() {
-            if (!window.auth || !window.onAuthStateChanged) return;
-            window.onAuthStateChanged(window.auth, async (user) => {
-                const isAuthorized = Boolean(
-                    user &&
-                    String(user.email || '').trim().toLowerCase() === ADMIN_EMAIL.toLowerCase()
-                );
-                if (user && !isAuthorized && window.signOut) {
-                    try { await window.signOut(window.auth); } catch (e) {}
-                }
-                syncAdminDashboardVisibility(isAuthorized);
-            });
+        const firebaseConfig = {
+            apiKey: "AIzaSyB7ri7qth64hU9AKDnh2g8P-lpI8iWFMGQ",
+            authDomain: "sahlalwusool.firebaseapp.com",
+            projectId: "sahlalwusool",
+            storageBucket: "sahlalwusool.firebasestorage.app",
+            messagingSenderId: "442219840408",
+            appId: "1:442219840408:web:f465736e275297c1fba1ed",
+            measurementId: "G-9VDBPZ5Y9T"
         };
 
-        async function loginAdminWithEmail() {
-            const emailInput = document.getElementById('adminEmailInput');
-            const passInput = document.getElementById('adminPasswordInput');
-            const errEl = document.getElementById('adminLoginError');
-            const btn = document.getElementById('adminLoginBtn');
-            if (errEl) errEl.textContent = '';
-
-            const enteredEmail = (emailInput ? emailInput.value : '').trim();
-            const enteredPass = passInput ? passInput.value : '';
-
-            if (!enteredEmail || !enteredPass) {
-                if (errEl) errEl.textContent = 'يرجى إدخال البريد الإلكتروني وكلمة المرور.';
-                return;
+        const DEMO_LISTINGS = [
+            {
+                id: "demo-1",
+                name: "أم محمد للمعجنات والحلويات البيتية",
+                category: "شغل بيوت",
+                address: "القيارة - حي المعلمين",
+                price: "12,000 د.ع",
+                orderWhatsapp: "",
+                image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400",
+                status: "approved",
+                vip: true,
+                likes: 5
+            },
+            {
+                id: "demo-2",
+                name: "أسواق الوفاء للمواد الغذائية",
+                category: "غذائية وحلويات",
+                address: "القيارة - الشارع العام",
+                price: "أسعار الجملة والمفرد",
+                orderWhatsapp: "",
+                image: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400",
+                status: "approved",
+                vip: false,
+                likes: 3
             }
+        ];
 
-            if (enteredEmail.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
-                if (errEl) errEl.textContent = 'هذا البريد غير مصرح له بالدخول إلى لوحة الإدارة.';
-                return;
-            }
+        let db = null;
+        let auth = null;
+        let allItems = DEMO_LISTINGS.slice();
+        let activeCat = "all";
+        let isAdmin = false;
+        let communityMode = "requests";
+        let quickRequests = [];
+        let charityItems = [];
 
-            if (btn) {
-                btn.disabled = true;
-                btn.textContent = 'جاري التحقق...';
-            }
+        const statusStrip = document.getElementById("statusStrip");
+        const vendorsList = document.getElementById("vendorsList");
+        const addFormContainer = document.getElementById("addFormContainer");
+        const adminModal = document.getElementById("adminModal");
+        const adminLoginView = document.getElementById("adminLoginView");
+        const adminDashboardView = document.getElementById("adminDashboardView");
+        const adminLoginError = document.getElementById("adminLoginError");
+        const communityModal = document.getElementById("communityModal");
 
-            try {
-                await waitForFirebase();
-                if (!window.auth || !window.signInWithEmailAndPassword) {
-                    throw new Error("خدمة المصادقة غير جاهزة");
-                }
-                await window.signInWithEmailAndPassword(window.auth, enteredEmail, enteredPass);
-                if (passInput) passInput.value = '';
-            } catch (err) {
-                console.error("Admin login error:", err);
-                if (errEl) {
-                    errEl.textContent = 'تعذر تسجيل الدخول: تأكد من صحة البريد الإلكتروني وكلمة المرور وتفعيل تسجيل الدخول بالبريد في Firebase.';
-                }
-            } finally {
-                if (btn) {
-                    btn.disabled = false;
-                    btn.textContent = 'تسجيل الدخول';
-                }
-            }
+        function showToast(msg) {
+            const el = document.getElementById("toastNotice");
+            if (!el) return;
+            el.textContent = msg;
+            el.style.display = "block";
+            clearTimeout(window._toastT);
+            window._toastT = setTimeout(() => { el.style.display = "none"; }, 3000);
         }
 
-        async function logoutAdminAccount() {
-            try {
-                if (window.auth && window.signOut) {
-                    await window.signOut(window.auth);
-                }
-            } catch (e) {
-                console.warn("Logout warning:", e);
-            }
-            syncAdminDashboardVisibility(false);
+        function esc(str) {
+            return String(str || "").replace(/[&<>"']/g, (m) => ({
+                "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+            }[m]));
         }
 
-        function isInsideInAppBrowser() {
-            const ua = navigator.userAgent || navigator.vendor || window.opera || '';
-            return /FBAN|FBAV|Instagram|Line|Twitter|Snapchat|MicroMessenger|WV/i.test(ua);
+        function setModalOpen(modalEl, open) {
+            if (!modalEl) return;
+            modalEl.style.display = open ? "flex" : "none";
+            const anyOpen = Array.from(document.querySelectorAll(".custom-modal")).some((m) => m.style.display === "flex");
+            document.body.classList.toggle("modal-open-scroll-lock", anyOpen);
         }
 
-        function evaluateInAppBrowserGuide() {
-            const bar = document.getElementById('externalBrowserGuideBar');
-            if (!bar) return;
-            bar.style.display = isInsideInAppBrowser() ? 'block' : 'none';
-        }
-
-        async function copyAppDirectLink() {
-            const ok = await copyTextSafe(APP_DIRECT_URL);
-            showToastNotice(ok ? 'تم نسخ رابط المتصفح المباشر. الصقه في متصفح الهاتف لتثبيت التطبيق ✅' : 'انسخ الرابط: ' + APP_DIRECT_URL);
-        }
-
-        function evaluateTwoDayReminder() {
-            const banner = document.getElementById('periodicReminderBanner');
-            if (!banner) return;
-            try {
-                const lastTs = Number(localStorage.getItem(TWO_DAY_REMINDER_KEY) || 0);
-                const now = Date.now();
-                if (!lastTs || (now - lastTs) >= TWO_DAY_MS) {
-                    banner.style.display = 'block';
-                }
-            } catch (e) {
-                banner.style.display = 'block';
-            }
-        }
-
-        function dismissTwoDayReminder() {
-            const banner = document.getElementById('periodicReminderBanner');
-            if (banner) banner.style.display = 'none';
-            try {
-                localStorage.setItem(TWO_DAY_REMINDER_KEY, String(Date.now()));
-            } catch (e) {}
-        }
-
-        function triggerTwoDayReminderNow() {
-            closeAdminModal();
-            const banner = document.getElementById('periodicReminderBanner');
-            if (banner) {
-                banner.style.display = 'block';
-                banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-            showToastNotice('تم عرض تنبيه التذكير داخل التطبيق ✅');
-        }
-
-        async function copyAdminReminderMessage() {
-            const area = document.getElementById('adminReminderText');
-            const msg = (area && area.value.trim()) ||
-                `تذكير بتطبيق سهل الوصول: تصفح أحدث المحلات، قسم شغل بيوت، والطلبات السريعة في القيارة والموصل: ${APP_DIRECT_URL}`;
-            const ok = await copyTextSafe(msg);
-            showToastNotice(ok ? 'تم نسخ رسالة التذكير بنجاح ✅' : 'تعذر النسخ تلقائياً');
-        }
-
-        function showToastNotice(message) {
-            const toastEl = document.getElementById('toastNotice');
-            if (!toastEl || !message) return;
-            toastEl.textContent = message;
-            toastEl.style.display = 'block';
-            if (toastTimer) clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => {
-                toastEl.style.display = 'none';
-            }, 3800);
-        }
-
-        async function copyTextSafe(text) {
-            if (!text) return false;
-            try {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    await navigator.clipboard.writeText(text);
-                    return true;
-                }
-            } catch (e) {}
-            try {
-                const tempArea = document.createElement('textarea');
-                tempArea.value = text;
-                document.body.appendChild(tempArea);
-                tempArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(tempArea);
-                return true;
-            } catch (e) {
-                return false;
-            }
-        }
-
-        async function copyLastOrderText() {
-            if (!lastOrderMessageText) return;
-            const ok = await copyTextSafe(lastOrderMessageText);
-            showToastNotice(ok ? 'تم نسخ نص الطلب مرة أخرى ✅' : 'تعذر النسخ تلقائياً');
-        }
-
-        function hasValidPhoneNumber(phone) {
-            const cleaned = String(phone || '').trim();
-            return Boolean(cleaned && cleaned !== 'لا يوجد' && cleaned !== 'غير متوفر' && cleaned.replace(/\D/g, '').length >= 7);
-        }
-
-        function formatIraqWhatsappNumber(phone) {
-            const digits = String(phone || '').replace(/\D/g, '');
-            if (!digits) return '';
-            if (digits.startsWith('964')) return digits;
-            if (digits.startsWith('0')) return '964' + digits.slice(1);
-            if (digits.length === 10) return '964' + digits;
-            return digits;
-        }
-
-        function buildInstagramPageUrl(instaValue) {
-            const raw = String(instaValue || '').trim();
-            if (!raw) return '';
-            if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
-            const handle = raw.replace(/^@/, '').replace(/^https?:\/\/(www\.)?instagram\.com\//i, '').split('/')[0].split('?')[0].trim();
-            if (!handle) return '';
-            return `https://www.instagram.com/${encodeURIComponent(handle)}/`;
-        }
-
-        function buildFacebookPageUrl(fbValue) {
-            const raw = String(fbValue || '').trim();
-            if (!raw) return '';
-            if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
-            const cleanHandle = raw.replace(/^@/, '').trim();
-            return cleanHandle ? `https://www.facebook.com/${encodeURIComponent(cleanHandle)}` : '';
-        }
-
-        function getAppSourceIntroText(storeName, platformLabel) {
-            const target = storeName ? ` (${storeName})` : '';
-            return `مرحباً${target}، أنا زبون أتيتك من (تطبيق سهل الوصول) عبر ${platformLabel}.`;
-        }
-
-        async function openSocialWithSourceNotice(storeId, platform) {
-            const store = findPageByAnyId(storeId) || (window.allListings || []).find(s => String(s.id) === String(storeId));
-            if (!store) return;
-
-            const isInsta = platform === 'instagram';
-            const platformLabel = isInsta ? 'إنستغرام' : 'فيسبوك';
-            const targetUrl = isInsta ? buildInstagramPageUrl(store.insta) : buildFacebookPageUrl(store.fb);
-            if (!targetUrl) {
-                showToastNotice(`رابط ${platformLabel} غير متوفر لهذه الصفحة.`);
-                return;
-            }
-
-            const introText = getAppSourceIntroText(store.name, platformLabel);
-            await copyTextSafe(introText);
-
-            const timeText = new Date().toLocaleTimeString('ar-IQ', { hour: '2-digit', minute: '2-digit' });
-            const visitLog = {
-                id: 'soc_' + Date.now(),
-                statusLabel: `دخول ${platformLabel} من التطبيق`,
-                storeId: store.id,
-                storeName: store.name || 'مشروع محلي',
-                customerName: 'زبون التطبيق',
-                customerPhone: '',
-                orderDetails: `دخل إلى صفحة ${platformLabel} قادماً من تطبيق سهل الوصول`,
-                channel: `${platformLabel} (من التطبيق)`,
-                orderState: 'new',
-                timeText,
-                timestamp: Date.now()
-            };
-
-            saveLocalOrder(visitLog);
-            store.contactClicks = (Number(store.contactClicks) || 0) + 1;
-
-            try {
-                await waitForFirebase();
-                await window.addDoc(window.collection(window.db, "app_orders"), visitLog);
-                const docId = String(store.id);
-                if (!docId.startsWith('demo') && window.updateDoc && window.increment) {
-                    await window.updateDoc(window.doc(window.db, "listings", docId), {
-                        contactClicks: window.increment(1)
-                    });
-                }
-            } catch (e) {
-                console.warn("Social visit sync warning:", e);
-            }
-
-            showToastNotice(`تم نسخ عبارة "أتيتك من تطبيق سهل الوصول" لـ ${platformLabel} للصقها في الرسالة ✅`);
-            window.open(targetUrl, '_blank');
-        }
-
-        function resolveOrderRoutingTarget(store) {
-            const orderWaRaw = (store.orderWhatsapp || '').trim();
-            const phoneRaw = (store.phone || '').trim();
-
-            if (hasValidPhoneNumber(orderWaRaw)) {
-                return {
-                    type: 'whatsapp',
-                    channelLabel: 'واتساب أولاً (رقم الطلبات)',
-                    url: `https://wa.me/${formatIraqWhatsappNumber(orderWaRaw)}`
-                };
-            }
-
-            if (hasValidPhoneNumber(phoneRaw)) {
-                return {
-                    type: 'whatsapp',
-                    channelLabel: 'واتساب أولاً',
-                    url: `https://wa.me/${formatIraqWhatsappNumber(phoneRaw)}`
-                };
-            }
-
-            return {
-                type: 'app_backup',
-                channelLabel: 'سجل احتياطي داخل التطبيق (بانتظار إضافة واتساب)',
-                url: ''
-            };
-        }
-
-        function syncModalScrollLock() {
-            const modals = document.querySelectorAll('.custom-modal, .image-modal');
-            let anyOpen = false;
-            modals.forEach(m => {
-                const styleDisplay = window.getComputedStyle(m).display;
-                if (m.style.display === 'flex' || styleDisplay === 'flex') {
-                    anyOpen = true;
-                }
+        function setActiveCategoryChip(cat) {
+            activeCat = cat;
+            document.querySelectorAll(".cat-chip").forEach((chip) => {
+                chip.classList.toggle("active", chip.dataset.cat === cat);
             });
-            document.body.classList.toggle('modal-open-scroll-lock', anyOpen);
+            renderVendors();
         }
 
-        function getSavedCustomerProfile() {
-            try {
-                const raw = localStorage.getItem(SAVED_CUSTOMER_KEY);
-                if (!raw) return null;
-                const parsed = JSON.parse(raw);
-                return parsed && typeof parsed === 'object' ? parsed : null;
-            } catch (e) {
-                return null;
-            }
-        }
-
-        function saveCustomerProfile(profile) {
-            try {
-                const clean = {
-                    name: String(profile.name || '').trim(),
-                    phone: String(profile.phone || '').trim()
-                };
-                if (clean.name || clean.phone) {
-                    localStorage.setItem(SAVED_CUSTOMER_KEY, JSON.stringify(clean));
-                }
-            } catch (e) {
-                console.warn("Customer profile save warning:", e);
-            }
-        }
-
-        function getSavedOwnerProfile() {
-            try {
-                const raw = localStorage.getItem(SAVED_OWNER_KEY);
-                if (!raw) return null;
-                const parsed = JSON.parse(raw);
-                if (!parsed || typeof parsed !== 'object') return null;
-                const hasAnyData = Boolean(
-                    (parsed.name && String(parsed.name).trim()) ||
-                    (parsed.orderWhatsapp && String(parsed.orderWhatsapp).trim()) ||
-                    (parsed.insta && String(parsed.insta).trim()) ||
-                    (parsed.address && String(parsed.address).trim())
-                );
-                return hasAnyData ? parsed : null;
-            } catch (e) {
-                return null;
-            }
-        }
-
-        function saveOwnerProfile(profile) {
-            try {
-                const cleanData = {
-                    name: (profile.name || '').trim(),
-                    phone: profile.phone && profile.phone !== 'لا يوجد' ? String(profile.phone).trim() : '',
-                    orderWhatsapp: (profile.orderWhatsapp || '').trim(),
-                    insta: (profile.insta || '').trim(),
-                    fb: (profile.fb || '').trim(),
-                    category: profile.category || 'أشياء أخرى',
-                    address: profile.address && profile.address !== 'غير محدد' ? String(profile.address).trim() : ''
-                };
-                const hasAnyData = Boolean(
-                    cleanData.name || cleanData.orderWhatsapp || cleanData.insta || cleanData.address
-                );
-                if (hasAnyData) {
-                    localStorage.setItem(SAVED_OWNER_KEY, JSON.stringify(cleanData));
-                } else {
-                    localStorage.removeItem(SAVED_OWNER_KEY);
-                }
-            } catch (e) {
-                console.warn("Saved owner profile warning:", e);
-            }
-        }
-
-        function applySavedOwnerProfileToForm() {
-            const saved = getSavedOwnerProfile();
-            const noticeEl = document.getElementById('savedOwnerNotice');
-            if (!saved) {
-                if (noticeEl) noticeEl.style.display = 'none';
-                return;
-            }
-
-            const nameEl = document.getElementById('reqName');
-            const orderWaEl = document.getElementById('reqOrderWhatsapp');
-            const instaEl = document.getElementById('reqInsta');
-            const fbEl = document.getElementById('reqFb');
-            const catEl = document.getElementById('reqCat');
-            const addressEl = document.getElementById('reqAddress');
-
-            if (nameEl && !nameEl.value && saved.name) nameEl.value = saved.name;
-            if (orderWaEl && !orderWaEl.value && (saved.orderWhatsapp || saved.phone)) {
-                orderWaEl.value = saved.orderWhatsapp || saved.phone;
-            }
-            if (instaEl && !instaEl.value && saved.insta) instaEl.value = saved.insta;
-            if (fbEl && !fbEl.value && saved.fb) fbEl.value = saved.fb;
-            if (catEl && saved.category) catEl.value = saved.category;
-            if (addressEl && !addressEl.value && saved.address) addressEl.value = saved.address;
-
-            if (noticeEl) {
-                noticeEl.style.display = 'flex';
-            }
-        }
-
-        function clearSavedOwnerProfile() {
-            try {
-                localStorage.removeItem(SAVED_OWNER_KEY);
-            } catch (e) {
-                console.warn("Clear owner profile warning:", e);
-            }
-            document.getElementById('reqName').value = '';
-            document.getElementById('reqOrderWhatsapp').value = '';
-            document.getElementById('reqInsta').value = '';
-            document.getElementById('reqFb').value = '';
-            document.getElementById('reqCat').value = 'أشياء أخرى';
-            document.getElementById('reqAddress').value = '';
-            document.getElementById('reqPrice').value = '';
-            const noticeEl = document.getElementById('savedOwnerNotice');
-            if (noticeEl) noticeEl.style.display = 'none';
-        }
-
-        function getLikedStoreIds() {
-            try {
-                const raw = localStorage.getItem(LIKED_STORES_KEY);
-                const parsed = raw ? JSON.parse(raw) : [];
-                return Array.isArray(parsed) ? parsed.map(String) : [];
-            } catch (e) {
-                return [];
-            }
-        }
-
-        function hasLikedStore(id) {
-            return getLikedStoreIds().includes(String(id));
-        }
-
-        function markStoreAsLiked(id) {
-            try {
-                const current = getLikedStoreIds();
-                const strId = String(id);
-                if (!current.includes(strId)) {
-                    current.push(strId);
-                    localStorage.setItem(LIKED_STORES_KEY, JSON.stringify(current));
-                }
-            } catch (e) {
-                console.warn("Liked store save warning:", e);
-            }
-        }
-
-        function escapeJsSingleQuote(val) {
-            return String(val || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-        }
-
-        function escapeHtmlText(val) {
-            return String(val || '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;');
-        }
-
-        function normalizeArabicText(text) {
-            if (!text) return '';
-            return String(text)
-                .toLowerCase()
-                .replace(/[\u064B-\u065F]/g, '')
-                .replace(/[أإآ]/g, 'ا')
-                .replace(/ة/g, 'ه')
-                .replace(/ى/g, 'ي')
-                .replace(/[^\u0600-\u06FFa-z0-9\s]/g, ' ')
-                .replace(/\s+/g, ' ')
-                .trim();
-        }
-
-        function normalizePhoneKey(phone) {
-            const cleaned = String(phone || '').trim();
-            if (!cleaned || cleaned === 'لا يوجد' || cleaned === 'غير متوفر') return '';
-            const digits = cleaned.replace(/\D/g, '');
-            if (digits.length < 7) return '';
-            return digits.length >= 10 ? digits.slice(-10) : digits;
-        }
-
-        function getOwnerGroupKey(item) {
-            const normPhone = normalizePhoneKey(item.phone || '');
-            if (normPhone) return `phone__${normPhone}`;
-
-            const normOrderWa = normalizePhoneKey(item.orderWhatsapp || '');
-            if (normOrderWa) return `phone__${normOrderWa}`;
-
-            const normName = normalizeArabicText(item.name || '');
-            if (normName) return `name__${normName}`;
-
-            return `id__${String(item.id || '')}`;
-        }
-
-        function findMatchingStoreRecord(items, candidate) {
-            const candPhone = normalizePhoneKey(candidate.phone || '');
-            const candOrderWa = normalizePhoneKey(candidate.orderWhatsapp || '');
-            const candName = normalizeArabicText(candidate.name || '');
-
-            return (items || []).find(item => {
-                const itemPhone = normalizePhoneKey(item.phone || '');
-                const itemOrderWa = normalizePhoneKey(item.orderWhatsapp || '');
-                const itemName = normalizeArabicText(item.name || '');
-
-                if (candPhone && (itemPhone === candPhone || itemOrderWa === candPhone)) return true;
-                if (candOrderWa && (itemPhone === candOrderWa || itemOrderWa === candOrderWa)) return true;
-                if (!candPhone && !candOrderWa && candName && itemName && candName === itemName) return true;
-                return false;
-            });
-        }
-
-        function buildGroupedPages(items) {
-            const approved = (items || []).filter(item => item.status === 'approved');
-            const groupsMap = new Map();
-
-            approved.forEach(rawItem => {
-                const item = { ...rawItem };
-                const key = getOwnerGroupKey(item);
-                const itemImgs = Array.isArray(item.images) ? item.images.filter(Boolean) : [];
-                const postEntry = {
-                    sourceId: item.id,
-                    title: item.name || 'إعلان',
-                    price: item.price || '',
-                    address: item.address || '',
-                    category: item.category || 'أشياء أخرى',
-                    images: itemImgs,
-                    createdAt: item.createdAt || ''
-                };
-
-                if (!groupsMap.has(key)) {
-                    const initialPosts = Array.isArray(item.posts) && item.posts.length > 0
-                        ? item.posts.slice()
-                        : [postEntry];
-
-                    groupsMap.set(key, {
-                        ...item,
-                        id: item.id,
-                        memberIds: [item.id],
-                        posts: initialPosts,
-                        contactClicks: Number(item.contactClicks) || 0,
-                        ordersCount: Number(item.ordersCount) || 0,
-                        allOffersText: initialPosts.map(p => p.price).filter(Boolean).join(' • ')
-                    });
-                } else {
-                    const existing = groupsMap.get(key);
-                    existing.memberIds.push(item.id);
-                    existing.likes = (Number(existing.likes) || 0) + (Number(item.likes) || 0);
-                    existing.contactClicks = (Number(existing.contactClicks) || 0) + (Number(item.contactClicks) || 0);
-                    existing.ordersCount = (Number(existing.ordersCount) || 0) + (Number(item.ordersCount) || 0);
-                    if (item.vip) existing.vip = true;
-                    if (!existing.logo && item.logo) existing.logo = item.logo;
-                    if (!existing.orderWhatsapp && item.orderWhatsapp) existing.orderWhatsapp = item.orderWhatsapp;
-                    if (!existing.insta && item.insta) existing.insta = item.insta;
-                    if (!existing.fb && item.fb) existing.fb = item.fb;
-                    if ((!existing.phone || existing.phone === 'لا يوجد') && item.phone && item.phone !== 'لا يوجد') {
-                        existing.phone = item.phone;
-                    }
-                    if ((!existing.address || existing.address === 'غير محدد') && item.address) {
-                        existing.address = item.address;
-                    }
-
-                    const mergedImgs = Array.isArray(existing.images) ? existing.images.slice() : [];
-                    itemImgs.forEach(img => {
-                        if (!mergedImgs.includes(img)) mergedImgs.push(img);
-                    });
-                    existing.images = mergedImgs;
-
-                    const alreadyHasPost = existing.posts.some(p =>
-                        String(p.sourceId) === String(item.id) ||
-                        (normalizeArabicText(p.price) === normalizeArabicText(postEntry.price) &&
-                         JSON.stringify(p.images || []) === JSON.stringify(postEntry.images || []))
-                    );
-                    if (!alreadyHasPost) {
-                        existing.posts.push(postEntry);
-                    }
-                    if (item.price) {
-                        existing.price = item.price;
-                    }
-                    existing.allOffersText = existing.posts.map(p => p.price).filter(Boolean).join(' • ');
-                }
+        function renderVendors() {
+            const q = (document.getElementById("searchInput").value || "").trim().toLowerCase();
+            const filtered = allItems.filter((item) => {
+                if (!isAdmin && item.status && item.status !== "approved") return false;
+                const catMatch = activeCat === "all" || item.category === activeCat;
+                const qMatch = !q || `${item.name || ""} ${item.address || ""} ${item.category || ""} ${item.price || ""}`.toLowerCase().includes(q);
+                return catMatch && qMatch;
             });
 
-            const grouped = Array.from(groupsMap.values());
-            grouped.sort((a, b) => {
-                if ((b.vip === true) !== (a.vip === true)) return (b.vip === true) - (a.vip === true);
-                return (b.likes || 0) - (a.likes || 0);
-            });
-            window.groupedPages = grouped;
-            return grouped;
-        }
-
-        function findPageByAnyId(id) {
-            const strId = String(id);
-            const pages = window.groupedPages && window.groupedPages.length > 0
-                ? window.groupedPages
-                : buildGroupedPages(window.allListings);
-
-            return pages.find(p =>
-                String(p.id) === strId ||
-                (Array.isArray(p.memberIds) && p.memberIds.map(String).includes(strId))
-            );
-        }
-
-        function openInAppOrderModal(storeId, prefilledNote) {
-            const store = findPageByAnyId(storeId) || (window.allListings || []).find(s => String(s.id) === String(storeId));
-            if (!store) return;
-
-            activeOrderTargetStore = store;
-            const savedCust = getSavedCustomerProfile();
-            const routing = resolveOrderRoutingTarget(store);
-            const instaUrl = buildInstagramPageUrl(store.insta);
-
-            const bannerEl = document.getElementById('orderStoreBanner');
-            const nameInput = document.getElementById('orderCustomerName');
-            const phoneInput = document.getElementById('orderCustomerPhone');
-            const detailsInput = document.getElementById('orderDetailsInput');
-            const instaArea = document.getElementById('orderModalInstaArea');
-            const receiptEl = document.getElementById('orderReceiptBanner');
-
-            if (bannerEl) {
-                bannerEl.innerHTML = `
-                    <div style="font-weight:900; color:#b91c1c; font-size:13.5px;">📌 ${escapeHtmlText(store.name)}</div>
-                    <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">📍 ${escapeHtmlText(store.address || 'غير محدد')} • المسار: <b>${escapeHtmlText(routing.channelLabel)}</b></div>
-                    ${store.price ? `<div style="font-size:11.5px; font-weight:800; color:#c2410c; margin-top:3px;">💰 ${escapeHtmlText(store.price)}</div>` : ''}
-                `;
-            }
-
-            if (instaArea) {
-                instaArea.innerHTML = instaUrl
-                    ? `<button type="button" class="social-direct-btn" style="width:100%;" onclick="openSocialWithSourceNotice('${escapeJsSingleQuote(store.id)}', 'instagram')">📸 دخول مباشر إلى صفحة إنستغرام (مع إشعار أنه من التطبيق)</button>`
-                    : '';
-            }
-
-            if (nameInput) nameInput.value = savedCust && savedCust.name ? savedCust.name : '';
-            if (phoneInput) phoneInput.value = savedCust && savedCust.phone ? savedCust.phone : '';
-            if (detailsInput) detailsInput.value = prefilledNote || '';
-            if (receiptEl) receiptEl.innerHTML = '';
-
-            document.getElementById('inAppOrderModal').style.display = 'flex';
-            syncModalScrollLock();
-        }
-
-        function saveLocalOrder(orderObj) {
-            try {
-                const current = getLocalOrders();
-                current.unshift(orderObj);
-                localStorage.setItem(LOCAL_ORDERS_KEY, JSON.stringify(current.slice(0, 120)));
-            } catch (e) {
-                console.warn("Local order save warning:", e);
-            }
-        }
-
-        function getLocalOrders() {
-            try {
-                const raw = localStorage.getItem(LOCAL_ORDERS_KEY);
-                const parsed = raw ? JSON.parse(raw) : [];
-                return Array.isArray(parsed) ? parsed : [];
-            } catch (e) {
-                return [];
-            }
-        }
-
-        async function submitInAppOrder() {
-            if (!activeOrderTargetStore) return;
-
-            const customerName = (document.getElementById('orderCustomerName').value || '').trim() || 'ابراهيم';
-            const customerPhone = (document.getElementById('orderCustomerPhone').value || '').trim();
-            const orderDetails = (document.getElementById('orderDetailsInput').value || '').trim();
-
-            if (!customerPhone) {
-                alert('يرجى إدخال رقم هاتفك لكي يتمكن صاحب المشروع من التواصل معك.');
-                document.getElementById('orderCustomerPhone').focus();
-                return;
-            }
-            if (!orderDetails) {
-                alert('يرجى كتابة تفاصيل الطلب أو الكمية المطلوبة.');
-                document.getElementById('orderDetailsInput').focus();
+            vendorsList.innerHTML = "";
+            if (!filtered.length) {
+                vendorsList.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:var(--text-sub); font-size:12px; padding:18px;">لا توجد محلات أو إعلانات مطابقة حالياً.</p>';
                 return;
             }
 
-            const btn = document.getElementById('confirmInAppOrderBtn');
-            btn.disabled = true;
-            btn.textContent = 'جاري تجهيز الطلب...';
-
-            saveCustomerProfile({ name: customerName, phone: customerPhone });
-
-            const routing = resolveOrderRoutingTarget(activeOrderTargetStore);
-
-            const orderMessageText =
-                `مرحباً، أنا زبون أتيتك من (تطبيق سهل الوصول) وهذه تفاصيل طلبي:\n` +
-                `• الجهة: ${activeOrderTargetStore.name || 'مشروع محلي'}\n` +
-                `• الزبون: ${customerName}\n` +
-                `• الهاتف: ${customerPhone}\n` +
-                `• الطلب: ${orderDetails}`;
-
-            lastOrderMessageText = orderMessageText;
-
-            const timeText = new Date().toLocaleTimeString('ar-IQ', { hour: '2-digit', minute: '2-digit' });
-            const compactDoneLog = {
-                id: 'ord_' + Date.now(),
-                statusLabel: routing.type === 'whatsapp' ? 'طلب واتساب' : 'طلب احتياطي (بدون واتساب)',
-                storeId: activeOrderTargetStore.id,
-                storeName: activeOrderTargetStore.name || 'مشروع محلي',
-                customerName,
-                customerPhone,
-                orderDetails,
-                channel: routing.channelLabel,
-                orderState: 'new',
-                timeText,
-                timestamp: Date.now()
-            };
-
-            saveLocalOrder(compactDoneLog);
-            activeOrderTargetStore.ordersCount = (Number(activeOrderTargetStore.ordersCount) || 0) + 1;
-
-            try {
-                await waitForFirebase();
-                await window.addDoc(window.collection(window.db, "app_orders"), compactDoneLog);
-                const docId = String(activeOrderTargetStore.id);
-                if (!docId.startsWith('demo') && window.updateDoc && window.increment) {
-                    await window.updateDoc(window.doc(window.db, "listings", docId), {
-                        ordersCount: window.increment(1)
-                    });
-                }
-            } catch (e) {
-                console.warn("Order counter/log sync warning:", e);
-            }
-
-            await copyTextSafe(orderMessageText);
-
-            btn.disabled = false;
-            btn.textContent = 'تأكيد وإرسال الطلب عبر واتساب ✅';
-
-            if (routing.type === 'whatsapp' && routing.url) {
-                showToastNotice('تم نسخ الطلب وتوضيح قدومك من تطبيق سهل الوصول؛ جاري فتح واتساب...');
-                window.open(`${routing.url}?text=${encodeURIComponent(orderMessageText)}`, '_blank');
-                closeModal('inAppOrderModal');
-                return;
-            }
-
-            const receiptEl = document.getElementById('orderReceiptBanner');
-            if (receiptEl) {
-                receiptEl.innerHTML = `
-                    <div class="in-app-receipt-box">
-                        <div style="font-weight:900; color:#c2410c; margin-bottom:4px;">📌 لا يوجد رقم واتساب مسجل لهذه الجهة حالياً</div>
-                        <div style="font-size:11px; color:var(--text-sub); margin-bottom:6px;">تم حفظ الطلب كسجل احتياطي للمتابعة • الوقت: <b>${escapeHtmlText(timeText)}</b></div>
-                        <pre style="white-space:pre-wrap; font-family:inherit; background:#ffffff; border:1px solid #d1d5db; border-radius:8px; padding:7px; margin:0 0 8px 0; font-size:11px; color:#111827;">${escapeHtmlText(orderMessageText)}</pre>
-                        <div style="display:flex; gap:6px;">
-                            <button type="button" class="mini-like-btn" style="flex:1; padding:7px; font-weight:800;" onclick="copyLastOrderText()">📋 نسخ نص الطلب</button>
-                            <button type="button" class="mini-call-link" style="flex:1; cursor:pointer; font-family:inherit; font-weight:800;" onclick="closeModal('inAppOrderModal')">إغلاق</button>
+            filtered.forEach((item) => {
+                const card = document.createElement("div");
+                card.className = "grid-item-card" + (item.vip ? " vip-card" : "");
+                const imgUrl = item.image || (Array.isArray(item.images) && item.images[0]) || "https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg";
+                card.innerHTML = `
+                    <div class="grid-img-box">
+                        <img src="${esc(imgUrl)}" alt="${esc(item.name)}" onerror="this.src='https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'">
+                    </div>
+                    <div class="grid-card-body">
+                        <h3 class="grid-title">${esc(item.name || "بدون اسم")}${item.vip ? " ⭐" : ""}</h3>
+                        ${item.price ? `<div class="grid-price">${esc(item.price)}</div>` : ""}
+                        <div class="grid-meta">${esc(item.category || "")}${item.address ? " • " + esc(item.address) : ""}</div>
+                        <div class="grid-actions">
+                            <button type="button" class="mini-like-btn like-btn">👍 ${Number(item.likes) || 0}</button>
+                            <button type="button" class="mini-order-btn order-btn">طلب</button>
                         </div>
                     </div>
                 `;
-            }
-            showToastNotice('تم حفظ الطلب في السجل الاحتياطي لعدم توفر رقم واتساب للجهة.');
-        }
 
-        function switchAdminSection(section) {
-            const listingsDiv = document.getElementById('adminPendingList');
-            const ordersDiv = document.getElementById('adminOrdersList');
-            const tabListings = document.getElementById('adminTabListingsBtn');
-            const tabOrders = document.getElementById('adminTabOrdersBtn');
-
-            if (section === 'orders') {
-                if (listingsDiv) listingsDiv.style.display = 'none';
-                if (ordersDiv) ordersDiv.style.display = 'block';
-                if (tabListings) { tabListings.style.background = '#f3f4f6'; tabListings.style.color = 'var(--text-main)'; }
-                if (tabOrders) { tabOrders.style.background = 'var(--brand-orange)'; tabOrders.style.color = '#fff'; }
-                loadAdminOrders();
-            } else {
-                if (listingsDiv) listingsDiv.style.display = 'block';
-                if (ordersDiv) ordersDiv.style.display = 'none';
-                if (tabListings) { tabListings.style.background = 'var(--brand-orange)'; tabListings.style.color = '#fff'; }
-                if (tabOrders) { tabOrders.style.background = '#f3f4f6'; tabOrders.style.color = 'var(--text-main)'; }
-                loadAdminListings();
-            }
-        }
-
-        async function loadAdminOrders() {
-            const ordersDiv = document.getElementById('adminOrdersList');
-            if (!ordersDiv) return;
-            ordersDiv.innerHTML = '<p style="font-size:11px; color:var(--text-sub); text-align:center;">جاري تحديث السجل...</p>';
-
-            const map = new Map();
-            getLocalOrders().forEach(o => map.set(String(o.id), o));
-
-            try {
-                await waitForFirebase();
-                const snap = await window.getDocs(window.collection(window.db, "app_orders"));
-                snap.forEach(d => {
-                    const data = d.data() || {};
-                    map.set(String(d.id), { id: d.id, ...data });
+                card.querySelector(".like-btn").addEventListener("click", async () => {
+                    item.likes = (Number(item.likes) || 0) + 1;
+                    renderVendors();
+                    if (db && !String(item.id).startsWith("demo-")) {
+                        try {
+                            await updateDoc(doc(db, "listings", String(item.id)), { likes: increment(1) });
+                        } catch (e) {}
+                    }
                 });
-            } catch (e) {
-                console.warn("Load admin orders warning:", e);
-            }
 
-            const logs = Array.from(map.values()).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-            if (logs.length === 0) {
-                ordersDiv.innerHTML = '<p style="font-size:11px; color:var(--text-sub); text-align:center;">لا توجد طلبات أو زيارات مسجلة حتى الآن.</p>';
+                card.querySelector(".order-btn").addEventListener("click", () => {
+                    const digits = String(item.orderWhatsapp || item.phone || "").replace(/\D/g, "");
+                    if (digits.length >= 7) {
+                        const intl = digits.startsWith("964") ? digits : (digits.startsWith("0") ? "964" + digits.slice(1) : "964" + digits);
+                        const text = encodeURIComponent(`مرحباً، أنا زبون أتيتك من تطبيق سهل الوصول بخصوص: ${item.name || ""}`);
+                        window.open(`https://wa.me/${intl}?text=${text}`, "_blank");
+                    } else {
+                        showToast(`الجهة: ${item.name || ""} — العنوان: ${item.address || "غير محدد"}`);
+                    }
+                });
+
+                vendorsList.appendChild(card);
+            });
+        }
+
+        function renderAdminManageList() {
+            const box = document.getElementById("adminListingsManage");
+            if (!box) return;
+            if (!allItems.length) {
+                box.innerHTML = '<p style="font-size:12px; color:var(--text-sub);">لا توجد إعلانات.</p>';
                 return;
             }
-
-            ordersDiv.innerHTML = `
-                <div style="background:#fff7ed; border:1px solid #fed7aa; border-radius:8px; padding:7px 10px; margin-bottom:8px; font-size:11px; font-weight:800; color:#9a3412;">
-                    📊 إجمالي الحركات المسجلة (واتساب + سجل احتياطي + إنستغرام/فيسبوك): ${logs.length}
-                </div>
-                ${logs.slice(0, 40).map(o => `
-                    <div style="background:#f9fafb; padding:8px 9px; border-radius:8px; margin-bottom:6px; border:1px solid #e5e7eb; font-size:11px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
-                            <div>
-                                <b style="color:var(--success-green);">✓ ${escapeHtmlText(o.statusLabel || 'تم')}</b> — <b>${escapeHtmlText(o.storeName || '')}</b>
-                                <span style="color:var(--text-sub);">(${escapeHtmlText(o.channel || 'واتساب')})</span>
-                            </div>
-                            <span style="color:var(--text-sub); font-size:10px;">${escapeHtmlText(o.timeText || '')}</span>
-                        </div>
-                        ${o.orderDetails ? `<div style="margin-top:4px; color:var(--text-main);">📝 ${escapeHtmlText(o.orderDetails)} ${o.customerPhone ? `• 📞 ${escapeHtmlText(o.customerPhone)}` : ''}</div>` : ''}
+            box.innerHTML = "";
+            allItems.forEach((item) => {
+                const row = document.createElement("div");
+                row.style.cssText = "background:#f9fafb; border:1px solid #e5e7eb; border-radius:9px; padding:8px; margin-bottom:7px; font-size:12px;";
+                row.innerHTML = `
+                    <div><b>${esc(item.name)}</b> — <span style="color:#4b5563;">${esc(item.status || "approved")}</span></div>
+                    <div style="color:#4b5563; font-size:11px; margin:3px 0 6px;">${esc(item.category || "")} • ${esc(item.address || "")}</div>
+                    <div style="display:flex; gap:6px;">
+                        <button type="button" class="mini-order-btn approve-btn">اعتماد</button>
+                        <button type="button" class="mini-like-btn del-btn" style="color:#dc2626; border-color:#fecaca; background:#fef2f2;">حذف</button>
                     </div>
-                `).join('')}
-            `;
+                `;
+                row.querySelector(".approve-btn").addEventListener("click", async () => {
+                    item.status = "approved";
+                    renderVendors();
+                    renderAdminManageList();
+                    if (db && !String(item.id).startsWith("demo-")) {
+                        try { await updateDoc(doc(db, "listings", String(item.id)), { status: "approved" }); } catch (e) {}
+                    }
+                });
+                row.querySelector(".del-btn").addEventListener("click", async () => {
+                    allItems = allItems.filter((x) => x.id !== item.id);
+                    renderVendors();
+                    renderAdminManageList();
+                    if (db && !String(item.id).startsWith("demo-")) {
+                        try { await deleteDoc(doc(db, "listings", String(item.id))); } catch (e) {}
+                    }
+                });
+                box.appendChild(row);
+            });
         }
 
-        function closeListingsFormDrawer() {
-            const form = document.getElementById('addFormContainer');
-            if (form) form.style.display = 'none';
+        function openCommunityModal(mode) {
+            communityMode = mode;
+            const titleEl = document.getElementById("communityModalTitle");
+            const txtInput = document.getElementById("commTextInput");
+            const listBox = document.getElementById("communityItemsBox");
+            if (mode === "charity") {
+                titleEl.textContent = "🤝 رفّ الخير والمستعمل";
+                txtInput.placeholder = "اسم الغرض أو التبرع...";
+            } else {
+                titleEl.textContent = "⚡ الطلبات السريعة (24 ساعة)";
+                txtInput.placeholder = "اكتب الغرض أو الخدمة المطلوبة...";
+            }
+            const sourceArr = mode === "charity" ? charityItems : quickRequests;
+            listBox.innerHTML = sourceArr.length
+                ? sourceArr.map((x) => `<div style="padding:7px; border:1px solid #e5e7eb; border-radius:8px; margin-bottom:6px; font-size:11.5px;"><b>${esc(x.text)}</b>${x.phone ? `<div style="color:#4b5563;">📞 ${esc(x.phone)}</div>` : ""}</div>`).join("")
+                : '<p style="font-size:11.5px; color:var(--text-sub); text-align:center;">لا توجد عناصر مضافة بعد.</p>';
+            setModalOpen(communityModal, true);
         }
 
-        function openAfterSubmitCloseModal(titleText, messageText) {
-            const titleEl = document.getElementById('afterSubmitTitle');
-            const msgEl = document.getElementById('afterSubmitMessage');
-            const modalEl = document.getElementById('afterSubmitCloseModal');
-            if (titleEl && titleText) titleEl.textContent = titleText;
-            if (msgEl && messageText) msgEl.textContent = messageText;
-            if (modalEl) {
-                modalEl.style.display = 'flex';
-                syncModalScrollLock();
+        // ربط جميع الأزرار والتبويبات مباشرة
+        document.querySelectorAll(".top-tab-item").forEach((tab) => {
+            tab.addEventListener("click", () => {
+                document.querySelectorAll(".top-tab-item").forEach((t) => t.classList.remove("active"));
+                tab.classList.add("active");
+                const mode = tab.dataset.tab;
+                if (mode === "homejobs") {
+                    setActiveCategoryChip("شغل بيوت");
+                } else if (mode === "requests") {
+                    openCommunityModal("requests");
+                } else if (mode === "charity") {
+                    openCommunityModal("charity");
+                } else {
+                    setActiveCategoryChip("all");
+                }
+            });
+        });
+
+        document.querySelectorAll(".cat-chip").forEach((chip) => {
+            chip.addEventListener("click", () => setActiveCategoryChip(chip.dataset.cat));
+        });
+
+        document.getElementById("searchInput").addEventListener("input", renderVendors);
+        document.getElementById("searchGoBtn").addEventListener("click", renderVendors);
+        document.getElementById("quickReqIcon").addEventListener("click", () => openCommunityModal("requests"));
+        document.getElementById("installGuideIcon").addEventListener("click", () => {
+            showToast("من قائمة المتصفح (⋮) اختر: إضافة إلى الشاشة الرئيسية");
+        });
+
+        document.getElementById("toggleFormBtn").addEventListener("click", () => {
+            addFormContainer.style.display = addFormContainer.style.display === "block" ? "none" : "block";
+        });
+        document.getElementById("closeFormBtn").addEventListener("click", () => {
+            addFormContainer.style.display = "none";
+        });
+
+        document.getElementById("submitListingBtn").addEventListener("click", async () => {
+            const name = document.getElementById("reqName").value.trim();
+            if (!name) {
+                showToast("يرجى إدخال اسم المحل أو صاحب المشروع.");
+                return;
+            }
+            const entry = {
+                name,
+                orderWhatsapp: document.getElementById("reqOrderWhatsapp").value.trim(),
+                category: document.getElementById("reqCat").value,
+                address: document.getElementById("reqAddress").value.trim(),
+                price: document.getElementById("reqPrice").value.trim(),
+                status: isAdmin ? "approved" : "pending",
+                likes: 0,
+                createdAt: Date.now()
+            };
+
+            try {
+                if (db) {
+                    const ref = await addDoc(collection(db, "listings"), entry);
+                    entry.id = ref.id;
+                } else {
+                    entry.id = "local-" + Date.now();
+                }
+                allItems.unshift(entry);
+                renderVendors();
+                if (isAdmin) renderAdminManageList();
+                document.getElementById("reqName").value = "";
+                document.getElementById("reqOrderWhatsapp").value = "";
+                document.getElementById("reqAddress").value = "";
+                document.getElementById("reqPrice").value = "";
+                addFormContainer.style.display = "none";
+                showToast(isAdmin ? "تم نشر الإعلان مباشرة ✅" : "تم إرسال الطلب بنجاح ✅");
+            } catch (err) {
+                showToast("تعذر الحفظ في قاعدة البيانات.");
+            }
+        });
+
+        document.getElementById("closeCommunityModalBtn").addEventListener("click", () => setModalOpen(communityModal, false));
+        document.getElementById("commSaveBtn").addEventListener("click", () => {
+            const text = document.getElementById("commTextInput").value.trim();
+            const phone = document.getElementById("commPhoneInput").value.trim();
+            if (!text) return;
+            if (communityMode === "charity") {
+                charityItems.unshift({ text, phone });
+            } else {
+                quickRequests.unshift({ text, phone });
+            }
+            document.getElementById("commTextInput").value = "";
+            document.getElementById("commPhoneInput").value = "";
+            openCommunityModal(communityMode);
+            showToast("تمت الإضافة بنجاح ✅");
+        });
+
+        document.querySelectorAll(".bottom-nav-btn").forEach((btn) => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".bottom-nav-btn").forEach((b) => b.classList.remove("active"));
+                btn.classList.add("active");
+                const nav = btn.dataset.nav;
+                if (nav === "admin") {
+                    adminLoginError.textContent = "";
+                    setModalOpen(adminModal, true);
+                } else if (nav === "requests") {
+                    openCommunityModal("requests");
+                } else if (nav === "charity") {
+                    openCommunityModal("charity");
+                } else if (nav === "categories") {
+                    document.querySelector(".categories-strip").scrollIntoView({ behavior: "smooth" });
+                } else {
+                    setActiveCategoryChip("all");
+                }
+            });
+        });
+
+        document.getElementById("closeAdminModalBtn").addEventListener("click", () => setModalOpen(adminModal, false));
+
+        document.getElementById("adminLoginBtn").addEventListener("click", async () => {
+            adminLoginError.textContent = "";
+            const email = document.getElementById("adminEmailInput").value.trim();
+            const pass = document.getElementById("adminPasswordInput").value;
+            if (!auth) {
+                adminLoginError.textContent = "تعذر تهيئة المصادقة حالياً.";
+                return;
+            }
+            if (!email || !pass) {
+                adminLoginError.textContent = "يرجى إدخال البريد الإلكتروني وكلمة المرور.";
+                return;
+            }
+            if (email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+                adminLoginError.textContent = "هذا البريد غير مخول للإدارة.";
+                return;
+            }
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                document.getElementById("adminPasswordInput").value = "";
+            } catch (err) {
+                adminLoginError.textContent = "تعذر الدخول: تأكد من البريد وكلمة المرور وتفعيل Email/Password في Firebase.";
+            }
+        });
+
+        document.getElementById("adminLogoutBtn").addEventListener("click", async () => {
+            if (auth) await signOut(auth);
+        });
+
+        async function loadRemoteListings() {
+            if (!db) return;
+            const snap = await getDocs(collection(db, "listings"));
+            const remote = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+            allItems = remote.length ? remote : DEMO_LISTINGS.slice();
+            renderVendors();
+            if (isAdmin) renderAdminManageList();
+        }
+
+        async function startApp() {
+            renderVendors();
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                onAuthStateChanged(auth, async (user) => {
+                    const ok = Boolean(user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+                    if (user && !ok) {
+                        await signOut(auth);
+                        return;
+                    }
+                    isAdmin = ok;
+                    adminLoginView.style.display = isAdmin ? "none" : "block";
+                    adminDashboardView.style.display = isAdmin ? "block" : "none";
+                    renderVendors();
+                    if (isAdmin) renderAdminManageList();
+                });
+
+                await loadRemoteListings();
+                statusStrip.textContent = "تم تحميل المحلات والخدمات بنجاح.";
+            } catch (err) {
+                console.warn("Firebase init note:", err);
+                statusStrip.textContent = "الواجهة جاهزة — تحقق من قواعد Firestore أو الاتصال بالشبكة.";
             }
         }
 
-        function closeAfterSubmitAndListings() {
-            closeModal('afterSubmitCloseModal');
-            closeListingsFormDrawer();
-            goBackToCatalog();
-        }
-
-        function openPlusInfoOffersModal(id) {
-            const store = findPageByAnyId(id);
-            const bodyEl = document.getElementById('plusInfoOffersBody');
-            const modalEl = document.getElementById('plusInfoOffersModal');
-            if (!store || !bodyEl || !modalEl) return;
-
-            const safeName = escapeHtmlText(store.name || 'مشروع محلي');
-            const safeCat = escapeHtmlText(store.category || 'أشياء أخرى');
-            const safeAddress = escapeHtmlText(store.address || 'غير محدد');
-            const clicksCount = Number(store.contactClicks) || 0;
-            const ordersCount = Number(store.ordersCount) || 0;
-            const routing = resolveOrderRoutingTarget(store);
-            const instaUrl = buildInstagramPageUrl(store.insta);
-
-            const posts = Array.isArray(store.posts) && store.posts.length > 0
-                ? store.posts
-                : [{ price: store.price || 'تواصل مع صاحب الصفحة للاطلاع على العروض والأسعار الحالية', images: store.images || [] }];
-
-            const offersListHtml = posts.map((post, idx) => {
-                const label = escapeHtmlText(post.price || `إعلان رقم ${idx + 1}`);
-                const loc = post.address ? ` — ${escapeHtmlText(post.address)}` : '';
-                return `<div style="padding:4px 0; border-bottom:1px dashed #fed7aa;">• <b>إعلان ${idx + 1}:</b> ${label}${loc}</div>`;
-            }).join('');
-
-            const galleryHtml = Array.isArray(store.images) && store.images.length > 0
-                ? `<div style="display:grid; grid-template-columns:repeat(2,1fr); gap:6px; margin-top:8px;">
-                    ${store.images.slice(0, 6).map(img => `<img src="${img}" alt="${safeName}" onclick="openImageModal('${img}')" style="width:100%; height:90px; object-fit:cover; border-radius:8px; border:1px solid #e5e7eb; cursor:pointer;">`).join('')}
-                   </div>`
-                : '';
-
-            const instaBtnHtml = instaUrl
-                ? `<button type="button" class="social-direct-btn" style="flex:1;" onclick="openSocialWithSourceNotice('${escapeJsSingleQuote(store.id)}', 'instagram')">📸 إنستغرام</button>`
-                : '';
-
-            bodyEl.innerHTML = `
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-                    <img src="${store.logo || (store.images && store.images[0]) || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'}" alt="${safeName}" style="width:46px; height:46px; border-radius:50%; object-fit:cover; border:1.5px solid #a855f7;">
-                    <div>
-                        <div style="font-size:15px; font-weight:900; color:#b91c1c;">${safeName} ${store.vip ? '⭐' : ''}</div>
-                        <div style="font-size:11px; color:var(--text-sub);">القسم: <b>${safeCat}</b> • الطلبات: <b>${ordersCount}</b> • التفاعل: <b>${clicksCount}</b></div>
-                    </div>
-                </div>
-                <div style="font-size:11.5px; margin-bottom:6px;">📍 <b>العنوان:</b> ${safeAddress}</div>
-                <div style="font-size:11.5px; margin-bottom:8px;">🛒 <b>الطلب:</b> <b>${escapeHtmlText(routing.channelLabel)}</b></div>
-                <div class="info-offer-box">
-                    <div style="font-weight:800; color:#c2410c; margin-bottom:4px;">🎁 جميع إعلانات وعروض الصفحة:</div>
-                    ${offersListHtml}
-                </div>
-                ${galleryHtml}
-                <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
-                    <button type="button" class="in-app-order-btn" onclick="closeModal('plusInfoOffersModal'); openInAppOrderModal('${escapeJsSingleQuote(store.id)}', '');">🛒 اطلب واتساب</button>
-                    ${instaBtnHtml}
-                    <button type="button" class="mini-like-btn" style="flex:1; padding:8px; font-size:11.5px;" onclick="closeModal('plusInfoOffersModal'); openStoreProfile('${escapeJsSingleQuote(store.id)}');">الصفحة كاملة</button>
-                </div>
-            `;
-
-            modalEl.style.display = 'flex';
-            syncModalScrollLock();
-        }
-
-        function getDemoListings() {
-            return [
-                {
-                    id: 'demo1',
-                    name: 'أم محمد للمعجنات والحلويات البيتية',
-                    category: 'شغل بيوت',
-                    address: 'القيارة - حي المعلمين (توصيل متوفر)',
-                    price: '12,000 د.ع - عرض طلب صينية معجنات مع تحلية مجانية',
-                    fb: '',
-                    insta: '',
-                    phone: '',
-                    orderWhatsapp: '',
-                    logo: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=150',
-                    images: ['https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400'],
-                    status: 'approved',
-                    vip: true,
-                    likes: 5,
-                    contactClicks: 0
+        startApp();
+    </script>
+</body>
+</html>
