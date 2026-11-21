@@ -32,7 +32,7 @@
     <!-- تضمين مكتبات Firebase SDK بأمان -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-      import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+      import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, increment, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
       import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
       import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
 
@@ -59,6 +59,7 @@
         window.deleteDoc = deleteDoc;
         window.doc = doc;
         window.updateDoc = updateDoc;
+        window.setDoc = setDoc;
         window.increment = increment;
 
         try {
@@ -269,6 +270,18 @@
             padding: 9px 11px;
             font-size: 11.5px;
             color: var(--text-main);
+        }
+
+        .db-status-banner {
+            display: none;
+            margin: 6px 12px 6px;
+            background: #fef2f2;
+            border: 1.5px solid #fca5a5;
+            border-radius: 10px;
+            padding: 9px 11px;
+            font-size: 11.5px;
+            color: #991b1b;
+            line-height: 1.5;
         }
 
         .categories-strip {
@@ -961,6 +974,9 @@
                 <button type="button" class="install-highlight-btn" onclick="openCustomInstallGuide()">ثبّت التطبيق</button>
             </div>
 
+            <!-- تنبيه حالة قاعدة البيانات عند وجود مشكلة أو فراغ -->
+            <div id="dbStatusBanner" class="db-status-banner"></div>
+
             <!-- تذكير كل يومين داخل التطبيق -->
             <div id="periodicReminderBanner" class="reminder-banner">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
@@ -1225,6 +1241,16 @@
                     <button type="button" onclick="logoutAdminSession()" style="background:#f3f4f6; color:#111827; border:1px solid #d1d5db; border-radius:6px; padding:3px 8px; font-size:10.5px; font-weight:700; cursor:pointer; font-family:inherit;">خروج</button>
                 </div>
 
+                <!-- أداة النسخ الاحتياطي والاستعادة اليدوية (JSON) -->
+                <div class="info-offer-box" style="margin-top:0; margin-bottom:10px; font-size:11px; background:#f0fdf4; border-color:#bbf7d0;">
+                    <div style="font-weight:800; color:#15803d; margin-bottom:4px;">🛡️ حماية النسخ الاحتياطي والاستعادة</div>
+                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                        <button type="button" class="mini-call-link" style="flex:1; cursor:pointer; font-family:inherit; font-weight:800; padding:6px;" onclick="exportListingsBackupJson()">⬇️ تصدير نسخة (JSON)</button>
+                        <label for="importBackupFileInput" class="mini-like-btn" style="flex:1; text-align:center; cursor:pointer; font-weight:800; padding:6px;">⬆️ استيراد نسخة</label>
+                        <input type="file" id="importBackupFileInput" accept="application/json,.json" style="display:none;" onchange="importListingsBackupJson(event)">
+                    </div>
+                </div>
+
                 <!-- أداة رسالة التذكير الدورية للتطبيق -->
                 <div class="info-offer-box" style="margin-top:0; margin-bottom:10px; font-size:11px;">
                     <div style="font-weight:800; color:#c2410c; margin-bottom:4px;">🔔 رسالة تذكير التطبيق (كل يومين)</div>
@@ -1236,10 +1262,12 @@
                 </div>
 
                 <div style="display:flex; gap:6px; margin-bottom:8px;">
-                    <button type="button" id="adminTabListingsBtn" onclick="switchAdminSection('listings')" style="flex:1; background:var(--brand-orange); color:#fff; border:none; border-radius:7px; padding:6px; font-size:11px; font-weight:800; cursor:pointer; font-family:inherit;">الإعلانات</button>
-                    <button type="button" id="adminTabOrdersBtn" onclick="switchAdminSection('orders')" style="flex:1; background:#f3f4f6; color:var(--text-main); border:none; border-radius:7px; padding:6px; font-size:11px; font-weight:800; cursor:pointer; font-family:inherit;">سجل الطلبات والزيارات</button>
+                    <button type="button" id="adminTabListingsBtn" onclick="switchAdminSection('listings')" style="flex:1; background:var(--brand-orange); color:#fff; border:none; border-radius:7px; padding:6px; font-size:10.5px; font-weight:800; cursor:pointer; font-family:inherit;">الإعلانات</button>
+                    <button type="button" id="adminTabTrashBtn" onclick="switchAdminSection('trash')" style="flex:1; background:#f3f4f6; color:var(--text-main); border:none; border-radius:7px; padding:6px; font-size:10.5px; font-weight:800; cursor:pointer; font-family:inherit;">المحذوفات</button>
+                    <button type="button" id="adminTabOrdersBtn" onclick="switchAdminSection('orders')" style="flex:1; background:#f3f4f6; color:var(--text-main); border:none; border-radius:7px; padding:6px; font-size:10.5px; font-weight:800; cursor:pointer; font-family:inherit;">السجل</button>
                 </div>
                 <div id="adminPendingList" style="max-height:240px; overflow-y:auto;"></div>
+                <div id="adminTrashList" style="display:none; max-height:240px; overflow-y:auto;"></div>
                 <div id="adminOrdersList" style="display:none; max-height:240px; overflow-y:auto;"></div>
             </div>
         </div>
@@ -1263,8 +1291,130 @@
         const SAVED_OWNER_KEY = "sahl_alwusool_saved_owner_v1";
         const SAVED_CUSTOMER_KEY = "sahl_alwusool_saved_customer_v1";
         const LOCAL_ORDERS_KEY = "sahl_alwusool_local_orders_v1";
+        const LISTINGS_BACKUP_KEY = "sahl_alwusool_listings_backup_v1";
         const TWO_DAY_REMINDER_KEY = "sahl_alwusool_two_day_reminder_ts_v1";
         const TWO_DAY_MS = 48 * 60 * 60 * 1000;
+
+        function setDbStatusBanner(msg, isError) {
+            const el = document.getElementById('dbStatusBanner');
+            if (!el) return;
+            if (!msg) {
+                el.style.display = 'none';
+                el.innerHTML = '';
+                return;
+            }
+            el.style.display = 'block';
+            el.style.background = isError ? '#fef2f2' : '#fffbeb';
+            el.style.borderColor = isError ? '#fca5a5' : '#fde68a';
+            el.style.color = isError ? '#991b1b' : '#92400e';
+            el.innerHTML = msg;
+        }
+
+        function saveListingsLocalBackup(items) {
+            try {
+                const cleanItems = (items || []).filter(i => i && i.id && !String(i.id).startsWith('demo'));
+                if (cleanItems.length > 0) {
+                    localStorage.setItem(LISTINGS_BACKUP_KEY, JSON.stringify({
+                        savedAt: new Date().toISOString(),
+                        items: cleanItems.slice(0, 100)
+                    }));
+                }
+            } catch (e) {
+                console.warn("Listings local backup warning:", e);
+            }
+        }
+
+        function getListingsLocalBackup() {
+            try {
+                const raw = localStorage.getItem(LISTINGS_BACKUP_KEY);
+                if (!raw) return [];
+                const parsed = JSON.parse(raw);
+                return parsed && Array.isArray(parsed.items) ? parsed.items : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function exportListingsBackupJson() {
+            const items = (window.allListings || []).filter(i => i && !String(i.id).startsWith('demo'));
+            if (items.length === 0) {
+                alert('لا توجد إعلانات مسجلة حالياً لتصدير نسخة احتياطية منها.');
+                return;
+            }
+            const payload = {
+                app: 'sahl-alwusool',
+                exportedAt: new Date().toISOString(),
+                count: items.length,
+                items
+            };
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sahl-alwusool-backup-${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToastNotice(`تم تصدير نسخة احتياطية (${items.length} إعلان) ✅`);
+        }
+
+        async function importListingsBackupJson(event) {
+            const file = event && event.target && event.target.files && event.target.files[0];
+            if (!file) return;
+
+            try {
+                const text = await file.text();
+                const parsed = JSON.parse(text);
+                const items = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.items) ? parsed.items : []);
+                if (items.length === 0) {
+                    alert('الملف لا يحتوي على إعلانات صالحة للاستيراد.');
+                    return;
+                }
+
+                await waitForFirebase();
+                let restoredCount = 0;
+
+                for (const item of items) {
+                    if (!item || !item.name) continue;
+                    const docId = String(item.id || ('restored_' + Date.now() + '_' + restoredCount));
+                    const cleanDoc = {
+                        name: item.name,
+                        category: item.category || 'أشياء أخرى',
+                        address: item.address || 'غير محدد',
+                        price: item.price || '',
+                        fb: item.fb || '',
+                        insta: item.insta || '',
+                        phone: item.phone || 'لا يوجد',
+                        orderWhatsapp: item.orderWhatsapp || '',
+                        logo: item.logo || '',
+                        images: Array.isArray(item.images) ? item.images : [],
+                        posts: Array.isArray(item.posts) ? item.posts : [],
+                        status: item.status === 'deleted' ? 'approved' : (item.status || 'approved'),
+                        vip: Boolean(item.vip),
+                        likes: Number(item.likes) || 0,
+                        contactClicks: Number(item.contactClicks) || 0,
+                        ordersCount: Number(item.ordersCount) || 0,
+                        createdAt: item.createdAt || new Date().toISOString(),
+                        restoredAt: new Date().toISOString()
+                    };
+
+                    if (window.setDoc) {
+                        await window.setDoc(window.doc(window.db, "listings", docId), cleanDoc, { merge: true });
+                    } else {
+                        await window.addDoc(window.collection(window.db, "listings"), cleanDoc);
+                    }
+                    restoredCount++;
+                }
+
+                event.target.value = '';
+                alert(`تم استيراد واستعادة ${restoredCount} إعلان بنجاح ✅`);
+                await loadApprovedListings();
+            } catch (e) {
+                console.error("Import backup error:", e);
+                alert('تعذر استيراد الملف: ' + (e.message || 'تأكد من صحة ملف JSON وصلاحيات قاعدة البيانات.'));
+            }
+        }
 
         function syncBakeryCategoryTip() {
             const catEl = document.getElementById('reqCat');
@@ -1706,6 +1856,7 @@
             const candName = normalizeArabicText(candidate.name || '');
 
             return (items || []).find(item => {
+                if (item.status === 'deleted') return false;
                 const itemPhone = normalizePhoneKey(item.phone || '');
                 const itemOrderWa = normalizePhoneKey(item.orderWhatsapp || '');
                 const itemName = normalizeArabicText(item.name || '');
@@ -1965,21 +2116,37 @@
 
         function switchAdminSection(section) {
             const listingsDiv = document.getElementById('adminPendingList');
+            const trashDiv = document.getElementById('adminTrashList');
             const ordersDiv = document.getElementById('adminOrdersList');
             const tabListings = document.getElementById('adminTabListingsBtn');
+            const tabTrash = document.getElementById('adminTabTrashBtn');
             const tabOrders = document.getElementById('adminTabOrdersBtn');
 
-            if (section === 'orders') {
+            const resetTabs = () => {
+                [tabListings, tabTrash, tabOrders].forEach(t => {
+                    if (t) {
+                        t.style.background = '#f3f4f6';
+                        t.style.color = 'var(--text-main)';
+                    }
+                });
                 if (listingsDiv) listingsDiv.style.display = 'none';
+                if (trashDiv) trashDiv.style.display = 'none';
+                if (ordersDiv) ordersDiv.style.display = 'none';
+            };
+
+            resetTabs();
+
+            if (section === 'orders') {
                 if (ordersDiv) ordersDiv.style.display = 'block';
-                if (tabListings) { tabListings.style.background = '#f3f4f6'; tabListings.style.color = 'var(--text-main)'; }
                 if (tabOrders) { tabOrders.style.background = 'var(--brand-orange)'; tabOrders.style.color = '#fff'; }
                 loadAdminOrders();
+            } else if (section === 'trash') {
+                if (trashDiv) trashDiv.style.display = 'block';
+                if (tabTrash) { tabTrash.style.background = 'var(--brand-orange)'; tabTrash.style.color = '#fff'; }
+                loadAdminTrash();
             } else {
                 if (listingsDiv) listingsDiv.style.display = 'block';
-                if (ordersDiv) ordersDiv.style.display = 'none';
                 if (tabListings) { tabListings.style.background = 'var(--brand-orange)'; tabListings.style.color = '#fff'; }
-                if (tabOrders) { tabOrders.style.background = '#f3f4f6'; tabOrders.style.color = 'var(--text-main)'; }
                 loadAdminListings();
             }
         }
@@ -2731,20 +2898,37 @@
                 querySnapshot.forEach((docSnap) => {
                     loaded.push({ id: docSnap.id, ...docSnap.data() });
                 });
+
+                setDbStatusBanner('');
+
                 if (loaded.length > 0) {
                     window.allListings = loaded;
-                } else if (!window.allListings || window.allListings.length === 0) {
-                    window.allListings = getDemoListings();
+                    saveListingsLocalBackup(loaded);
+                } else {
+                    const localBackup = getListingsLocalBackup();
+                    if (localBackup.length > 0) {
+                        window.allListings = localBackup;
+                        setDbStatusBanner('⚠️ قاعدة البيانات السحابية فارغة حالياً؛ يتم عرض النسخة الاحتياطية المحفوظة على جهازك. يمكنك تصديرها أو إعادة مزامنتها.', false);
+                    } else {
+                        window.allListings = getDemoListings();
+                        setDbStatusBanner('ℹ️ لا توجد إعلانات مسجلة في قاعدة البيانات حالياً؛ يُعرض إعلان تجريبي لحين إضافة إعلاناتك أو استيراد نسخة احتياطية.', false);
+                    }
                 }
+
                 sortAndRenderListings();
                 if (isAdminLoggedIn) {
                     loadAdminListings();
+                    loadAdminTrash();
                 }
             } catch (err) {
                 console.error("Load listings error:", err);
-                if (!window.allListings || window.allListings.length === 0) {
+                const localBackup = getListingsLocalBackup();
+                if (localBackup.length > 0) {
+                    window.allListings = localBackup;
+                } else if (!window.allListings || window.allListings.length === 0) {
                     window.allListings = getDemoListings();
                 }
+                setDbStatusBanner(`⚠️ تعذر الاتصال بقاعدة البيانات (${escapeHtmlText(err.code || err.message || 'خطأ شبكة')}). تم الاعتماد على النسخة المتوفرة محلياً.`, true);
                 sortAndRenderListings();
             }
         }
@@ -2794,7 +2978,7 @@
                             ${isAdminLoggedIn ? `
                                 <div style="display:flex; gap:4px; margin-top:6px;" onclick="event.stopPropagation()">
                                     <button type="button" onclick="editListingData('${safeId}', '${safeName}', '${safeAddress}', '${safeCat}', '${safePrice}')" style="flex:1; background:var(--brand-orange); color:#fff; border:none; border-radius:6px; padding:3px; font-size:10px; cursor:pointer;">تعديل</button>
-                                    <button type="button" onclick="deleteListingFromMain('${safeId}')" style="flex:1; background:#dc2626; color:#fff; border:none; border-radius:6px; padding:3px; font-size:10px; cursor:pointer;">حذف</button>
+                                    <button type="button" onclick="deleteListingFromMain('${safeId}')" style="flex:1; background:#dc2626; color:#fff; border:none; border-radius:6px; padding:3px; font-size:10px; cursor:pointer;">أرشفة</button>
                                 </div>
                             ` : ''}
                         </div>
@@ -2930,7 +3114,7 @@
                 adminActionsDiv.style.display = 'flex';
                 adminActionsDiv.innerHTML = `
                     <button type="button" onclick="editListingData('${safeId}', '${safeName}', '${safeAddress}', '${safeCat}', '${safePrice}')" style="background:var(--brand-orange); color:#fff; border:none; padding:6px 10px; border-radius:7px; cursor:pointer; font-size:11px; font-weight:700;">تعديل</button>
-                    <button type="button" onclick="deleteListing('${safeId}')" style="background:#dc2626; color:#fff; border:none; padding:6px 10px; border-radius:7px; cursor:pointer; font-size:11px; font-weight:700;">حذف</button>
+                    <button type="button" onclick="deleteListing('${safeId}')" style="background:#dc2626; color:#fff; border:none; padding:6px 10px; border-radius:7px; cursor:pointer; font-size:11px; font-weight:700;">أرشفة</button>
                 `;
             } else {
                 adminActionsDiv.style.display = 'none';
@@ -3017,8 +3201,8 @@
             const adminContainer = document.getElementById('adminPendingList');
             adminContainer.innerHTML = '<p style="font-size:11px; color:var(--text-sub);">جاري التحميل...</p>';
             try {
-                let items = window.allListings || [];
-                if (items.length === 0) { adminContainer.innerHTML = '<p style="font-size:11px; color:var(--text-sub);">لا توجد إعلانات حالياً.</p>'; return; }
+                let items = (window.allListings || []).filter(i => i.status !== 'deleted');
+                if (items.length === 0) { adminContainer.innerHTML = '<p style="font-size:11px; color:var(--text-sub);">لا توجد إعلانات نشطة حالياً.</p>'; return; }
 
                 adminContainer.innerHTML = items.map(item => {
                     const safeId = escapeJsSingleQuote(item.id);
@@ -3037,12 +3221,62 @@
                                 <button type="button" onclick="toggleVip('${safeId}', ${!item.vip})" style="background:#2563eb; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">${item.vip ? 'إلغاء VIP' : 'VIP'}</button>
                                 <button type="button" onclick="editListingData('${safeId}', '${safeName}', '${safeAddress}', '${safeCat}', '${safePrice}')" style="background:#4b5563; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">تعديل</button>
                                 <button type="button" onclick="notifyOwner('${escapeJsSingleQuote(waContact)}', '${safeName}')" style="background:#16a34a; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">إشعار</button>
-                                <button type="button" onclick="deleteListing('${safeId}')" style="background:#dc2626; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">حذف</button>
+                                <button type="button" onclick="deleteListing('${safeId}')" style="background:#dc2626; color:#fff; border:none; padding:3px 7px; border-radius:5px; cursor:pointer; font-size:10px;">أرشفة</button>
                             </div>
                         </div>
                     `;
                 }).join('');
             } catch (e) { adminContainer.innerHTML = '<p style="font-size:11px; color:var(--danger-red);">خطأ في جلب البيانات.</p>'; }
+        }
+
+        function loadAdminTrash() {
+            const trashContainer = document.getElementById('adminTrashList');
+            if (!trashContainer) return;
+            const deletedItems = (window.allListings || []).filter(i => i.status === 'deleted');
+            if (deletedItems.length === 0) {
+                trashContainer.innerHTML = '<p style="font-size:11px; color:var(--text-sub); text-align:center;">سلة المحذوفات فارغة حالياً.</p>';
+                return;
+            }
+            trashContainer.innerHTML = deletedItems.map(item => {
+                const safeId = escapeJsSingleQuote(item.id);
+                return `
+                    <div style="background:#fef2f2; padding:8px; border-radius:8px; margin-bottom:7px; border:1px solid #fecaca; font-size:11px;">
+                        <b>${escapeHtmlText(item.name)}</b> (${escapeHtmlText(item.category || 'أشياء أخرى')})<br>
+                        <div style="margin-top:6px; display:flex; gap:6px;">
+                            <button type="button" onclick="restoreListing('${safeId}')" style="background:#16a34a; color:#fff; border:none; padding:4px 9px; border-radius:5px; cursor:pointer; font-size:10px; font-weight:800;">♻️ استرجاع</button>
+                            <button type="button" onclick="permanentDeleteListing('${safeId}')" style="background:#dc2626; color:#fff; border:none; padding:4px 9px; border-radius:5px; cursor:pointer; font-size:10px; font-weight:800;">حذف نهائي</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function restoreListing(id) {
+            const store = (window.allListings || []).find(s => String(s.id) === String(id));
+            if (!store) return;
+            if (!String(store.id).startsWith('demo') && window.db && window.updateDoc) {
+                await window.updateDoc(window.doc(window.db, "listings", store.id), { status: 'approved' });
+            }
+            store.status = 'approved';
+            saveListingsLocalBackup(window.allListings);
+            alert('تم استرجاع الإعلان ونشره بنجاح!');
+            loadAdminTrash();
+            loadAdminListings();
+            sortAndRenderListings();
+        }
+
+        async function permanentDeleteListing(id) {
+            if (!confirm("هل أنت متأكد من الحذف النهائي؟ لن يمكن استرجاع هذا العنصر بعد الحذف النهائي.")) return;
+            const store = (window.allListings || []).find(s => String(s.id) === String(id));
+            if (!store) return;
+            if (!String(store.id).startsWith('demo') && window.db && window.deleteDoc) {
+                await window.deleteDoc(window.doc(window.db, "listings", store.id));
+            }
+            window.allListings = (window.allListings || []).filter(s => String(s.id) !== String(id));
+            saveListingsLocalBackup(window.allListings);
+            alert('تم الحذف النهائي.');
+            loadAdminTrash();
+            sortAndRenderListings();
         }
 
         async function approveListing(id) {
@@ -3052,6 +3286,7 @@
                 await window.updateDoc(window.doc(window.db, "listings", id), { status: 'approved' });
             }
             store.status = 'approved';
+            saveListingsLocalBackup(window.allListings);
             alert('تم اعتماد ونشر الإعلان بنجاح!');
             loadAdminListings();
             loadApprovedListings();
@@ -3064,6 +3299,7 @@
                 await window.updateDoc(window.doc(window.db, "listings", id), { status: 'pending' });
             }
             store.status = 'pending';
+            saveListingsLocalBackup(window.allListings);
             alert('تم إخفاء الإعلان.');
             loadAdminListings();
             loadApprovedListings();
@@ -3086,6 +3322,7 @@
                 await window.updateDoc(window.doc(window.db, "listings", id), { vip: makeVip });
             }
             store.vip = makeVip;
+            saveListingsLocalBackup(window.allListings);
             alert(makeVip ? 'تم تعيين المحل كمتجر VIP!' : 'تم إزالة VIP.');
             loadAdminListings();
             loadApprovedListings();
@@ -3162,6 +3399,7 @@
                     store.category = cleanCategory;
                     store.price = cleanPrice;
                 }
+                saveListingsLocalBackup(window.allListings);
                 alert('تم تحديث بيانات الإعلان بنجاح!');
                 if (document.getElementById('storeProfileView').style.display === 'block') {
                     openStoreProfile(id);
@@ -3175,23 +3413,27 @@
         }
 
         async function deleteListing(id) {
-            if (confirm("هل أنت متأكد من الحذف نهائياً؟")) {
-                const page = findPageByAnyId(id);
-                const idsToDelete = page && Array.isArray(page.memberIds) && page.memberIds.length > 0
-                    ? page.memberIds
-                    : [id];
+            if (confirm("هل تريد نقل هذا العنصر إلى سلة المحذوفات؟ يمكنك استرجاعه لاحقاً من تبويب المحذوفات.")) {
+                const targetStore = (window.allListings || []).find(s => String(s.id) === String(id));
+                const idsToArchive = targetStore ? [targetStore.id] : [id];
 
-                for (const docId of idsToDelete) {
-                    if (!String(docId).startsWith('demo') && window.db && window.deleteDoc) {
-                        await window.deleteDoc(window.doc(window.db, "listings", docId));
+                for (const docId of idsToArchive) {
+                    if (!String(docId).startsWith('demo') && window.db && window.updateDoc) {
+                        await window.updateDoc(window.doc(window.db, "listings", docId), { status: 'deleted' });
                     }
                 }
-                const idSet = new Set(idsToDelete.map(String));
-                window.allListings = (window.allListings || []).filter(s => !idSet.has(String(s.id)));
-                alert('تم الحذف بنجاح.');
+                const idSet = new Set(idsToArchive.map(String));
+                (window.allListings || []).forEach(s => {
+                    if (idSet.has(String(s.id))) {
+                        s.status = 'deleted';
+                    }
+                });
+                saveListingsLocalBackup(window.allListings);
+                alert('تم نقل العنصر إلى سلة المحذوفات ويمكن استرجاعه في أي وقت.');
                 goBackToCatalog();
                 loadAdminListings();
-                loadApprovedListings();
+                loadAdminTrash();
+                sortAndRenderListings();
             }
         }
 
@@ -3236,7 +3478,8 @@
             evaluateInAppBrowserGuide();
             evaluateTwoDayReminder();
             applySavedOwnerProfileToForm();
-            window.allListings = getDemoListings();
+            const localBackup = getListingsLocalBackup();
+            window.allListings = localBackup.length > 0 ? localBackup : getDemoListings();
             sortAndRenderListings();
             loadApprovedListings();
 
