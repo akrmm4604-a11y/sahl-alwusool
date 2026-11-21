@@ -1068,7 +1068,7 @@
             <span class="bottom-nav-icon">🤝</span>
             <span>رفّ الخير</span>
         </button>
-        <button class="bottom-nav-btn" type="button" onclick="setBottomNav(this, 'admin')">
+        <button id="adminNavBtn" class="bottom-nav-btn" type="button" style="display:none;" onclick="setBottomNav(this, 'admin')">
             <span class="bottom-nav-icon">⚙️</span>
             <span>الإدارة</span>
         </button>
@@ -1236,6 +1236,13 @@
         const LOCAL_ORDERS_KEY = "sahl_alwusool_local_orders_v1";
         const TWO_DAY_REMINDER_KEY = "sahl_alwusool_two_day_reminder_ts_v1";
         const TWO_DAY_MS = 48 * 60 * 60 * 1000;
+
+        function updateAdminButtonVisibility() {
+            const adminBtn = document.getElementById('adminNavBtn');
+            if (!adminBtn) return;
+            const isAdminUrl = new URLSearchParams(window.location.search).get('admin') === '1';
+            adminBtn.style.display = (isAdminLoggedIn || isAdminUrl) ? 'flex' : 'none';
+        }
 
         function isInsideInAppBrowser() {
             const ua = navigator.userAgent || navigator.vendor || window.opera || '';
@@ -2172,6 +2179,7 @@
 
         function applyAdminLoggedInUi(active) {
             isAdminLoggedIn = Boolean(active);
+            updateAdminButtonVisibility();
             document.getElementById('adminLoginView').style.display = isAdminLoggedIn ? 'none' : 'block';
             document.getElementById('adminDashboardView').style.display = isAdminLoggedIn ? 'block' : 'none';
             if (isAdminLoggedIn) {
@@ -3163,6 +3171,7 @@
 
         document.addEventListener('visibilitychange', function() {
             if (document.visibilityState === 'visible') {
+                updateAdminButtonVisibility();
                 evaluateInAppBrowserGuide();
                 evaluateTwoDayReminder();
                 loadApprovedListings();
@@ -3170,6 +3179,7 @@
         });
 
         window.onload = function() {
+            updateAdminButtonVisibility();
             evaluateInAppBrowserGuide();
             evaluateTwoDayReminder();
             applySavedOwnerProfileToForm();
@@ -3193,6 +3203,7 @@
             if (!autoSyncInterval) {
                 autoSyncInterval = setInterval(() => {
                     if (document.visibilityState === 'visible') {
+                        updateAdminButtonVisibility();
                         evaluateInAppBrowserGuide();
                         evaluateTwoDayReminder();
                         loadApprovedListings();
