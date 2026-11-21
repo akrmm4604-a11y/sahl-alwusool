@@ -588,6 +588,18 @@
             line-height: 1.6;
         }
 
+        .bakery-category-tip {
+            display: none;
+            background: #fefce8;
+            border: 1px solid #fde047;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin: -4px 0 12px 0;
+            font-size: 12px;
+            color: #854d0e;
+            line-height: 1.6;
+        }
+
         .saved-profile-bar {
             display: none;
             background: #fff7ed;
@@ -972,6 +984,7 @@
                 <button class="cat-chip" onclick="filterCat('غذائية وحلويات', this)">🛒 غذائية وحلويات</button>
                 <button class="cat-chip" onclick="filterCat('ملابس وكوزمتك', this)">👗 ملابس وكوزمتك</button>
                 <button class="cat-chip" onclick="filterCat('مطاعم', this)">🍽️ مطاعم</button>
+                <button class="cat-chip" onclick="filterCat('أفران وصمون', this)">🥖 أفران وصمون</button>
                 <button class="cat-chip" onclick="filterCat('خضار وفواكه', this)">🍎 خضار وفواكه</button>
                 <button class="cat-chip" onclick="filterCat('أشياء أخرى', this)">📦 أشياء أخرى</button>
             </div>
@@ -1008,15 +1021,20 @@
                 <input type="text" id="reqFb" placeholder="https://facebook.com/...">
 
                 <label class="listing-field-label">📂 القسم:</label>
-                <select id="reqCat">
+                <select id="reqCat" onchange="syncBakeryCategoryTip()">
                     <option value="أشياء أخرى">-- اختر القسم المناسب --</option>
                     <option value="شغل بيوت">🏠 شغل بيوت (أسر منتجة ومعجنات)</option>
                     <option value="غذائية وحلويات">غذائية وحلويات</option>
                     <option value="ملابس وكوزمتك">ملابس وكوزمتك</option>
                     <option value="مطاعم">مطاعم</option>
+                    <option value="أفران وصمون">🥖 أفران وصمون</option>
                     <option value="خضار وفواكه">خضار وفواكه</option>
                     <option value="أشياء أخرى">أشياء أخرى</option>
                 </select>
+
+                <div id="bakeryCategoryTip" class="bakery-category-tip">
+                    🥖 <b>نصيحة لقسم أفران وصمون:</b> اكتب في حقل «السعر والملاحظات» سعر الصمونة أو الشدّة، <b>أوقات العمل والخبز</b>، وإمكانية الطلب والتوصيل لتسهيل طلبات الزبائن اليومية.
+                </div>
 
                 <label class="listing-field-label">👤 صورة الشعار (اختياري):</label>
                 <label for="reqLogoFile" class="custom-file-upload">📷 اختر صورة الشعار</label>
@@ -1091,7 +1109,7 @@
             <input type="text" id="orderCustomerPhone" placeholder="0770..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:6px; font-family:inherit;">
 
             <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">📝 تفاصيل الطلب / الكمية / العنوان:</label>
-            <textarea id="orderDetailsInput" rows="3" placeholder="مثال: قالب كيك أو صينية معجنات..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:8px; font-family:inherit;"></textarea>
+            <textarea id="orderDetailsInput" rows="3" placeholder="مثال: قالب كيك أو صينية معجنات أو 20 صمونة..." style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:8px; font-family:inherit;"></textarea>
 
             <button class="submit-btn" id="confirmInAppOrderBtn" type="button" onclick="submitInAppOrder()">تأكيد وإرسال الطلب عبر واتساب ✅</button>
             <div id="orderModalInstaArea" style="margin-top:8px;"></div>
@@ -1247,6 +1265,13 @@
         const LOCAL_ORDERS_KEY = "sahl_alwusool_local_orders_v1";
         const TWO_DAY_REMINDER_KEY = "sahl_alwusool_two_day_reminder_ts_v1";
         const TWO_DAY_MS = 48 * 60 * 60 * 1000;
+
+        function syncBakeryCategoryTip() {
+            const catEl = document.getElementById('reqCat');
+            const tipEl = document.getElementById('bakeryCategoryTip');
+            if (!catEl || !tipEl) return;
+            tipEl.style.display = catEl.value === 'أفران وصمون' ? 'block' : 'none';
+        }
 
         function updateAdminButtonVisibility() {
             const adminBtn = document.getElementById('adminNavBtn');
@@ -1558,6 +1583,7 @@
             const noticeEl = document.getElementById('savedOwnerNotice');
             if (!saved) {
                 if (noticeEl) noticeEl.style.display = 'none';
+                syncBakeryCategoryTip();
                 return;
             }
 
@@ -1580,6 +1606,7 @@
             if (noticeEl) {
                 noticeEl.style.display = 'flex';
             }
+            syncBakeryCategoryTip();
         }
 
         function clearSavedOwnerProfile() {
@@ -1597,6 +1624,7 @@
             document.getElementById('reqPrice').value = '';
             const noticeEl = document.getElementById('savedOwnerNotice');
             if (noticeEl) noticeEl.style.display = 'none';
+            syncBakeryCategoryTip();
         }
 
         function getLikedStoreIds() {
@@ -2953,7 +2981,7 @@
             suggestionsBox.innerHTML = matches.slice(0, 8).map(item => {
                 const isAddressMatch = normalizeArabicText(item.address).includes(query);
                 const isProductMatch = normalizeArabicText(item.allOffersText || item.price).includes(query);
-                let badge = item.category === 'شغل بيوت' ? '🏠 شغل بيوت' : '🏪 متجر';
+                let badge = item.category === 'شغل بيوت' ? '🏠 شغل بيوت' : (item.category === 'أفران وصمون' ? '🥖 أفران وصمون' : '🏪 متجر');
                 if (isAddressMatch) badge = '📍 منطقة';
                 else if (isProductMatch) badge = '💰 منتج';
 
@@ -3089,7 +3117,7 @@
             if (newAddress === null) return;
 
             const newCategory = prompt(
-                "تعديل القسم (اكتب أحد الأقسام: شغل بيوت، غذائية وحلويات، ملابس وكوزمتك، مطاعم، خضار وفواكه، أشياء أخرى):",
+                "تعديل القسم (اكتب أحد الأقسام: شغل بيوت، غذائية وحلويات، ملابس وكوزمتك، مطاعم، أفران وصمون، خضار وفواكه، أشياء أخرى):",
                 currentCategory
             );
             if (newCategory === null) return;
