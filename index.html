@@ -12,7 +12,7 @@
     <title>ثبّت تطبيق سهل الوصول - الدليل المحلي الشامل في القيارة والموصل</title>
     
     <meta property="og:title" content="ثبّت تطبيق سهل الوصول - دليل التسوق في العراق">
-    <meta property="og:description" content="ثبّت تطبيق سهل الوصول الآن على هاتفك: دليلك المحلي الأول للمحلات، الأسواق، وخدمات التوصيل، وقسم شغل بيوت للأسر المنتجة.">
+    <meta property="og:description" content="ثبّت تطبيق سهل الوصول الآن على هاتفك (عبر Safari للآيفون أو Chrome للأندرويد): دليلك المحلي الأول للمحلات، الأسواق، وخدمات التوصيل، وقسم شغل بيوت للأسر المنتجة.">
     <meta property="og:image" content="https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg">
     <meta property="og:image:secure_url" content="https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg">
     <meta property="og:image:type" content="image/jpeg">
@@ -929,11 +929,11 @@
                 <div id="searchSuggestions" class="search-suggestions"></div>
             </div>
 
-            <!-- شريط توجيه لفتح الصفحة في المتصفح الخارجي عند الفتح من داخل تطبيق آخر -->
+            <!-- شريط توجيه لفتح الصفحة في المتصفح الخارجي / Safari عند الفتح من داخل تطبيق آخر -->
             <div id="externalBrowserGuideBar" style="display:none; margin:8px 12px 4px; background:#fff7ed; border:1.5px solid #fdba74; border-radius:10px; padding:10px 11px; font-size:11.5px; color:#111827;">
                 <div style="font-weight:900; color:#c2410c; margin-bottom:4px;">🌐 لسهولة تثبيت التطبيق: افتحه من متصفح الهاتف</div>
                 <div style="font-size:11px; color:#4b5563; line-height:1.5; margin-bottom:8px;">
-                    يبدو أنك فتحت الرابط من داخل تطبيق آخر. اضغط على <b>النقاط الثلاث (⋮)</b> في أعلى الشاشة واختر <b>"فتح في المتصفح" (Open in browser)</b> ثم ثبّت التطبيق.
+                    إذا كنت على <b>الآيفون</b> افتح الرابط في <b>Safari</b> واضغط زر المشاركة في الشريط السفلي ثم <b>"إضافة إلى الشاشة الرئيسية"</b>. وإذا كنت داخل تطبيق آخر على الأندرويد اضغط <b>النقاط الثلاث (⋮)</b> واختر <b>"فتح في المتصفح"</b>.
                 </div>
                 <div style="display:flex; gap:6px;">
                     <button type="button" class="install-highlight-btn" style="flex:1;" onclick="copyAppDirectLink()">📋 نسخ رابط المتصفح</button>
@@ -1131,11 +1131,22 @@
                 <h3 style="margin:0; color:#e64a00; font-size:14px; font-weight:800;">📱 تثبيت تطبيق "سهل الوصول"</h3>
                 <button type="button" onclick="closeModal('installGuideModal')" style="background:none; color:#111827; border:none; font-size:15px; cursor:pointer;">✕</button>
             </div>
-            <p style="font-size:11px; line-height:1.6; color:var(--text-main); margin-bottom:10px;">
+            <p style="font-size:11px; line-height:1.65; color:var(--text-main); margin-bottom:10px;">
+                <b>🍎 لمستخدمي الآيفون (عبر متصفح Safari):</b><br>
+                1️⃣ افتح الرابط في متصفح <b>Safari</b> (وإذا فتحته من تطبيق آخر يمكنك نسخ الرابط أدناه ولصقه في Safari).<br>
+                2️⃣ اضغط على أيقونة <b>المشاركة</b> (مربع بداخله سهم للأعلى) الموجودة في شريط <b>Safari</b> السفلي.<br>
+                3️⃣ اختر <b>"إضافة إلى الشاشة الرئيسية"</b> ثم اضغط <b>"إضافة"</b> في الأعلى.<br><br>
+                <b>🤖 لمستخدمي الأندرويد (عبر متصفح Chrome):</b><br>
                 1️⃣ إذا كنت داخل Messenger أو تطبيق آخر: اضغط <b>النقاط الثلاث (⋮)</b> واختر <b>"فتح في المتصفح"</b> أولاً.<br>
                 2️⃣ في المتصفح: اضغط على <b>النقاط الثلاث (⋮)</b> في أعلى المتصفح.<br>
-                3️⃣ اختر <b>"إضافة إلى الشاشة الرئيسية"</b> أو <b>"إنشاء اختصار"</b> ثم اضغط <b>"إضافة"</b>.
+                3️⃣ اختر <b>"إضافة إلى الشاشة الرئيسية"</b> أو <b>"تثبيت التطبيق"</b> ثم اضغط <b>"إضافة"</b>.
             </p>
+            <div style="margin-top:6px; margin-bottom:10px;">
+                <button type="button" id="copyAppLinkBtn" onclick="copySahlAppLink()" style="padding:7px 12px; border-radius:8px; border:none; background:#ea580c; color:#fff; font-weight:800; font-size:11px; cursor:pointer; font-family:inherit;">
+                    📋 نسخ الرابط
+                </button>
+                <span id="copyLinkStatus" style="font-size:11px; margin-right:8px; font-weight:700;"></span>
+            </div>
             <button class="submit-btn" type="button" onclick="closeModal('installGuideModal')">حسناً</button>
         </div>
     </div>
@@ -1255,9 +1266,21 @@
             bar.style.display = isInsideInAppBrowser() ? 'block' : 'none';
         }
 
+        async function copySahlAppLink() {
+            const statusEl = document.getElementById('copyLinkStatus');
+            const ok = await copyTextSafe(APP_DIRECT_URL);
+            if (statusEl) {
+                statusEl.textContent = ok
+                    ? '✅ تم نسخ الرابط، الصقه الآن في Safari أو Chrome'
+                    : 'انسخ الرابط يدوياً: ' + APP_DIRECT_URL;
+                statusEl.style.color = ok ? '#15803d' : '#c2410c';
+            }
+            showToastNotice(ok ? 'تم نسخ رابط التطبيق بنجاح ✅' : 'انسخ الرابط: ' + APP_DIRECT_URL);
+        }
+
         async function copyAppDirectLink() {
             const ok = await copyTextSafe(APP_DIRECT_URL);
-            showToastNotice(ok ? 'تم نسخ رابط المتصفح المباشر. الصقه في متصفح الهاتف لتثبيت التطبيق ✅' : 'انسخ الرابط: ' + APP_DIRECT_URL);
+            showToastNotice(ok ? 'تم نسخ رابط المتصفح المباشر. الصقه في Safari أو Chrome لتثبيت التطبيق ✅' : 'انسخ الرابط: ' + APP_DIRECT_URL);
         }
 
         function evaluateTwoDayReminder() {
@@ -2155,6 +2178,8 @@
         }
 
         function openCustomInstallGuide() {
+            const statusEl = document.getElementById('copyLinkStatus');
+            if (statusEl) statusEl.textContent = '';
             document.getElementById('installGuideModal').style.display = 'flex';
             syncModalScrollLock();
         }
