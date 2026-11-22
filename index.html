@@ -1376,6 +1376,8 @@
                         savedAt: new Date().toISOString(),
                         items: cleanItems.slice(0, 120)
                     }));
+                } else {
+                    localStorage.removeItem(LISTINGS_BACKUP_KEY);
                 }
             } catch (e) {
                 console.warn("Listings local backup warning:", e);
@@ -1677,12 +1679,6 @@
             } catch (e) {
                 return false;
             }
-        }
-
-        async function copyLastOrderText() {
-            if (!lastOrderMessageText) return;
-            const ok = await copyTextSafe(lastOrderMessageText);
-            showToastNotice(ok ? 'تم نسخ نص الطلب ✅' : 'تعذر النسخ تلقائياً');
         }
 
         function hasValidPhoneNumber(phone) {
@@ -3050,6 +3046,7 @@
             }
         }
 
+        // السحابة هي المصدر المعتمد عند نجاح الاتصال لتطابق العرض على كل الأجهزة دون إبقاء بيانات قديمة محذوفة
         async function loadApprovedListings() {
             const localBackup = getListingsLocalBackup();
 
@@ -3065,15 +3062,12 @@
                 setDbStatusBanner('');
 
                 if (loaded.length > 0) {
-                    const merged = mergeListingsPreservingLocal(loaded, localBackup);
-                    window.allListings = merged;
-                    saveListingsLocalBackup(merged);
-                } else if (localBackup.length > 0) {
-                    window.allListings = localBackup;
-                    setDbStatusBanner('⚠️ قاعدة البيانات السحابية فارغة حالياً؛ يتم عرض النسخة المحفوظة محلياً.', false);
+                    window.allListings = loaded;
+                    saveListingsLocalBackup(loaded);
                 } else {
-                    window.allListings = getDemoListings();
-                    setDbStatusBanner('ℹ️ لا توجد إعلانات مسجلة في قاعدة البيانات حالياً؛ يُعرض إعلان تجريبي.', false);
+                    window.allListings = [];
+                    saveListingsLocalBackup([]);
+                    setDbStatusBanner('ℹ️ لا توجد إعلانات منشورة في قاعدة البيانات حالياً.', false);
                 }
 
                 sortAndRenderListings();
