@@ -801,6 +801,38 @@
             line-height: 1.4;
         }
 
+        .single-post-admin-bar {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #e5e7eb;
+        }
+
+        .single-post-edit-btn {
+            background: var(--brand-orange);
+            color: #ffffff;
+            border: none;
+            border-radius: 7px;
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .single-post-del-btn {
+            background: var(--danger-red);
+            color: #ffffff;
+            border: none;
+            border-radius: 7px;
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
         .bottom-nav-bar {
             position: fixed;
             bottom: 0;
@@ -2523,6 +2555,11 @@
             if (isAdminLoggedIn) {
                 switchAdminSection('listings');
             }
+            if (document.getElementById('storeProfileView').style.display === 'block') {
+                const currentHeading = document.querySelector('#storeProfileContent h2');
+                const currentStore = (window.groupedPages || []).find(p => currentHeading && currentHeading.textContent && currentHeading.textContent.includes(p.name));
+                if (currentStore) openStoreProfile(currentStore.id);
+            }
         }
 
         function openAdmin() {
@@ -3150,6 +3187,200 @@
             }
         }
 
+        // تعديل إعلان فردي واحد داخل الصفحة (للمشرف فقط)
+        async function editSinglePostInStore(storeId, postIndex) {
+            if (!isAdminLoggedIn) return;
+            const store = findPageByAnyId(storeId) || (window.allListings || []).find(s => String(s.id) === String(storeId));
+            if (!store) return;
+
+            const posts = Array.isArray(store.posts) && store.posts.length > 0
+                ? store.posts.slice()
+                : [{
+                    sourceId: store.id,
+                    title: store.name || 'إعلان',
+                    price: store.price || '',
+                    address: store.address || '',
+                    category: store.category || 'أشياء أخرى',
+                    images: store.images || [],
+                    createdAt: store.createdAt || ''
+                }];
+
+            const targetPost = posts[postIndex];
+            if (!targetPost) return;
+
+            const newTitle = prompt(`تعديل عنوان الإعلان رقم ${postIndex + 1}:`, targetPost.title || store.name || '');
+            if (newTitle === null) return;
+
+            const newPrice = prompt(`تعديل السعر والملاحظات للإعلان رقم ${postIndex + 1}:`, targetPost.price || '');
+            if (newPrice === null) return;
+
+            const newAddress = prompt(`تعديل العنوان / الحي للإعلان رقم ${postIndex + 1}:`, targetPost.address || store.address || '');
+            if (newAddress === null) return;
+
+            const cleanTitle = newTitle.trim() || targetPost.title || store.name || `إعلان ${postIndex + 1}`;
+            const cleanPrice = newPrice.trim();
+            const cleanAddress = newAddress.trim();
+
+            posts[postIndex] = {
+                ...targetPost,
+                title: cleanTitle,
+                price: cleanPrice,
+                address: cleanAddress
+            };
+
+            store.posts = posts;
+            store.allOffersText = posts.map(p => p.price).filter(Boolean).join(' • ');
+            if (postIndex === posts.length - 1) {
+                store.price = cleanPrice;
+                if (cleanAddress) store.address = cleanAddress;
+            }
+
+            const mainDoc = (window.allListings || []).find(s => String(s.id) === String(store.id));
+            if (mainDoc && !String(mainDoc.id).startsWith('demo')) {
+                mainDoc.posts = posts;
+                mainDoc.price = store.price;
+                mainDoc.address = store.address;
+                if (window.db && window.updateDoc) {
+                    try {
+                        await window.updateDoc(window.doc(window.db, "listings", mainDoc.id), {
+                            posts: posts,
+                            price: mainDoc.price,
+                            address: mainDoc.address
+                        });
+                    } catch (e) {
+                        console.warn("Update single post main doc warning:", e);
+                    }
+                }
+            }
+
+            if (targetPost.sourceId && String(targetPost.sourceId) !== String(store.id) && !String(targetPost.sourceId).startsWith('demo') && !String(targetPost.sourceId).startsWith('post_') && !String(targetPost.sourceId).startsWith('init_')) {
+                const subDoc = (window.allListings || []).find(s => String(s.id) === String(targetPost.sourceId));
+                if (subDoc) {
+                    subDoc.price = cleanPrice;
+                    if (cleanAddress) subDoc.address = cleanAddress;
+                }
+                if (window.db && window.updateDoc) {
+                    try {
+                        await window.updateDoc(window.doc(window.db, "listings", String(targetPost.sourceId)), {
+                            price: cleanPrice,
+                            address: cleanAddress || (subDoc ? subDoc.address : '')
+                        });
+                    } catch (e) {
+                        console.warn("Update single post sub doc warning:", e);
+                    }
+                }
+            }
+
+            saveListingsLocalBackup(window.allListings);
+            showToastNotice(`تم تحديث الإعلان رقم ${postIndex + 1} بنجاح ✅`);
+            openStoreProfile(store.id);
+            if (isAdminLoggedIn) loadAdminListings();
+        }
+
+        // حذف إعلان فردي واحد فقط دون حذف باقي الصفحة (للمشرف فقط)
+        async function deleteSinglePostInStore(storeId, postIndex) {
+            if (!isAdminLoggedIn) return;
+            const store = findPageByAnyId(storeId) || (window.allListings || []).find(s => String(s.id) === String(storeId));
+            if (!store) return;
+
+            const posts = Array.isArray(store.posts) && store.posts.length > 0
+                ? store.posts.slice()
+                : [{
+                    sourceId: store.id,
+                    title: store.name || 'إعلان',
+                    price: store.price || '',
+                    address: store.address || '',
+                    category: store.category || 'أشياء أخرى',
+                    images: store.images || [],
+                    createdAt: store.createdAt || ''
+                }];
+
+            const targetPost = posts[postIndex];
+            if (!targetPost) return;
+
+            const confirmMsg = posts.length > 1
+                ? `هل تريد حذف (إعلان ${postIndex + 1}) فقط مع الإبقاء على باقي إعلانات الصفحة؟`
+                : `هذا هو آخر إعلان في الصفحة؛ حذفه سينقل الصفحة بالكامل إلى سلة المحذوفات. هل تريد المتابعة؟`;
+
+            if (!confirm(confirmMsg)) return;
+
+            const removedPost = posts.splice(postIndex, 1)[0];
+
+            // إذا كان هذا الإعلان مستنداً مستقلاً مدمجاً ضمن الصفحة، يتم أرشفته حتى لا يعود عند التحديث
+            if (removedPost && removedPost.sourceId && String(removedPost.sourceId) !== String(store.id)) {
+                const subId = String(removedPost.sourceId);
+                const subItem = (window.allListings || []).find(s => String(s.id) === subId);
+                if (subItem) subItem.status = 'deleted';
+                if (Array.isArray(store.memberIds)) {
+                    store.memberIds = store.memberIds.filter(mid => String(mid) !== subId);
+                }
+                if (!subId.startsWith('demo') && !subId.startsWith('post_') && !subId.startsWith('init_') && window.db && window.updateDoc) {
+                    try {
+                        await window.updateDoc(window.doc(window.db, "listings", subId), { status: 'deleted' });
+                    } catch (e) {
+                        console.warn("Archive removed sub-post warning:", e);
+                    }
+                }
+            }
+
+            const mainDoc = (window.allListings || []).find(s => String(s.id) === String(store.id));
+
+            if (posts.length === 0) {
+                if (mainDoc) mainDoc.status = 'deleted';
+                store.status = 'deleted';
+                if (mainDoc && !String(mainDoc.id).startsWith('demo') && window.db && window.updateDoc) {
+                    try {
+                        await window.updateDoc(window.doc(window.db, "listings", mainDoc.id), { status: 'deleted' });
+                    } catch (e) {
+                        console.warn("Archive empty store warning:", e);
+                    }
+                }
+                saveListingsLocalBackup(window.allListings);
+                showToastNotice('تم حذف آخر إعلان ونقل الصفحة إلى سلة المحذوفات ✅');
+                goBackToCatalog();
+                if (isAdminLoggedIn) {
+                    loadAdminListings();
+                    loadAdminTrash();
+                }
+                return;
+            }
+
+            const rebuiltImages = [];
+            posts.forEach(p => {
+                (p.images || []).forEach(img => {
+                    if (img && !rebuiltImages.includes(img)) rebuiltImages.push(img);
+                });
+            });
+
+            const lastPost = posts[posts.length - 1];
+            store.posts = posts;
+            store.images = rebuiltImages;
+            store.price = lastPost ? (lastPost.price || '') : '';
+            store.allOffersText = posts.map(p => p.price).filter(Boolean).join(' • ');
+
+            if (mainDoc) {
+                mainDoc.posts = posts;
+                mainDoc.images = rebuiltImages;
+                mainDoc.price = store.price;
+                if (!String(mainDoc.id).startsWith('demo') && window.db && window.updateDoc) {
+                    try {
+                        await window.updateDoc(window.doc(window.db, "listings", mainDoc.id), {
+                            posts: posts,
+                            images: rebuiltImages,
+                            price: store.price
+                        });
+                    } catch (e) {
+                        console.warn("Update store after single post delete warning:", e);
+                    }
+                }
+            }
+
+            saveListingsLocalBackup(window.allListings);
+            showToastNotice(`تم حذف الإعلان رقم ${postIndex + 1} فقط وبقية الصفحة سليمة ✅`);
+            openStoreProfile(store.id);
+            if (isAdminLoggedIn) loadAdminListings();
+        }
+
         async function openStoreProfile(id) {
             const store = findPageByAnyId(id) || (window.allListings || []).find(s => String(s.id) === String(id));
             if (!store) return;
@@ -3171,12 +3402,21 @@
                     images: store.images || []
                 }];
 
+            const safeStoreId = escapeJsSingleQuote(store.id);
+
             const postsHtml = posts.map((post, idx) => {
                 const imgs = Array.isArray(post.images) ? post.images.filter(Boolean) : [];
                 const fullPostName = escapeHtmlText(post.title || store.name || `إعلان ${idx + 1}`);
                 const postPrice = post.price ? escapeHtmlText(post.price) : '';
                 const postAddr = post.address ? escapeHtmlText(post.address) : '';
                 const notePrefill = escapeJsSingleQuote(postPrice ? `${fullPostName} (${post.price})` : fullPostName);
+
+                const singlePostAdminControls = isAdminLoggedIn
+                    ? `<div class="single-post-admin-bar">
+                        <button type="button" class="single-post-edit-btn" onclick="editSinglePostInStore('${safeStoreId}', ${idx})">✏️ تعديل إعلان ${idx + 1}</button>
+                        <button type="button" class="single-post-del-btn" onclick="deleteSinglePostInStore('${safeStoreId}', ${idx})">🗑️ حذف إعلان ${idx + 1}</button>
+                       </div>`
+                    : '';
 
                 return `
                     <div class="profile-post-item">
@@ -3196,18 +3436,19 @@
                                 ? `<div style="font-size:11.5px; color:var(--text-sub); margin-bottom:6px;">📍 ${postAddr}</div>`
                                 : ''
                             }
-                            <button type="button" class="mini-like-btn" style="font-weight:800; padding:5px 10px;" onclick="openInAppOrderModal('${escapeJsSingleQuote(store.id)}', '${notePrefill}')">🛒 اطلب هذا الإعلان (واتساب)</button>
+                            <button type="button" class="mini-like-btn" style="font-weight:800; padding:5px 10px;" onclick="openInAppOrderModal('${safeStoreId}', '${notePrefill}')">🛒 اطلب هذا الإعلان (واتساب)</button>
+                            ${singlePostAdminControls}
                         </div>
                     </div>
                 `;
             }).join('');
 
             const instaBtnHtml = instaUrl
-                ? `<button type="button" class="social-direct-btn" onclick="openSocialWithSourceNotice('${escapeJsSingleQuote(store.id)}', 'instagram')">📸 صفحة إنستغرام</button>`
+                ? `<button type="button" class="social-direct-btn" onclick="openSocialWithSourceNotice('${safeStoreId}', 'instagram')">📸 صفحة إنستغرام</button>`
                 : '';
 
             const fbBtnHtml = fbUrl
-                ? `<button type="button" class="social-fb-btn" onclick="openSocialWithSourceNotice('${escapeJsSingleQuote(store.id)}', 'facebook')">📘 فيسبوك</button>`
+                ? `<button type="button" class="social-fb-btn" onclick="openSocialWithSourceNotice('${safeStoreId}', 'facebook')">📘 فيسبوك</button>`
                 : '';
 
             document.getElementById('mainCatalogView').style.display = 'none';
@@ -3225,8 +3466,8 @@
                     </div>
                 </div>
                 <div style="margin-bottom:8px; display:flex; gap:6px; flex-wrap:wrap;">
-                    <button type="button" class="mini-like-btn ${alreadyLiked ? 'liked' : ''}" onclick="addLike('${escapeJsSingleQuote(store.id)}');">${alreadyLiked ? '🧡 تم الإعجاب' : '❤️ إعجاب'} (${store.likes || 0})</button>
-                    <button type="button" class="mini-like-btn" onclick="shareListingCard('${escapeJsSingleQuote(store.id)}', event)">🔗 مشاركة الصفحة</button>
+                    <button type="button" class="mini-like-btn ${alreadyLiked ? 'liked' : ''}" onclick="addLike('${safeStoreId}');">${alreadyLiked ? '🧡 تم الإعجاب' : '❤️ إعجاب'} (${store.likes || 0})</button>
+                    <button type="button" class="mini-like-btn" onclick="shareListingCard('${safeStoreId}', event)">🔗 مشاركة الصفحة</button>
                 </div>
                 <p style="font-size:12px; margin-bottom:4px;"><b>العنوان:</b> ${store.address || 'غير محدد'}</p>
                 <p style="font-size:11.5px; color:var(--text-sub); margin-bottom:10px;"><b>مسار الطلب:</b> ${escapeHtmlText(routing.channelLabel)}</p>
@@ -3235,7 +3476,7 @@
                 ${postsHtml}
 
                 <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
-                    <button type="button" class="in-app-order-btn" onclick="openInAppOrderModal('${escapeJsSingleQuote(store.id)}', '')">🛒 اطلب الآن (واتساب)</button>
+                    <button type="button" class="in-app-order-btn" onclick="openInAppOrderModal('${safeStoreId}', '')">🛒 اطلب الآن (واتساب)</button>
                     ${instaBtnHtml}
                     ${fbBtnHtml}
                     <a href="https://maps.google.com/?q=${encodeURIComponent(store.address || '')}" target="_blank" class="mini-like-btn" style="text-align:center; text-decoration:none; padding:10px 12px; font-size:12.5px;">📍 الخريطة</a>
@@ -3244,15 +3485,14 @@
 
             const adminActionsDiv = document.getElementById('adminStoreActions');
             if (isAdminLoggedIn) {
-                const safeId = escapeJsSingleQuote(store.id);
                 const safeName = escapeJsSingleQuote(store.name);
                 const safeAddress = escapeJsSingleQuote(store.address || '');
                 const safeCat = escapeJsSingleQuote(store.category || '');
                 const safePrice = escapeJsSingleQuote(store.price || '');
                 adminActionsDiv.style.display = 'flex';
                 adminActionsDiv.innerHTML = `
-                    <button type="button" onclick="editListingData('${safeId}', '${safeName}', '${safeAddress}', '${safeCat}', '${safePrice}')" style="background:var(--brand-orange); color:#fff; border:none; padding:6px 10px; border-radius:7px; cursor:pointer; font-size:11px; font-weight:700;">تعديل</button>
-                    <button type="button" onclick="deleteListing('${safeId}')" style="background:#dc2626; color:#fff; border:none; padding:6px 10px; border-radius:7px; cursor:pointer; font-size:11px; font-weight:700;">أرشفة</button>
+                    <button type="button" onclick="editListingData('${safeStoreId}', '${safeName}', '${safeAddress}', '${safeCat}', '${safePrice}')" style="background:var(--brand-orange); color:#fff; border:none; padding:6px 10px; border-radius:7px; cursor:pointer; font-size:11px; font-weight:700;">تعديل</button>
+                    <button type="button" onclick="deleteListing('${safeStoreId}')" style="background:#dc2626; color:#fff; border:none; padding:6px 10px; border-radius:7px; cursor:pointer; font-size:11px; font-weight:700;">أرشفة</button>
                 `;
             } else {
                 adminActionsDiv.style.display = 'none';
