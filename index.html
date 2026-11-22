@@ -1368,6 +1368,104 @@
         const AUTO_SYNC_PREF_KEY = "sahl_alwusool_auto_sync_enabled_v1";
         const TWO_DAY_MS = 48 * 60 * 60 * 1000;
 
+        // تطبيع المستندات لقبول الحقول العربية والإنجليزية معاً
+        function normalizeListingRecord(rawDoc, idOverride) {
+            const d = (rawDoc && typeof rawDoc === 'object') ? rawDoc : {};
+            const id = String(idOverride || d.id || ('rec_' + Date.now()));
+
+            const pickStr = (...vals) => {
+                for (const v of vals) {
+                    if (typeof v === 'string' && v.trim()) return v.trim();
+                    if (typeof v === 'number') return String(v);
+                }
+                return '';
+            };
+
+            const rawName = pickStr(d.name, d['الاسم'], d['اسم'], d['عنوان'], d['العنوان'], d.title);
+            const rawCategory = pickStr(d.category, d['فئة'], d['الفئة'], d['القسم'], d.cat) || 'أشياء أخرى';
+            const rawAddress = pickStr(d.address, d['العنوان'], d['عنوان'], d['الحي'], d['المنطقة']) || 'غير محدد';
+            const rawPrice = pickStr(d.price, d['السعر'], d['سعر'], d['الملاحظات'], d['ملاحظات']);
+            const rawOrderWa = pickStr(d.orderWhatsapp, d['طلب واتساب'], d['واتساب'], d['رقم واتساب']);
+            const rawPhone = pickStr(d.phone, d['هاتف'], d['رقم الهاتف'], rawOrderWa) || 'لا يوجد';
+            const rawInsta = pickStr(d.insta, d['انستا'], d['إنستغرام'], d['انستغرام'], d.instagram);
+            const rawFb = pickStr(d.fb, d['فيسبوك'], d['فيس بوك'], d.facebook);
+            const rawLogo = pickStr(d.logo, d['شعار'], d['الشعار']);
+
+            const rawImages = Array.isArray(d.images)
+                ? d.images.filter(Boolean)
+                : (Array.isArray(d['صور']) ? d['صور'].filter(Boolean) : []);
+
+            const rawStatusVal = pickStr(d.status, d['الحالة'], d['حالة']).toLowerCase();
+            let normalizedStatus = 'approved';
+            if (rawStatusVal === 'deleted' || rawStatusVal === 'محذوف' || rawStatusVal === 'مؤرشف') {
+                normalizedStatus = 'deleted';
+            } else if (
+                rawStatusVal === 'pending' ||
+                rawStatusVal === 'بانتظار الموافقة' ||
+                rawStatusVal === 'معلق' ||
+                rawStatusVal === 'بانتظار'
+            ) {
+                normalizedStatus = 'pending';
+            } else if (
+                rawStatusVal === 'approved' ||
+                rawStatusVal.includes('موافق') ||
+                rawStatusVal.includes('معتمد') ||
+                rawStatusVal.includes('منشور')
+            ) {
+                normalizedStatus = 'approved';
+            }
+
+            const rawPosts = Array.isArray(d.posts)
+                ? d.posts
+                : (Array.isArray(d['منشورات']) ? d['منشورات'] : []);
+
+            const normalizedPosts = rawPosts.map((p, idx) => {
+                if (!p || typeof p !== 'object') return null;
+                const pTitle = pickStr(p.title, p['عنوان'], p['الاسم'], p.name, rawName, `إعلان ${idx + 1}`);
+                const pPrice = pickStr(p.price, p['السعر'], p['سعر']);
+                const pAddr = pickStr(p.address, p['العنوان'], p['عنوان'], rawAddress);
+                const pCat = pickStr(p.category, p['فئة'], p['الفئة'], rawCategory);
+                const pImgs = Array.isArray(p.images)
+                    ? p.images.filter(Boolean)
+                    : (Array.isArray(p['صور']) ? p['صور'].filter(Boolean) : []);
+                return {
+                    sourceId: pickStr(p.sourceId, p['معرف المصدر'], id) || id,
+                    title: pTitle,
+                    price: pPrice,
+                    address: pAddr,
+                    category: pCat,
+                    images: pImgs,
+                    createdAt: pickStr(p.createdAt, p['تاريخ الإنشاء'], d.createdAt)
+                };
+            }).filter(Boolean);
+
+            const likesNum = Number(d.likes !== undefined ? d.likes : d['الإعجابات']) || 0;
+            const clicksNum = Number(d.contactClicks !== undefined ? d.contactClicks : d['نقرات التواصل']) || 0;
+            const ordersNum = Number(d.ordersCount !== undefined ? d.ordersCount : d['عدد الطلبات']) || 0;
+            const isVip = Boolean(d.vip || d['مميز'] || d['vip']);
+
+            return {
+                ...d,
+                id,
+                name: rawName || 'مشروع محلي',
+                category: rawCategory,
+                address: rawAddress,
+                price: rawPrice,
+                phone: rawPhone,
+                orderWhatsapp: rawOrderWa,
+                insta: rawInsta,
+                fb: rawFb,
+                logo: rawLogo,
+                images: rawImages,
+                posts: normalizedPosts,
+                status: normalizedStatus,
+                vip: isVip,
+                likes: likesNum,
+                contactClicks: clicksNum,
+                ordersCount: ordersNum
+            };
+        }
+
         function loadAutoSyncPref() {
             try {
                 const raw = localStorage.getItem(AUTO_SYNC_PREF_KEY);
@@ -1467,7 +1565,8 @@
                 const raw = localStorage.getItem(LISTINGS_BACKUP_KEY);
                 if (!raw) return [];
                 const parsed = JSON.parse(raw);
-                return parsed && Array.isArray(parsed.items) ? parsed.items : [];
+                const list = parsed && Array.isArray(parsed.items) ? parsed.items : [];
+                return list.map(item => normalizeListingRecord(item, item.id));
             } catch (e) {
                 return [];
             }
@@ -1477,12 +1576,12 @@
             const map = new Map();
             (localItems || []).forEach(item => {
                 if (item && item.id && !String(item.id).startsWith('demo')) {
-                    map.set(String(item.id), item);
+                    map.set(String(item.id), normalizeListingRecord(item, item.id));
                 }
             });
             (cloudItems || []).forEach(item => {
                 if (item && item.id && !String(item.id).startsWith('demo')) {
-                    map.set(String(item.id), item);
+                    map.set(String(item.id), normalizeListingRecord(item, item.id));
                 }
             });
             return Array.from(map.values());
@@ -1583,28 +1682,16 @@
                 }
 
                 const normalizedItems = items
-                    .filter(item => item && item.name)
-                    .map((item, idx) => ({
-                        id: String(item.id || ('restored_' + Date.now() + '_' + idx)),
-                        name: String(item.name).trim(),
-                        category: item.category || 'أشياء أخرى',
-                        address: item.address || 'غير محدد',
-                        price: item.price || '',
-                        fb: item.fb || '',
-                        insta: item.insta || '',
-                        phone: item.phone || 'لا يوجد',
-                        orderWhatsapp: item.orderWhatsapp || '',
-                        logo: item.logo || '',
-                        images: Array.isArray(item.images) ? item.images : [],
-                        posts: Array.isArray(item.posts) ? item.posts : [],
-                        status: item.status === 'deleted' ? 'approved' : (item.status || 'approved'),
-                        vip: Boolean(item.vip),
-                        likes: Number(item.likes) || 0,
-                        contactClicks: Number(item.contactClicks) || 0,
-                        ordersCount: Number(item.ordersCount) || 0,
-                        createdAt: item.createdAt || new Date().toISOString(),
-                        restoredAt: new Date().toISOString()
-                    }));
+                    .filter(item => item && (item.name || item['الاسم'] || item['عنوان']))
+                    .map((item, idx) => {
+                        const norm = normalizeListingRecord(item, item.id || ('restored_' + Date.now() + '_' + idx));
+                        return {
+                            ...norm,
+                            status: norm.status === 'deleted' ? 'approved' : (norm.status || 'approved'),
+                            createdAt: item.createdAt || new Date().toISOString(),
+                            restoredAt: new Date().toISOString()
+                        };
+                    });
 
                 if (normalizedItems.length === 0) {
                     alert('لا توجد إعلانات مكتملة البيانات داخل الملف.');
@@ -2083,7 +2170,9 @@
         }
 
         function buildGroupedPages(items) {
-            const approved = (items || []).filter(item => item.status === 'approved');
+            const approved = (items || [])
+                .map(raw => normalizeListingRecord(raw, raw && raw.id))
+                .filter(item => item.status === 'approved');
             const groupsMap = new Map();
 
             approved.forEach(rawItem => {
@@ -3124,12 +3213,12 @@
             }
         }
 
-        // السحابة هي المصدر المعتمد مع حماية البيانات المستوردة والمحلية من المسح عند عودة نتيجة فارغة أو خطأ مؤقت
+        // السحابة هي المصدر المعتمد مع تطبيع الحقول العربية والإنجليزية وحماية البيانات المحلية
         async function loadApprovedListings() {
             const localBackup = getListingsLocalBackup();
-            const currentNonDemo = (window.allListings || []).filter(
-                i => i && i.id && !String(i.id).startsWith('demo')
-            );
+            const currentNonDemo = (window.allListings || [])
+                .filter(i => i && i.id && !String(i.id).startsWith('demo'))
+                .map(i => normalizeListingRecord(i, i.id));
             const existingFallback = currentNonDemo.length > 0 ? currentNonDemo : localBackup;
 
             try {
@@ -3138,7 +3227,7 @@
                 const querySnapshot = await fetchFn(window.collection(window.db, LISTINGS_COLLECTION));
                 const loaded = [];
                 querySnapshot.forEach((docSnap) => {
-                    loaded.push({ id: docSnap.id, ...docSnap.data() });
+                    loaded.push(normalizeListingRecord(docSnap.data(), docSnap.id));
                 });
 
                 setDbStatusBanner('');
@@ -3663,7 +3752,9 @@
             const adminContainer = document.getElementById('adminPendingList');
             adminContainer.innerHTML = '<p style="font-size:11px; color:var(--text-sub);">جاري التحميل...</p>';
             try {
-                let items = (window.allListings || []).filter(i => i.status !== 'deleted');
+                let items = (window.allListings || [])
+                    .map(raw => normalizeListingRecord(raw, raw && raw.id))
+                    .filter(i => i.status !== 'deleted');
                 if (items.length === 0) { adminContainer.innerHTML = '<p style="font-size:11px; color:var(--text-sub);">لا توجد إعلانات نشطة حالياً.</p>'; return; }
 
                 adminContainer.innerHTML = items.map(item => {
@@ -3694,7 +3785,9 @@
         function loadAdminTrash() {
             const trashContainer = document.getElementById('adminTrashList');
             if (!trashContainer) return;
-            const deletedItems = (window.allListings || []).filter(i => i.status === 'deleted');
+            const deletedItems = (window.allListings || [])
+                .map(raw => normalizeListingRecord(raw, raw && raw.id))
+                .filter(i => i.status === 'deleted');
             if (deletedItems.length === 0) {
                 trashContainer.innerHTML = '<p style="font-size:11px; color:var(--text-sub); text-align:center;">سلة المحذوفات فارغة حالياً.</p>';
                 return;
@@ -3717,7 +3810,7 @@
             const store = (window.allListings || []).find(s => String(s.id) === String(id));
             if (!store) return;
             if (!String(store.id).startsWith('demo') && window.db && window.updateDoc) {
-                await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, store.id), { status: 'approved' });
+                await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, store.id), { status: 'approved', 'الحالة': 'موافق عليه' });
             }
             store.status = 'approved';
             saveListingsLocalBackup(window.allListings);
@@ -3745,7 +3838,7 @@
             let store = window.allListings.find(s => s.id === id);
             if (!store) return;
             if (!String(store.id).startsWith('demo')) {
-                await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, id), { status: 'approved' });
+                await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, id), { status: 'approved', 'الحالة': 'موافق عليه' });
             }
             store.status = 'approved';
             saveListingsLocalBackup(window.allListings);
@@ -3758,7 +3851,7 @@
             let store = window.allListings.find(s => s.id === id);
             if (!store) return;
             if (!String(store.id).startsWith('demo')) {
-                await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, id), { status: 'pending' });
+                await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, id), { status: 'pending', 'الحالة': 'بانتظار الموافقة' });
             }
             store.status = 'pending';
             saveListingsLocalBackup(window.allListings);
@@ -3842,13 +3935,17 @@
                 if (store && !String(store.id).startsWith('demo') && window.db && window.updateDoc) {
                     await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, id), {
                         name: cleanName,
+                        'الاسم': cleanName,
                         phone: cleanPhone,
                         orderWhatsapp: cleanOrderWa,
                         insta: cleanInsta,
                         fb: cleanFb,
                         address: cleanAddress,
+                        'العنوان': cleanAddress,
                         category: cleanCategory,
-                        price: cleanPrice
+                        'فئة': cleanCategory,
+                        price: cleanPrice,
+                        'السعر': cleanPrice
                     });
                 }
                 if (store) {
@@ -3881,7 +3978,7 @@
 
                 for (const docId of idsToArchive) {
                     if (!String(docId).startsWith('demo') && window.db && window.updateDoc) {
-                        await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, docId), { status: 'deleted' });
+                        await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, docId), { status: 'deleted', 'الحالة': 'محذوف' });
                     }
                 }
                 const idSet = new Set(idsToArchive.map(String));
