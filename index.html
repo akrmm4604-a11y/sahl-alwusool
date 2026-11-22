@@ -552,7 +552,7 @@
             border: none;
             border-radius: 10px;
             padding: 10px 14px;
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 800;
             cursor: pointer;
             font-family: inherit;
@@ -1170,7 +1170,7 @@
     <div class="custom-modal" id="inAppOrderModal">
         <div class="custom-modal-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h3 style="margin:0; color:#e64a00; font-size:14px; font-weight:800;">🛒 طلب عبر واتساب</h3>
+                <h3 style="margin:0; color:#e64a00; font-size:14px; font-weight:800;">🛒 اطلب من واتساب أو اتصل مباشر</h3>
                 <button type="button" onclick="closeModal('inAppOrderModal')" style="background:none; color:#111827; border:none; font-size:15px; cursor:pointer;">✕</button>
             </div>
             <div id="orderStoreBanner" class="info-offer-box" style="margin-top:0;"></div>
@@ -2118,6 +2118,9 @@
             const savedCust = getSavedCustomerProfile();
             const routing = resolveOrderRoutingTarget(store);
             const instaUrl = buildInstagramPageUrl(store.insta);
+            const directPhone = hasValidPhoneNumber(store.orderWhatsapp)
+                ? String(store.orderWhatsapp).trim()
+                : (hasValidPhoneNumber(store.phone) ? String(store.phone).trim() : '');
 
             const bannerEl = document.getElementById('orderStoreBanner');
             const nameInput = document.getElementById('orderCustomerName');
@@ -2127,10 +2130,14 @@
             const receiptEl = document.getElementById('orderReceiptBanner');
 
             if (bannerEl) {
+                const directCallHtml = directPhone
+                    ? `<div style="margin-top:6px;"><a href="tel:${encodeURIComponent(directPhone)}" class="mini-call-link" style="display:inline-block; font-weight:800;">📞 اتصال مباشر: ${escapeHtmlText(directPhone)}</a></div>`
+                    : '';
                 bannerEl.innerHTML = `
                     <div style="font-weight:900; color:#b91c1c; font-size:13.5px;">📌 ${escapeHtmlText(store.name)}</div>
                     <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">📍 ${escapeHtmlText(store.address || 'غير محدد')} • المسار: <b>${escapeHtmlText(routing.channelLabel)}</b></div>
                     ${store.price ? `<div style="font-size:11.5px; font-weight:800; color:#c2410c; margin-top:3px;">💰 ${escapeHtmlText(store.price)}</div>` : ''}
+                    ${directCallHtml}
                 `;
             }
 
@@ -2418,7 +2425,7 @@
                 </div>
                 ${galleryHtml}
                 <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
-                    <button type="button" class="in-app-order-btn" onclick="closeModal('plusInfoOffersModal'); openInAppOrderModal('${escapeJsSingleQuote(store.id)}', '');">🛒 اطلب واتساب</button>
+                    <button type="button" class="in-app-order-btn" onclick="closeModal('plusInfoOffersModal'); openInAppOrderModal('${escapeJsSingleQuote(store.id)}', '');">🛒 اطلب من واتساب أو اتصل مباشر</button>
                     ${instaBtnHtml}
                     <button type="button" class="mini-like-btn" style="flex:1; padding:8px; font-size:11.5px;" onclick="closeModal('plusInfoOffersModal'); openStoreProfile('${escapeJsSingleQuote(store.id)}');">الصفحة كاملة</button>
                 </div>
@@ -3145,7 +3152,7 @@
                                 <button type="button" class="mini-like-btn ${alreadyLiked ? 'liked' : ''}" onclick="addLike('${safeId}')">${alreadyLiked ? '🧡' : '❤️'} ${item.likes || 0}</button>
                                 <button type="button" class="mini-like-btn" title="مشاركة الإعلان" onclick="shareListingCard('${safeId}', event)">🔗</button>
                                 <button type="button" class="mini-plus-btn" title="معلومات وعروض" onclick="openPlusInfoOffersModal('${safeId}')">+</button>
-                                <button type="button" class="mini-call-link" style="background:#fff7ed; color:#c2410c; border-color:#fdba74; cursor:pointer; font-family:inherit; font-weight:800;" onclick="openInAppOrderModal('${safeId}', '')">🛒 اطلب</button>
+                                <button type="button" class="mini-call-link" style="background:#fff7ed; color:#c2410c; border-color:#fdba74; cursor:pointer; font-family:inherit; font-weight:800;" onclick="openInAppOrderModal('${safeId}', '')">🛒 اطلب من واتساب أو اتصل مباشر</button>
                             </div>
                             ${isAdminLoggedIn ? `
                                 <div style="display:flex; gap:4px; margin-top:6px;" onclick="event.stopPropagation()">
@@ -3392,6 +3399,9 @@
             const avail = getAvailabilityBadgeInfo(store);
             const instaUrl = buildInstagramPageUrl(store.insta);
             const fbUrl = buildFacebookPageUrl(store.fb);
+            const directPhone = hasValidPhoneNumber(store.orderWhatsapp)
+                ? String(store.orderWhatsapp).trim()
+                : (hasValidPhoneNumber(store.phone) ? String(store.phone).trim() : '');
 
             const posts = Array.isArray(store.posts) && store.posts.length > 0
                 ? store.posts
@@ -3436,7 +3446,7 @@
                                 ? `<div style="font-size:11.5px; color:var(--text-sub); margin-bottom:6px;">📍 ${postAddr}</div>`
                                 : ''
                             }
-                            <button type="button" class="mini-like-btn" style="font-weight:800; padding:5px 10px;" onclick="openInAppOrderModal('${safeStoreId}', '${notePrefill}')">🛒 اطلب هذا الإعلان (واتساب)</button>
+                            <button type="button" class="mini-like-btn" style="font-weight:800; padding:5px 10px;" onclick="openInAppOrderModal('${safeStoreId}', '${notePrefill}')">🛒 اطلب من واتساب أو اتصل مباشر</button>
                             ${singlePostAdminControls}
                         </div>
                     </div>
@@ -3449,6 +3459,10 @@
 
             const fbBtnHtml = fbUrl
                 ? `<button type="button" class="social-fb-btn" onclick="openSocialWithSourceNotice('${safeStoreId}', 'facebook')">📘 فيسبوك</button>`
+                : '';
+
+            const directCallBtnHtml = directPhone
+                ? `<a href="tel:${encodeURIComponent(directPhone)}" class="mini-call-link" style="text-decoration:none; padding:10px 12px; font-size:12px; font-weight:800;">📞 اتصال مباشر</a>`
                 : '';
 
             document.getElementById('mainCatalogView').style.display = 'none';
@@ -3476,7 +3490,8 @@
                 ${postsHtml}
 
                 <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
-                    <button type="button" class="in-app-order-btn" onclick="openInAppOrderModal('${safeStoreId}', '')">🛒 اطلب الآن (واتساب)</button>
+                    <button type="button" class="in-app-order-btn" onclick="openInAppOrderModal('${safeStoreId}', '')">🛒 اطلب من واتساب أو اتصل مباشر</button>
+                    ${directCallBtnHtml}
                     ${instaBtnHtml}
                     ${fbBtnHtml}
                     <a href="https://maps.google.com/?q=${encodeURIComponent(store.address || '')}" target="_blank" class="mini-like-btn" style="text-align:center; text-decoration:none; padding:10px 12px; font-size:12.5px;">📍 الخريطة</a>
