@@ -32,7 +32,7 @@
     <!-- تضمين مكتبات Firebase SDK بأمان -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-      import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, increment, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+      import { getFirestore, collection, addDoc, getDocs, getDocsFromServer, deleteDoc, doc, updateDoc, increment, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
       import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
       import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
 
@@ -56,6 +56,7 @@
         window.collection = collection;
         window.addDoc = addDoc;
         window.getDocs = getDocs;
+        window.getDocsFromServer = getDocsFromServer;
         window.deleteDoc = deleteDoc;
         window.doc = doc;
         window.updateDoc = updateDoc;
@@ -1166,7 +1167,7 @@
         </button>
     </nav>
 
-    <!-- نافذة الطلب عبر واتساب أولاً + سجل احتياطي عند غياب واتساب + دخول إنستغرام -->
+    <!-- نافذة الطلب عبر واتساب -->
     <div class="custom-modal" id="inAppOrderModal">
         <div class="custom-modal-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -1174,7 +1175,6 @@
                 <button type="button" onclick="closeModal('inAppOrderModal')" style="background:none; color:#111827; border:none; font-size:15px; cursor:pointer;">✕</button>
             </div>
             <div id="orderStoreBanner" class="info-offer-box" style="margin-top:0;"></div>
-            <p style="font-size:11px; color:var(--text-sub); margin:0 0 8px 0;">يُوجَّه الطلب أولاً إلى <b>واتساب</b> مع توضيح أنك قادم من <b>تطبيق سهل الوصول</b>، ويُحفظ في سجل المتابعة كخيار احتياطي إذا لم يتوفر واتساب.</p>
 
             <label style="font-size:11px; font-weight:700; display:block; margin-bottom:2px;">👤 اسمك (اختياري):</label>
             <input type="text" id="orderCustomerName" placeholder="مثال: ابراهيم" style="width:100%; padding:8px; font-size:11.5px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:6px; font-family:inherit;">
@@ -1402,8 +1402,7 @@
             });
             (cloudItems || []).forEach(item => {
                 if (item && item.id && !String(item.id).startsWith('demo')) {
-                    const prev = map.get(String(item.id));
-                    map.set(String(item.id), prev ? { ...prev, ...item } : item);
+                    map.set(String(item.id), item);
                 }
             });
             return Array.from(map.values());
@@ -1683,7 +1682,7 @@
         async function copyLastOrderText() {
             if (!lastOrderMessageText) return;
             const ok = await copyTextSafe(lastOrderMessageText);
-            showToastNotice(ok ? 'تم نسخ نص الطلب مرة أخرى ✅' : 'تعذر النسخ تلقائياً');
+            showToastNotice(ok ? 'تم نسخ نص الطلب ✅' : 'تعذر النسخ تلقائياً');
         }
 
         function hasValidPhoneNumber(phone) {
@@ -1717,11 +1716,6 @@
             return cleanHandle ? `https://www.facebook.com/${encodeURIComponent(cleanHandle)}` : '';
         }
 
-        function getAppSourceIntroText(storeName, platformLabel) {
-            const target = storeName ? ` (${storeName})` : '';
-            return `مرحباً${target}، أنا زبون أتيتك من (تطبيق سهل الوصول) عبر ${platformLabel}.`;
-        }
-
         async function openSocialWithSourceNotice(storeId, platform) {
             const store = findPageByAnyId(storeId) || (window.allListings || []).find(s => String(s.id) === String(storeId));
             if (!store) return;
@@ -1734,19 +1728,16 @@
                 return;
             }
 
-            const introText = getAppSourceIntroText(store.name, platformLabel);
-            await copyTextSafe(introText);
-
             const timeText = new Date().toLocaleTimeString('ar-IQ', { hour: '2-digit', minute: '2-digit' });
             const visitLog = {
                 id: 'soc_' + Date.now(),
-                statusLabel: `دخول ${platformLabel} من التطبيق`,
+                statusLabel: `دخول ${platformLabel}`,
                 storeId: store.id,
                 storeName: store.name || 'مشروع محلي',
-                customerName: 'زبون التطبيق',
+                customerName: '',
                 customerPhone: '',
-                orderDetails: `دخل إلى صفحة ${platformLabel} قادماً من تطبيق سهل الوصول`,
-                channel: `${platformLabel} (من التطبيق)`,
+                orderDetails: '',
+                channel: platformLabel,
                 orderState: 'new',
                 timeText,
                 timestamp: Date.now()
@@ -1768,7 +1759,6 @@
                 console.warn("Social visit sync warning:", e);
             }
 
-            showToastNotice(`تم نسخ عبارة "أتيتك من تطبيق سهل الوصول" لـ ${platformLabel} للصقها في الرسالة ✅`);
             window.open(targetUrl, '_blank');
         }
 
@@ -1779,7 +1769,7 @@
             if (hasValidPhoneNumber(orderWaRaw)) {
                 return {
                     type: 'whatsapp',
-                    channelLabel: 'واتساب أولاً (رقم الطلبات)',
+                    channelLabel: 'واتساب',
                     url: `https://wa.me/${formatIraqWhatsappNumber(orderWaRaw)}`
                 };
             }
@@ -1787,14 +1777,14 @@
             if (hasValidPhoneNumber(phoneRaw)) {
                 return {
                     type: 'whatsapp',
-                    channelLabel: 'واتساب أولاً',
+                    channelLabel: 'واتساب',
                     url: `https://wa.me/${formatIraqWhatsappNumber(phoneRaw)}`
                 };
             }
 
             return {
                 type: 'app_backup',
-                channelLabel: 'سجل احتياطي داخل التطبيق (بانتظار إضافة واتساب)',
+                channelLabel: 'سجل المتابعة',
                 url: ''
             };
         }
@@ -2143,7 +2133,7 @@
 
             if (instaArea) {
                 instaArea.innerHTML = instaUrl
-                    ? `<button type="button" class="social-direct-btn" style="width:100%;" onclick="openSocialWithSourceNotice('${escapeJsSingleQuote(store.id)}', 'instagram')">📸 دخول مباشر إلى صفحة إنستغرام (مع إشعار أنه من التطبيق)</button>`
+                    ? `<button type="button" class="social-direct-btn" style="width:100%;" onclick="openSocialWithSourceNotice('${escapeJsSingleQuote(store.id)}', 'instagram')">📸 دخول مباشر إلى صفحة إنستغرام</button>`
                     : '';
             }
 
@@ -2176,10 +2166,11 @@
             }
         }
 
+        // النص يوضع مباشرة في رسالة واتساب عند التحويل للمحادثة بدون نسخ تلقائي للحافظة
         async function submitInAppOrder() {
             if (!activeOrderTargetStore) return;
 
-            const customerName = (document.getElementById('orderCustomerName').value || '').trim() || 'ابراهيم';
+            const customerName = (document.getElementById('orderCustomerName').value || '').trim();
             const customerPhone = (document.getElementById('orderCustomerPhone').value || '').trim();
             const orderDetails = (document.getElementById('orderDetailsInput').value || '').trim();
 
@@ -2203,18 +2194,18 @@
             const routing = resolveOrderRoutingTarget(activeOrderTargetStore);
 
             const orderMessageText =
-                `مرحباً، أنا زبون أتيتك من (تطبيق سهل الوصول) وهذه تفاصيل طلبي:\n` +
-                `• الجهة: ${activeOrderTargetStore.name || 'مشروع محلي'}\n` +
-                `• الزبون: ${customerName}\n` +
-                `• الهاتف: ${customerPhone}\n` +
-                `• الطلب: ${orderDetails}`;
+                `مرحباً، أنا زبون أتيتك من تطبيق سهل الوصول\n` +
+                `الجهة: ${activeOrderTargetStore.name || 'مشروع محلي'}\n` +
+                (customerName ? `الاسم: ${customerName}\n` : '') +
+                `الهاتف: ${customerPhone}\n` +
+                `الطلب: ${orderDetails}`;
 
             lastOrderMessageText = orderMessageText;
 
             const timeText = new Date().toLocaleTimeString('ar-IQ', { hour: '2-digit', minute: '2-digit' });
             const compactDoneLog = {
                 id: 'ord_' + Date.now(),
-                statusLabel: routing.type === 'whatsapp' ? 'طلب واتساب' : 'طلب احتياطي (بدون واتساب)',
+                statusLabel: routing.type === 'whatsapp' ? 'طلب واتساب' : 'طلب احتياطي',
                 storeId: activeOrderTargetStore.id,
                 storeName: activeOrderTargetStore.name || 'مشروع محلي',
                 customerName,
@@ -2242,13 +2233,10 @@
                 console.warn("Order counter/log sync warning:", e);
             }
 
-            await copyTextSafe(orderMessageText);
-
             btn.disabled = false;
             btn.textContent = 'تأكيد وإرسال الطلب عبر واتساب ✅';
 
             if (routing.type === 'whatsapp' && routing.url) {
-                showToastNotice('تم نسخ الطلب وتوضيح قدومك من تطبيق سهل الوصول؛ جاري فتح واتساب...');
                 window.open(`${routing.url}?text=${encodeURIComponent(orderMessageText)}`, '_blank');
                 closeModal('inAppOrderModal');
                 return;
@@ -2258,17 +2246,14 @@
             if (receiptEl) {
                 receiptEl.innerHTML = `
                     <div class="in-app-receipt-box">
-                        <div style="font-weight:900; color:#c2410c; margin-bottom:4px;">📌 لا يوجد رقم واتساب مسجل لهذه الجهة حالياً</div>
-                        <div style="font-size:11px; color:var(--text-sub); margin-bottom:6px;">تم حفظ الطلب كسجل احتياطي للمتابعة • الوقت: <b>${escapeHtmlText(timeText)}</b></div>
+                        <div style="font-weight:900; color:#c2410c; margin-bottom:4px;">📌 تم حفظ الطلب في سجل المتابعة • الوقت: <b>${escapeHtmlText(timeText)}</b></div>
                         <pre style="white-space:pre-wrap; font-family:inherit; background:#ffffff; border:1px solid #d1d5db; border-radius:8px; padding:7px; margin:0 0 8px 0; font-size:11px; color:#111827;">${escapeHtmlText(orderMessageText)}</pre>
                         <div style="display:flex; gap:6px;">
-                            <button type="button" class="mini-like-btn" style="flex:1; padding:7px; font-weight:800;" onclick="copyLastOrderText()">📋 نسخ نص الطلب</button>
                             <button type="button" class="mini-call-link" style="flex:1; cursor:pointer; font-family:inherit; font-weight:800;" onclick="closeModal('inAppOrderModal')">إغلاق</button>
                         </div>
                     </div>
                 `;
             }
-            showToastNotice('تم حفظ الطلب في السجل الاحتياطي لعدم توفر رقم واتساب للجهة.');
         }
 
         function switchAdminSection(section) {
@@ -2318,7 +2303,8 @@
 
             try {
                 await waitForFirebase();
-                const snap = await window.getDocs(window.collection(window.db, "app_orders"));
+                const fetchFn = window.getDocsFromServer || window.getDocs;
+                const snap = await fetchFn(window.collection(window.db, "app_orders"));
                 snap.forEach(d => {
                     const data = d.data() || {};
                     map.set(String(d.id), { id: d.id, ...data });
@@ -2335,7 +2321,7 @@
 
             ordersDiv.innerHTML = `
                 <div style="background:#fff7ed; border:1px solid #fed7aa; border-radius:8px; padding:7px 10px; margin-bottom:8px; font-size:11px; font-weight:800; color:#9a3412;">
-                    📊 إجمالي الحركات المسجلة (واتساب + سجل احتياطي + إنستغرام/فيسبوك): ${logs.length}
+                    📊 إجمالي الحركات المسجلة: ${logs.length}
                 </div>
                 ${logs.slice(0, 40).map(o => `
                     <div style="background:#f9fafb; padding:8px 9px; border-radius:8px; margin-bottom:6px; border:1px solid #e5e7eb; font-size:11px;">
@@ -2875,7 +2861,8 @@
             listDiv.innerHTML = '<p style="font-size:10.5px; color:var(--text-sub); text-align:center;">جاري تحميل الطلبات...</p>';
             try {
                 await waitForFirebase();
-                const snap = await window.getDocs(window.collection(window.db, "quick_requests"));
+                const fetchFn = window.getDocsFromServer || window.getDocs;
+                const snap = await fetchFn(window.collection(window.db, "quick_requests"));
                 let now = Date.now();
                 let requests = [];
 
@@ -3014,7 +3001,8 @@
 
             try {
                 await waitForFirebase();
-                const snap = await window.getDocs(window.collection(window.db, "charity_shelf"));
+                const fetchFn = window.getDocsFromServer || window.getDocs;
+                const snap = await fetchFn(window.collection(window.db, "charity_shelf"));
                 snap.forEach(d => {
                     const data = d.data() || {};
                     const ts = Number(data.timestamp || now);
@@ -3064,12 +3052,11 @@
 
         async function loadApprovedListings() {
             const localBackup = getListingsLocalBackup();
-            const currentNonDemo = (window.allListings || []).filter(i => i && i.id && !String(i.id).startsWith('demo'));
-            const combinedLocal = mergeListingsPreservingLocal(localBackup, currentNonDemo);
 
             try {
                 await waitForFirebase();
-                const querySnapshot = await window.getDocs(window.collection(window.db, "listings"));
+                const fetchFn = window.getDocsFromServer || window.getDocs;
+                const querySnapshot = await fetchFn(window.collection(window.db, "listings"));
                 const loaded = [];
                 querySnapshot.forEach((docSnap) => {
                     loaded.push({ id: docSnap.id, ...docSnap.data() });
@@ -3078,16 +3065,15 @@
                 setDbStatusBanner('');
 
                 if (loaded.length > 0) {
-                    const merged = mergeListingsPreservingLocal(loaded, combinedLocal);
+                    const merged = mergeListingsPreservingLocal(loaded, localBackup);
                     window.allListings = merged;
                     saveListingsLocalBackup(merged);
-                } else if (combinedLocal.length > 0) {
-                    window.allListings = combinedLocal;
-                    saveListingsLocalBackup(combinedLocal);
-                    setDbStatusBanner('⚠️ قاعدة البيانات السحابية فارغة حالياً؛ يتم الحفاظ على النسخة المحفوظة محلياً. يمكنك تصدير نسخة JSON من لوحة الإدارة.', false);
+                } else if (localBackup.length > 0) {
+                    window.allListings = localBackup;
+                    setDbStatusBanner('⚠️ قاعدة البيانات السحابية فارغة حالياً؛ يتم عرض النسخة المحفوظة محلياً.', false);
                 } else {
                     window.allListings = getDemoListings();
-                    setDbStatusBanner('ℹ️ لا توجد إعلانات مسجلة في قاعدة البيانات حالياً؛ يُعرض إعلان تجريبي لحين إضافة إعلاناتك أو استيراد نسخة احتياطية.', false);
+                    setDbStatusBanner('ℹ️ لا توجد إعلانات مسجلة في قاعدة البيانات حالياً؛ يُعرض إعلان تجريبي.', false);
                 }
 
                 sortAndRenderListings();
@@ -3097,8 +3083,8 @@
                 }
             } catch (err) {
                 console.error("Load listings error:", err);
-                if (combinedLocal.length > 0) {
-                    window.allListings = combinedLocal;
+                if (localBackup.length > 0) {
+                    window.allListings = localBackup;
                 } else if (!window.allListings || window.allListings.length === 0) {
                     window.allListings = getDemoListings();
                 }
@@ -3194,7 +3180,6 @@
             }
         }
 
-        // تعديل إعلان فردي واحد داخل الصفحة (للمشرف فقط)
         async function editSinglePostInStore(storeId, postIndex) {
             if (!isAdminLoggedIn) return;
             const store = findPageByAnyId(storeId) || (window.allListings || []).find(s => String(s.id) === String(storeId));
@@ -3284,7 +3269,6 @@
             if (isAdminLoggedIn) loadAdminListings();
         }
 
-        // حذف إعلان فردي واحد فقط دون حذف باقي الصفحة (للمشرف فقط)
         async function deleteSinglePostInStore(storeId, postIndex) {
             if (!isAdminLoggedIn) return;
             const store = findPageByAnyId(storeId) || (window.allListings || []).find(s => String(s.id) === String(storeId));
@@ -3313,7 +3297,6 @@
 
             const removedPost = posts.splice(postIndex, 1)[0];
 
-            // إذا كان هذا الإعلان مستنداً مستقلاً مدمجاً ضمن الصفحة، يتم أرشفته حتى لا يعود عند التحديث
             if (removedPost && removedPost.sourceId && String(removedPost.sourceId) !== String(store.id)) {
                 const subId = String(removedPost.sourceId);
                 const subItem = (window.allListings || []).find(s => String(s.id) === subId);
