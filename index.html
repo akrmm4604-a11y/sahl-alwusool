@@ -1347,6 +1347,7 @@
         const ADMIN_PIN_CODE = "334455ff";
         const ADMIN_EMAIL = "akrmm4604@gmail.com";
         const APP_DIRECT_URL = "https://akrmm4604-a11y.github.io/sahl-alwusool/";
+        const LISTINGS_COLLECTION = "قوائم";
         let isAdminLoggedIn = false;
         let selectedFilesArray = [];
         let currentCat = 'all';
@@ -1620,9 +1621,9 @@
                         const docPayload = { ...cleanDoc };
                         delete docPayload.id;
                         if (window.setDoc) {
-                            await window.setDoc(window.doc(window.db, "listings", cleanDoc.id), docPayload, { merge: true });
+                            await window.setDoc(window.doc(window.db, LISTINGS_COLLECTION, cleanDoc.id), docPayload, { merge: true });
                         } else if (window.addDoc) {
-                            await window.addDoc(window.collection(window.db, "listings"), docPayload);
+                            await window.addDoc(window.collection(window.db, LISTINGS_COLLECTION), docPayload);
                         }
                     }
                 } catch (cloudErr) {
@@ -1824,7 +1825,7 @@
                 await window.addDoc(window.collection(window.db, "app_orders"), visitLog);
                 const docId = String(store.id);
                 if (!docId.startsWith('demo') && window.updateDoc && window.increment) {
-                    await window.updateDoc(window.doc(window.db, "listings", docId), {
+                    await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, docId), {
                         contactClicks: window.increment(1)
                     });
                 }
@@ -2239,7 +2240,6 @@
             }
         }
 
-        // النص يوضع مباشرة في رسالة واتساب عند التحويل للمحادثة بدون نسخ تلقائي للحافظة
         async function submitInAppOrder() {
             if (!activeOrderTargetStore) return;
 
@@ -2298,7 +2298,7 @@
                 await window.addDoc(window.collection(window.db, "app_orders"), compactDoneLog);
                 const docId = String(activeOrderTargetStore.id);
                 if (!docId.startsWith('demo') && window.updateDoc && window.increment) {
-                    await window.updateDoc(window.doc(window.db, "listings", docId), {
+                    await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, docId), {
                         ordersCount: window.increment(1)
                     });
                 }
@@ -2855,7 +2855,7 @@
                     if (insta) updateData.insta = insta;
                     if (fb) updateData.fb = fb;
 
-                    await window.updateDoc(window.doc(window.db, "listings", existingStore.id), updateData);
+                    await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, existingStore.id), updateData);
                     Object.assign(existingStore, updateData);
                     modalTitle = 'تمت إضافة الإعلان إلى صفحتك بنجاح! 🎉';
                     modalMsg = 'تم ربط الإعلان الجديد بحسابك وإضافته داخل صفحتك دون تكرار بطاقة جديدة. اضغط إغلاق لإغلاق قائمة الإعلانات.';
@@ -2878,7 +2878,7 @@
                         likes: 0, contactClicks: 0, ordersCount: 0, createdAt: new Date().toISOString()
                     };
 
-                    const docRef = await window.addDoc(window.collection(window.db, "listings"), newRecord);
+                    const docRef = await window.addDoc(window.collection(window.db, LISTINGS_COLLECTION), newRecord);
                     window.allListings = [
                         { id: docRef && docRef.id ? docRef.id : ('local_' + Date.now()), ...newRecord },
                         ...(window.allListings || []).filter(i => !String(i.id).startsWith('demo'))
@@ -3135,7 +3135,7 @@
             try {
                 await waitForFirebase();
                 const fetchFn = window.getDocsFromServer || window.getDocs;
-                const querySnapshot = await fetchFn(window.collection(window.db, "listings"));
+                const querySnapshot = await fetchFn(window.collection(window.db, LISTINGS_COLLECTION));
                 const loaded = [];
                 querySnapshot.forEach((docSnap) => {
                     loaded.push({ id: docSnap.id, ...docSnap.data() });
@@ -3253,7 +3253,7 @@
             const targetDocId = String(store.id);
             if (!targetDocId.startsWith('demo') && window.db && window.updateDoc) {
                 try {
-                    await window.updateDoc(window.doc(window.db, "listings", targetDocId), { likes: window.increment(1) });
+                    await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, targetDocId), { likes: window.increment(1) });
                 } catch (e) {
                     console.warn("Like update warning:", e);
                 }
@@ -3320,7 +3320,7 @@
                 mainDoc.address = store.address;
                 if (window.db && window.updateDoc) {
                     try {
-                        await window.updateDoc(window.doc(window.db, "listings", mainDoc.id), {
+                        await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, mainDoc.id), {
                             posts: posts,
                             price: mainDoc.price,
                             address: mainDoc.address
@@ -3339,7 +3339,7 @@
                 }
                 if (window.db && window.updateDoc) {
                     try {
-                        await window.updateDoc(window.doc(window.db, "listings", String(targetPost.sourceId)), {
+                        await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, String(targetPost.sourceId)), {
                             price: cleanPrice,
                             address: cleanAddress || (subDoc ? subDoc.address : '')
                         });
@@ -3392,7 +3392,7 @@
                 }
                 if (!subId.startsWith('demo') && !subId.startsWith('post_') && !subId.startsWith('init_') && window.db && window.updateDoc) {
                     try {
-                        await window.updateDoc(window.doc(window.db, "listings", subId), { status: 'deleted' });
+                        await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, subId), { status: 'deleted' });
                     } catch (e) {
                         console.warn("Archive removed sub-post warning:", e);
                     }
@@ -3406,7 +3406,7 @@
                 store.status = 'deleted';
                 if (mainDoc && !String(mainDoc.id).startsWith('demo') && window.db && window.updateDoc) {
                     try {
-                        await window.updateDoc(window.doc(window.db, "listings", mainDoc.id), { status: 'deleted' });
+                        await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, mainDoc.id), { status: 'deleted' });
                     } catch (e) {
                         console.warn("Archive empty store warning:", e);
                     }
@@ -3440,7 +3440,7 @@
                 mainDoc.price = store.price;
                 if (!String(mainDoc.id).startsWith('demo') && window.db && window.updateDoc) {
                     try {
-                        await window.updateDoc(window.doc(window.db, "listings", mainDoc.id), {
+                        await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, mainDoc.id), {
                             posts: posts,
                             images: rebuiltImages,
                             price: store.price
@@ -3717,7 +3717,7 @@
             const store = (window.allListings || []).find(s => String(s.id) === String(id));
             if (!store) return;
             if (!String(store.id).startsWith('demo') && window.db && window.updateDoc) {
-                await window.updateDoc(window.doc(window.db, "listings", store.id), { status: 'approved' });
+                await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, store.id), { status: 'approved' });
             }
             store.status = 'approved';
             saveListingsLocalBackup(window.allListings);
@@ -3732,7 +3732,7 @@
             const store = (window.allListings || []).find(s => String(s.id) === String(id));
             if (!store) return;
             if (!String(store.id).startsWith('demo') && window.db && window.deleteDoc) {
-                await window.deleteDoc(window.doc(window.db, "listings", store.id));
+                await window.deleteDoc(window.doc(window.db, LISTINGS_COLLECTION, store.id));
             }
             window.allListings = (window.allListings || []).filter(s => String(s.id) !== String(id));
             saveListingsLocalBackup(window.allListings);
@@ -3745,7 +3745,7 @@
             let store = window.allListings.find(s => s.id === id);
             if (!store) return;
             if (!String(store.id).startsWith('demo')) {
-                await window.updateDoc(window.doc(window.db, "listings", id), { status: 'approved' });
+                await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, id), { status: 'approved' });
             }
             store.status = 'approved';
             saveListingsLocalBackup(window.allListings);
@@ -3758,7 +3758,7 @@
             let store = window.allListings.find(s => s.id === id);
             if (!store) return;
             if (!String(store.id).startsWith('demo')) {
-                await window.updateDoc(window.doc(window.db, "listings", id), { status: 'pending' });
+                await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, id), { status: 'pending' });
             }
             store.status = 'pending';
             saveListingsLocalBackup(window.allListings);
@@ -3781,7 +3781,7 @@
             let store = window.allListings.find(s => s.id === id);
             if (!store) return;
             if (!String(store.id).startsWith('demo')) {
-                await window.updateDoc(window.doc(window.db, "listings", id), { vip: makeVip });
+                await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, id), { vip: makeVip });
             }
             store.vip = makeVip;
             saveListingsLocalBackup(window.allListings);
@@ -3840,7 +3840,7 @@
 
             try {
                 if (store && !String(store.id).startsWith('demo') && window.db && window.updateDoc) {
-                    await window.updateDoc(window.doc(window.db, "listings", id), {
+                    await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, id), {
                         name: cleanName,
                         phone: cleanPhone,
                         orderWhatsapp: cleanOrderWa,
@@ -3881,7 +3881,7 @@
 
                 for (const docId of idsToArchive) {
                     if (!String(docId).startsWith('demo') && window.db && window.updateDoc) {
-                        await window.updateDoc(window.doc(window.db, "listings", docId), { status: 'deleted' });
+                        await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, docId), { status: 'deleted' });
                     }
                 }
                 const idSet = new Set(idsToArchive.map(String));
