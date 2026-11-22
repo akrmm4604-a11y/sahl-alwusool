@@ -1299,6 +1299,18 @@
                     <button type="button" onclick="logoutAdminSession()" style="background:#f3f4f6; color:#111827; border:1px solid #d1d5db; border-radius:6px; padding:3px 8px; font-size:10.5px; font-weight:700; cursor:pointer; font-family:inherit;">خروج</button>
                 </div>
 
+                <!-- التحكم الآلي بالمزامنة والتحديث -->
+                <div class="info-offer-box" style="margin-top:0; margin-bottom:10px; font-size:11px; background:#eff6ff; border-color:#bfdbfe;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:6px;">
+                        <span style="font-weight:800; color:#1d4ed8;">🔄 المزامنة والتحديث الآلي</span>
+                        <span id="autoSyncStatusLabel" style="font-weight:800; color:#15803d;">مفعّل (كل 60 ثانية)</span>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <button type="button" class="mini-call-link" style="flex:1; cursor:pointer; font-family:inherit; font-weight:800; padding:6px;" onclick="runManualCloudSync()">🔄 تحديث الآن</button>
+                        <button type="button" id="toggleAutoSyncBtn" class="mini-like-btn" style="flex:1; cursor:pointer; font-weight:800; padding:6px;" onclick="toggleAutoSyncMode()">⏸ إيقاف التلقائي</button>
+                    </div>
+                </div>
+
                 <!-- أداة النسخ الاحتياطي والاستعادة اليدوية (JSON) -->
                 <div class="info-offer-box" style="margin-top:0; margin-bottom:10px; font-size:11px; background:#f0fdf4; border-color:#bbf7d0;">
                     <div style="font-weight:800; color:#15803d; margin-bottom:4px;">🛡️ حماية النسخ الاحتياطي والاستعادة</div>
@@ -1342,6 +1354,7 @@
         let lastOrderMessageText = '';
         let toastTimer = null;
         let autoSyncInterval = null;
+        let autoSyncEnabled = true;
         window.allListings = [];
         window.groupedPages = [];
         const CHARITY_LOCAL_KEY = "sahl_alwusool_charity_items_v1";
@@ -1351,7 +1364,71 @@
         const LOCAL_ORDERS_KEY = "sahl_alwusool_local_orders_v1";
         const LISTINGS_BACKUP_KEY = "sahl_alwusool_listings_backup_v1";
         const TWO_DAY_REMINDER_KEY = "sahl_alwusool_two_day_reminder_ts_v1";
+        const AUTO_SYNC_PREF_KEY = "sahl_alwusool_auto_sync_enabled_v1";
         const TWO_DAY_MS = 48 * 60 * 60 * 1000;
+
+        function loadAutoSyncPref() {
+            try {
+                const raw = localStorage.getItem(AUTO_SYNC_PREF_KEY);
+                autoSyncEnabled = raw === null ? true : raw === 'true';
+            } catch (e) {
+                autoSyncEnabled = true;
+            }
+            updateAutoSyncUi();
+        }
+
+        function updateAutoSyncUi() {
+            const label = document.getElementById('autoSyncStatusLabel');
+            const btn = document.getElementById('toggleAutoSyncBtn');
+            if (label) {
+                label.textContent = autoSyncEnabled ? 'مفعّل (كل 60 ثانية)' : 'متوقف مؤقتاً';
+                label.style.color = autoSyncEnabled ? '#15803d' : '#b91c1c';
+            }
+            if (btn) {
+                btn.textContent = autoSyncEnabled ? '⏸ إيقاف التلقائي' : '▶️ تشغيل التلقائي';
+            }
+        }
+
+        function toggleAutoSyncMode() {
+            autoSyncEnabled = !autoSyncEnabled;
+            try {
+                localStorage.setItem(AUTO_SYNC_PREF_KEY, String(autoSyncEnabled));
+            } catch (e) {}
+            updateAutoSyncUi();
+            if (autoSyncEnabled) {
+                startAutoSyncLoop();
+                runManualCloudSync();
+            } else {
+                stopAutoSyncLoop();
+                showToastNotice('تم إيقاف التحديث التلقائي مؤقتاً');
+            }
+        }
+
+        function startAutoSyncLoop() {
+            if (autoSyncInterval) clearInterval(autoSyncInterval);
+            if (!autoSyncEnabled) return;
+            autoSyncInterval = setInterval(() => {
+                if (autoSyncEnabled && document.visibilityState === 'visible') {
+                    updateAdminButtonVisibility();
+                    evaluateInAppBrowserGuide();
+                    evaluateTwoDayReminder();
+                    loadApprovedListings();
+                }
+            }, 60000);
+        }
+
+        function stopAutoSyncLoop() {
+            if (autoSyncInterval) {
+                clearInterval(autoSyncInterval);
+                autoSyncInterval = null;
+            }
+        }
+
+        async function runManualCloudSync() {
+            showToastNotice('جاري مزامنة البيانات مع السحابة...');
+            await loadApprovedListings();
+            showToastNotice('تمت مزامنة البيانات بنجاح ✅');
+        }
 
         function setDbStatusBanner(msg, isError) {
             const el = document.getElementById('dbStatusBanner');
@@ -2539,6 +2616,7 @@
         function applyAdminLoggedInUi(active) {
             isAdminLoggedIn = Boolean(active);
             updateAdminButtonVisibility();
+            updateAutoSyncUi();
             document.getElementById('adminLoginView').style.display = isAdminLoggedIn ? 'none' : 'block';
             document.getElementById('adminDashboardView').style.display = isAdminLoggedIn ? 'block' : 'none';
             if (isAdminLoggedIn) {
@@ -3046,9 +3124,13 @@
             }
         }
 
-        // السحابة هي المصدر المعتمد عند نجاح الاتصال لتطابق العرض على كل الأجهزة دون إبقاء بيانات قديمة محذوفة
+        // السحابة هي المصدر المعتمد مع حماية البيانات المستوردة والمحلية من المسح عند عودة نتيجة فارغة أو خطأ مؤقت
         async function loadApprovedListings() {
             const localBackup = getListingsLocalBackup();
+            const currentNonDemo = (window.allListings || []).filter(
+                i => i && i.id && !String(i.id).startsWith('demo')
+            );
+            const existingFallback = currentNonDemo.length > 0 ? currentNonDemo : localBackup;
 
             try {
                 await waitForFirebase();
@@ -3062,11 +3144,18 @@
                 setDbStatusBanner('');
 
                 if (loaded.length > 0) {
-                    window.allListings = loaded;
-                    saveListingsLocalBackup(loaded);
+                    const merged = mergeListingsPreservingLocal(loaded, existingFallback);
+                    window.allListings = merged;
+                    saveListingsLocalBackup(merged);
+                } else if (existingFallback.length > 0) {
+                    window.allListings = existingFallback;
+                    saveListingsLocalBackup(existingFallback);
+                    setDbStatusBanner(
+                        '⚠️ أعادت قاعدة البيانات نتيجة فارغة مؤقتاً؛ تم الإبقاء على الإعلانات المحفوظة محلياً دون مسحها.',
+                        false
+                    );
                 } else {
                     window.allListings = [];
-                    saveListingsLocalBackup([]);
                     setDbStatusBanner('ℹ️ لا توجد إعلانات منشورة في قاعدة البيانات حالياً.', false);
                 }
 
@@ -3077,12 +3166,15 @@
                 }
             } catch (err) {
                 console.error("Load listings error:", err);
-                if (localBackup.length > 0) {
-                    window.allListings = localBackup;
+                if (existingFallback.length > 0) {
+                    window.allListings = existingFallback;
                 } else if (!window.allListings || window.allListings.length === 0) {
                     window.allListings = getDemoListings();
                 }
-                setDbStatusBanner(`⚠️ تعذر الاتصال بقاعدة البيانات (${escapeHtmlText(err.code || err.message || 'خطأ شبكة')}). تم الاعتماد على النسخة المتوفرة محلياً.`, true);
+                setDbStatusBanner(
+                    `⚠️ تعذر الاتصال بقاعدة البيانات (${escapeHtmlText(err.code || err.message || 'خطأ شبكة')}). تم الإبقاء على النسخة المتوفرة محلياً دون مسح أي إعلانات.`,
+                    true
+                );
                 sortAndRenderListings();
             }
         }
@@ -3843,7 +3935,14 @@
             }
         });
 
+        window.addEventListener('online', function() {
+            updateAdminButtonVisibility();
+            evaluateInAppBrowserGuide();
+            loadApprovedListings();
+        });
+
         window.onload = function() {
+            loadAutoSyncPref();
             updateAdminButtonVisibility();
             evaluateInAppBrowserGuide();
             evaluateTwoDayReminder();
@@ -3866,16 +3965,7 @@
                 }
             }, 300);
 
-            if (!autoSyncInterval) {
-                autoSyncInterval = setInterval(() => {
-                    if (document.visibilityState === 'visible') {
-                        updateAdminButtonVisibility();
-                        evaluateInAppBrowserGuide();
-                        evaluateTwoDayReminder();
-                        loadApprovedListings();
-                    }
-                }, 60000);
-            }
+            startAutoSyncLoop();
         };
     </script>
 </body>
