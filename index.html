@@ -329,6 +329,19 @@
             border-color: var(--brand-purple);
         }
 
+        .cat-chip.flash-chip {
+            background: #fef2f2;
+            color: #b91c1c;
+            border-color: #fecaca;
+            font-weight: 800;
+        }
+
+        .cat-chip.flash-chip.active {
+            background: #dc2626;
+            color: #ffffff;
+            border-color: #dc2626;
+        }
+
         .utility-actions-bar {
             display: grid;
             grid-template-columns: 1fr;
@@ -378,6 +391,11 @@
             border-color: var(--vip-gold);
         }
 
+        .grid-item-card.flash-active-card {
+            border: 1.5px solid #dc2626;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.12);
+        }
+
         .grid-img-box {
             position: relative;
             width: 100%;
@@ -391,6 +409,45 @@
             height: 100%;
             object-fit: cover;
             display: block;
+        }
+
+        .flash-ribbon-overlay {
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            left: 7px;
+            background: linear-gradient(135deg, #dc2626, #ea580c);
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 4px 7px;
+            font-size: 10px;
+            font-weight: 900;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        .flash-ribbon-overlay.sold-out {
+            background: #374151;
+        }
+
+        .flash-detail-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            padding: 8px 10px;
+            margin: 8px 0 10px;
+            font-size: 11.5px;
+            color: #991b1b;
+            line-height: 1.5;
+        }
+
+        .flash-detail-box.sold-out {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+            color: #374151;
         }
 
         .grid-ribbon {
@@ -565,6 +622,41 @@
             flex: 1;
         }
 
+        .in-app-order-btn.flash-btn {
+            background: linear-gradient(135deg, #dc2626, #ea580c);
+        }
+
+        .in-app-order-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .admin-stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin-bottom: 8px;
+        }
+
+        .admin-stat-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 6px 4px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .admin-stat-num {
+            display: block;
+            font-size: 13px;
+            font-weight: 900;
+            color: var(--brand-orange-dark);
+            margin-top: 2px;
+        }
+
         .form-container {
             display: none;
             background: #ffffff;
@@ -584,7 +676,8 @@
             line-height: 1.45;
         }
 
-        .form-container input,
+        .form-container input[type="text"],
+        .form-container input[type="number"],
         .form-container select,
         .form-container textarea {
             width: 100%;
@@ -602,7 +695,8 @@
             transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
 
-        .form-container input:focus,
+        .form-container input[type="text"]:focus,
+        .form-container input[type="number"]:focus,
         .form-container select:focus,
         .form-container textarea:focus {
             outline: none;
@@ -616,6 +710,40 @@
             font-size: 13px;
             font-weight: 500;
             color: #9ca3af;
+        }
+
+        .flash-toggle-card {
+            background: #fef2f2;
+            border: 1.5px solid #fecaca;
+            border-radius: 12px;
+            padding: 11px 12px;
+            margin-bottom: 12px;
+        }
+
+        .flash-toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 900;
+            color: #991b1b;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .flash-toggle-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #dc2626;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .flash-owner-fields {
+            display: none;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #fca5a5;
         }
 
         .whatsapp-priority-tip {
@@ -1053,6 +1181,7 @@
 
             <div class="categories-strip">
                 <button class="cat-chip active" onclick="filterCat('all', this)">الكل</button>
+                <button class="cat-chip flash-chip" onclick="filterCat('flash', this)">🔥 احجز قبل النفاد</button>
                 <button class="cat-chip home-chip" onclick="filterCat('شغل بيوت', this)">🏠 شغل بيوت</button>
                 <button class="cat-chip" onclick="filterCat('غذائية وحلويات', this)">🛒 غذائية وحلويات</button>
                 <button class="cat-chip" onclick="filterCat('ملابس وكوزمتك', this)">👗 ملابس وكوزمتك</button>
@@ -1124,6 +1253,23 @@
 
                 <label class="listing-field-label">💰 السعر والملاحظات:</label>
                 <input type="text" id="reqPrice" placeholder="مثال: 15,000 د.ع أو حسب الطلب">
+
+                <div class="flash-toggle-card">
+                    <label class="flash-toggle-label" for="reqFlashEnabled">
+                        <input type="checkbox" id="reqFlashEnabled" onchange="syncClientFlashFields()">
+                        <span>🔥 تفعيل «احجز قبل النفاد» (كمية محدودة / عرض سريع)</span>
+                    </label>
+                    <div id="reqFlashFieldsBox" class="flash-owner-fields">
+                        <label class="listing-field-label">📦 الكمية المتوفرة للحجز:</label>
+                        <input type="number" id="reqFlashStock" min="1" max="999" value="5" placeholder="مثال: 5">
+
+                        <label class="listing-field-label">⚡ عنوان العرض السريع:</label>
+                        <input type="text" id="reqFlashLabel" placeholder="مثال: صواني معجنات ساخنة أو عرض محدود">
+
+                        <label class="listing-field-label">⏳ مدة العرض بالساعات (0 لعدم تحديد وقت انتهاء):</label>
+                        <input type="number" id="reqFlashHours" min="0" max="168" value="6" placeholder="مثال: 6">
+                    </div>
+                </div>
 
                 <button class="submit-btn" id="submitListingBtn" type="button">إرسال الطلب للإدارة</button>
             </div>
@@ -1296,6 +1442,13 @@
                     <button type="button" onclick="logoutAdminSession()" style="background:#f3f4f6; color:#111827; border:1px solid #d1d5db; border-radius:6px; padding:3px 8px; font-size:10.5px; font-weight:700; cursor:pointer; font-family:inherit;">خروج</button>
                 </div>
 
+                <div id="adminListingsStatsBar" class="admin-stats-bar">
+                    <div class="admin-stat-box">معتمد<span class="admin-stat-num" id="statApprovedCount">0</span></div>
+                    <div class="admin-stat-box">معلق<span class="admin-stat-num" id="statPendingCount">0</span></div>
+                    <div class="admin-stat-box">محذوف<span class="admin-stat-num" id="statDeletedCount">0</span></div>
+                    <div class="admin-stat-box">صفحات<span class="admin-stat-num" id="statPagesCount">0</span></div>
+                </div>
+
                 <div class="info-offer-box" style="margin-top:0; margin-bottom:10px; font-size:11px; background:#eff6ff; border-color:#bfdbfe;">
                     <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:6px;">
                         <span style="font-weight:800; color:#1d4ed8;">🔄 المزامنة والتحديث الآلي</span>
@@ -1349,6 +1502,7 @@
         let lastOrderMessageText = '';
         let toastTimer = null;
         let autoSyncInterval = null;
+        let flashTickerInterval = null;
         let autoSyncEnabled = true;
         window.allListings = [];
         window.groupedPages = [];
@@ -1365,6 +1519,53 @@
         // إلغاء الإعلان الاستعراضي نهائياً
         function getDemoListings() {
             return [];
+        }
+
+        function syncClientFlashFields() {
+            const chk = document.getElementById('reqFlashEnabled');
+            const box = document.getElementById('reqFlashFieldsBox');
+            if (!chk || !box) return;
+            box.style.display = chk.checked ? 'block' : 'none';
+        }
+
+        function readClientFlashInput() {
+            const chk = document.getElementById('reqFlashEnabled');
+            const enabled = Boolean(chk && chk.checked);
+            if (!enabled) {
+                return {
+                    flashEnabled: false,
+                    flashStock: 0,
+                    flashLabel: '',
+                    flashExpiresAt: 0
+                };
+            }
+            const stockEl = document.getElementById('reqFlashStock');
+            const labelEl = document.getElementById('reqFlashLabel');
+            const hoursEl = document.getElementById('reqFlashHours');
+
+            const flashStock = Math.max(1, parseInt(stockEl ? stockEl.value : '5', 10) || 5);
+            const flashLabel = (labelEl ? labelEl.value : '').trim() || 'عرض سريع قبل النفاد';
+            const hoursNum = Math.max(0, parseFloat(hoursEl ? hoursEl.value : '6') || 0);
+            const flashExpiresAt = hoursNum > 0 ? (Date.now() + hoursNum * 3600000) : 0;
+
+            return {
+                flashEnabled: true,
+                flashStock,
+                flashLabel,
+                flashExpiresAt
+            };
+        }
+
+        function resetClientFlashForm() {
+            const chk = document.getElementById('reqFlashEnabled');
+            const stockEl = document.getElementById('reqFlashStock');
+            const labelEl = document.getElementById('reqFlashLabel');
+            const hoursEl = document.getElementById('reqFlashHours');
+            if (chk) chk.checked = false;
+            if (stockEl) stockEl.value = '5';
+            if (labelEl) labelEl.value = '';
+            if (hoursEl) hoursEl.value = '6';
+            syncClientFlashFields();
         }
 
         function normalizeListingRecord(rawDoc, idOverride) {
@@ -1443,6 +1644,12 @@
             const ordersNum = Number(d.ordersCount !== undefined ? d.ordersCount : d['عدد الطلبات']) || 0;
             const isVip = Boolean(d.vip || d['مميز'] || d['vip']);
 
+            const flashEnabled = Boolean(d.flashEnabled || d['احجز_قبل_النفاد']);
+            const flashStockRaw = Number(d.flashStock !== undefined ? d.flashStock : d['الكمية_المتبقية']);
+            const flashStock = Number.isFinite(flashStockRaw) && flashStockRaw >= 0 ? Math.floor(flashStockRaw) : 0;
+            const flashLabel = pickStr(d.flashLabel, d['عنوان_العرض_السريع']) || 'عرض محدود';
+            const flashExpiresAt = Number(d.flashExpiresAt || d['انتهاء_العرض_السريع'] || 0) || 0;
+
             return {
                 ...d,
                 id,
@@ -1461,8 +1668,71 @@
                 vip: isVip,
                 likes: likesNum,
                 contactClicks: clicksNum,
-                ordersCount: ordersNum
+                ordersCount: ordersNum,
+                flashEnabled,
+                flashStock,
+                flashLabel,
+                flashExpiresAt
             };
+        }
+
+        function getFlashOfferState(item) {
+            if (!item || !item.flashEnabled) {
+                return { active: false, expired: false, soldOut: false, stock: 0, remainingText: '', label: '' };
+            }
+            const now = Date.now();
+            const hasExpiry = Number(item.flashExpiresAt) > 0;
+            const expired = hasExpiry && now >= Number(item.flashExpiresAt);
+            const stock = Math.max(0, Number(item.flashStock) || 0);
+            const soldOut = stock <= 0;
+
+            if (expired) {
+                return {
+                    active: false,
+                    expired: true,
+                    soldOut,
+                    stock,
+                    remainingText: 'انتهى الوقت',
+                    label: item.flashLabel || 'عرض محدود'
+                };
+            }
+
+            let remainingText = '';
+            if (hasExpiry) {
+                const diffMs = Math.max(0, Number(item.flashExpiresAt) - now);
+                const totalMins = Math.ceil(diffMs / 60000);
+                const hrs = Math.floor(totalMins / 60);
+                const mins = totalMins % 60;
+                remainingText = hrs > 0 ? `${hrs}س ${mins}د` : `${mins}د`;
+            }
+
+            return {
+                active: !soldOut,
+                expired: false,
+                soldOut,
+                stock,
+                remainingText,
+                label: item.flashLabel || 'عرض محدود'
+            };
+        }
+
+        function updateAdminListingsStatsCounter() {
+            const approvedEl = document.getElementById('statApprovedCount');
+            const pendingEl = document.getElementById('statPendingCount');
+            const deletedEl = document.getElementById('statDeletedCount');
+            const pagesEl = document.getElementById('statPagesCount');
+            if (!approvedEl || !pendingEl || !deletedEl || !pagesEl) return;
+
+            const allNorm = (window.allListings || []).map(raw => normalizeListingRecord(raw, raw && raw.id));
+            const approvedCount = allNorm.filter(i => i.status === 'approved').length;
+            const pendingCount = allNorm.filter(i => i.status === 'pending').length;
+            const deletedCount = allNorm.filter(i => i.status === 'deleted').length;
+            const pagesCount = Array.isArray(window.groupedPages) ? window.groupedPages.length : 0;
+
+            approvedEl.textContent = String(approvedCount);
+            pendingEl.textContent = String(pendingCount);
+            deletedEl.textContent = String(deletedCount);
+            pagesEl.textContent = String(pagesCount);
         }
 
         function loadAutoSyncPref() {
@@ -1511,6 +1781,16 @@
                     evaluateInAppBrowserGuide();
                     evaluateTwoDayReminder();
                     loadApprovedListings();
+                }
+            }, 60000);
+        }
+
+        function startFlashTickerLoop() {
+            if (flashTickerInterval) clearInterval(flashTickerInterval);
+            flashTickerInterval = setInterval(() => {
+                const hasFlash = (window.groupedPages || []).some(p => p && p.flashEnabled);
+                if (hasFlash && document.visibilityState === 'visible') {
+                    applyFilters();
                 }
             }, 60000);
         }
@@ -1607,8 +1887,14 @@
             const store = findPageByAnyId(id) || (window.allListings || []).find(s => String(s.id) === String(id));
             if (!store) return;
 
+            const flashState = getFlashOfferState(store);
+            const flashLine = flashState.active
+                ? `🔥 احجز قبل النفاد (${flashState.label}) • متبقي ${flashState.stock}\n`
+                : '';
+
             const shareText =
                 `📌 ${store.name || 'مشروع محلي'} (${store.category || ''})\n` +
+                flashLine +
                 `📍 ${store.address || 'القيارة والموصل'}\n` +
                 (store.price ? `💰 ${store.price}\n` : '') +
                 `عبر تطبيق سهل الوصول:\n${APP_DIRECT_URL}`;
@@ -2036,6 +2322,7 @@
             if (!saved) {
                 if (noticeEl) noticeEl.style.display = 'none';
                 syncBakeryCategoryTip();
+                syncClientFlashFields();
                 return;
             }
 
@@ -2059,6 +2346,7 @@
                 noticeEl.style.display = 'flex';
             }
             syncBakeryCategoryTip();
+            syncClientFlashFields();
         }
 
         function clearSavedOwnerProfile() {
@@ -2074,6 +2362,7 @@
             document.getElementById('reqCat').value = 'أشياء أخرى';
             document.getElementById('reqAddress').value = '';
             document.getElementById('reqPrice').value = '';
+            resetClientFlashForm();
             const noticeEl = document.getElementById('savedOwnerNotice');
             if (noticeEl) noticeEl.style.display = 'none';
             syncBakeryCategoryTip();
@@ -2211,6 +2500,12 @@
                     existing.contactClicks = (Number(existing.contactClicks) || 0) + (Number(item.contactClicks) || 0);
                     existing.ordersCount = (Number(existing.ordersCount) || 0) + (Number(item.ordersCount) || 0);
                     if (item.vip) existing.vip = true;
+                    if (item.flashEnabled) {
+                        existing.flashEnabled = true;
+                        existing.flashStock = Math.max(Number(existing.flashStock) || 0, Number(item.flashStock) || 0);
+                        if (item.flashLabel) existing.flashLabel = item.flashLabel;
+                        if (item.flashExpiresAt) existing.flashExpiresAt = Math.max(Number(existing.flashExpiresAt) || 0, Number(item.flashExpiresAt) || 0);
+                    }
                     if (!existing.logo && item.logo) existing.logo = item.logo;
                     if (!existing.orderWhatsapp && item.orderWhatsapp) existing.orderWhatsapp = item.orderWhatsapp;
                     if (!existing.insta && item.insta) existing.insta = item.insta;
@@ -2245,10 +2540,14 @@
 
             const grouped = Array.from(groupsMap.values());
             grouped.sort((a, b) => {
+                const aFlash = getFlashOfferState(a).active ? 1 : 0;
+                const bFlash = getFlashOfferState(b).active ? 1 : 0;
+                if (bFlash !== aFlash) return bFlash - aFlash;
                 if ((b.vip === true) !== (a.vip === true)) return (b.vip === true) - (a.vip === true);
                 return (b.likes || 0) - (a.likes || 0);
             });
             window.groupedPages = grouped;
+            updateAdminListingsStatsCounter();
             return grouped;
         }
 
@@ -2267,6 +2566,12 @@
         function openInAppOrderModal(storeId, prefilledNote) {
             const store = findPageByAnyId(storeId) || (window.allListings || []).find(s => String(s.id) === String(storeId));
             if (!store) return;
+
+            const flashState = getFlashOfferState(store);
+            if (store.flashEnabled && !flashState.expired && flashState.soldOut) {
+                showToastNotice('نفدت الكمية المحددة لهذا العرض حالياً.');
+                return;
+            }
 
             activeOrderTargetStore = store;
             const savedCust = getSavedCustomerProfile();
@@ -2287,10 +2592,14 @@
                 const directCallHtml = directPhone
                     ? `<div style="margin-top:6px;"><a href="tel:${encodeURIComponent(directPhone)}" class="mini-call-link" style="display:inline-block; font-weight:800;">📞 اتصال مباشر: ${escapeHtmlText(directPhone)}</a></div>`
                     : '';
+                const flashBannerHtml = flashState.active
+                    ? `<div style="margin-top:6px; background:#fef2f2; border:1px solid #fecaca; color:#991b1b; padding:5px 8px; border-radius:7px; font-size:11px; font-weight:800;">🔥 احجز قبل النفاد (${escapeHtmlText(flashState.label)}) • متبقي: <b>${flashState.stock}</b>${flashState.remainingText ? ` • ينتهي خلال ${escapeHtmlText(flashState.remainingText)}` : ''}</div>`
+                    : '';
                 bannerEl.innerHTML = `
                     <div style="font-weight:900; color:#b91c1c; font-size:13.5px;">📌 ${escapeHtmlText(store.name)}</div>
                     <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">📍 ${escapeHtmlText(store.address || 'غير محدد')} • المسار: <b>${escapeHtmlText(routing.channelLabel)}</b></div>
                     ${store.price ? `<div style="font-size:11.5px; font-weight:800; color:#c2410c; margin-top:3px;">💰 ${escapeHtmlText(store.price)}</div>` : ''}
+                    ${flashBannerHtml}
                     ${directCallHtml}
                 `;
             }
@@ -2303,7 +2612,9 @@
 
             if (nameInput) nameInput.value = savedCust && savedCust.name ? savedCust.name : '';
             if (phoneInput) phoneInput.value = savedCust && savedCust.phone ? savedCust.phone : '';
-            if (detailsInput) detailsInput.value = prefilledNote || '';
+            if (detailsInput) {
+                detailsInput.value = prefilledNote || (flashState.active ? `حجز قبل النفاد: ${flashState.label} (كمية 1)` : '');
+            }
             if (receiptEl) receiptEl.innerHTML = '';
 
             document.getElementById('inAppOrderModal').style.display = 'flex';
@@ -2354,10 +2665,12 @@
 
             saveCustomerProfile({ name: customerName, phone: customerPhone });
 
+            const flashState = getFlashOfferState(activeOrderTargetStore);
             const routing = resolveOrderRoutingTarget(activeOrderTargetStore);
 
             const orderMessageText =
                 `مرحباً، أنا زبون أتيتك من تطبيق سهل الوصول\n` +
+                (flashState.active ? `🔥 حجز قبل النفاد (${flashState.label})\n` : '') +
                 `الجهة: ${activeOrderTargetStore.name || 'مشروع محلي'}\n` +
                 (customerName ? `الاسم: ${customerName}\n` : '') +
                 `الهاتف: ${customerPhone}\n` +
@@ -2368,7 +2681,7 @@
             const timeText = new Date().toLocaleTimeString('ar-IQ', { hour: '2-digit', minute: '2-digit' });
             const compactDoneLog = {
                 id: 'ord_' + Date.now(),
-                statusLabel: routing.type === 'whatsapp' ? 'طلب واتساب' : 'طلب احتياطي',
+                statusLabel: flashState.active ? 'حجز قبل النفاد' : (routing.type === 'whatsapp' ? 'طلب واتساب' : 'طلب احتياطي'),
                 storeId: activeOrderTargetStore.id,
                 storeName: activeOrderTargetStore.name || 'مشروع محلي',
                 customerName,
@@ -2383,18 +2696,32 @@
             saveLocalOrder(compactDoneLog);
             activeOrderTargetStore.ordersCount = (Number(activeOrderTargetStore.ordersCount) || 0) + 1;
 
+            let nextFlashStock = null;
+            if (flashState.active) {
+                nextFlashStock = Math.max(0, flashState.stock - 1);
+                activeOrderTargetStore.flashStock = nextFlashStock;
+                const matchingMain = (window.allListings || []).find(s => String(s.id) === String(activeOrderTargetStore.id));
+                if (matchingMain) matchingMain.flashStock = nextFlashStock;
+                saveListingsLocalBackup(window.allListings);
+            }
+
             try {
                 await waitForFirebase();
                 await window.addDoc(window.collection(window.db, "app_orders"), compactDoneLog);
                 const docId = String(activeOrderTargetStore.id);
-                if (!docId.startsWith('demo') && window.updateDoc && window.increment) {
-                    await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, docId), {
-                        ordersCount: window.increment(1)
-                    });
+                if (!docId.startsWith('demo') && window.updateDoc) {
+                    const updatePayload = {};
+                    if (window.increment) updatePayload.ordersCount = window.increment(1);
+                    if (nextFlashStock !== null) updatePayload.flashStock = nextFlashStock;
+                    if (Object.keys(updatePayload).length > 0) {
+                        await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, docId), updatePayload);
+                    }
                 }
             } catch (e) {
                 console.warn("Order counter/log sync warning:", e);
             }
+
+            sortAndRenderListings();
 
             btn.disabled = false;
             btn.textContent = 'تأكيد وإرسال الطلب عبر واتساب ✅';
@@ -2420,6 +2747,7 @@
         }
 
         function switchAdminSection(section) {
+            updateAdminListingsStatsCounter();
             const listingsDiv = document.getElementById('adminPendingList');
             const trashDiv = document.getElementById('adminTrashList');
             const ordersDiv = document.getElementById('adminOrdersList');
@@ -2537,6 +2865,16 @@
             const ordersCount = Number(store.ordersCount) || 0;
             const routing = resolveOrderRoutingTarget(store);
             const instaUrl = buildInstagramPageUrl(store.insta);
+            const flashState = getFlashOfferState(store);
+
+            const flashBoxHtml = store.flashEnabled
+                ? `<div class="flash-detail-box ${flashState.active ? '' : 'sold-out'}">
+                    <b>🔥 احجز قبل النفاد (${escapeHtmlText(flashState.label)}):</b>
+                    ${flashState.active
+                        ? `متبقي <b>${flashState.stock}</b> فقط${flashState.remainingText ? ` • ينتهي خلال <b>${escapeHtmlText(flashState.remainingText)}</b>` : ''}`
+                        : `<b>${escapeHtmlText(flashState.remainingText || 'نفدت الكمية')}</b>`}
+                   </div>`
+                : '';
 
             const posts = Array.isArray(store.posts) && store.posts.length > 0
                 ? store.posts
@@ -2558,6 +2896,11 @@
                 ? `<button type="button" class="social-direct-btn" style="flex:1;" onclick="openSocialWithSourceNotice('${escapeJsSingleQuote(store.id)}', 'instagram')">📸 إنستغرام</button>`
                 : '';
 
+            const orderDisabledAttr = (store.flashEnabled && !flashState.expired && flashState.soldOut) ? 'disabled' : '';
+            const orderBtnLabel = (store.flashEnabled && !flashState.expired && flashState.soldOut)
+                ? '⛔ نفدت الكمية'
+                : (flashState.active ? `🔥 احجز قبل النفاد (${flashState.stock})` : '🛒 اطلب من واتساب أو اتصل مباشر');
+
             bodyEl.innerHTML = `
                 <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
                     <img src="${store.logo || (store.images && store.images[0]) || 'https://akrmm4604-a11y.github.io/sahl-alwusool/1795103326267.jpg'}" alt="${safeName}" style="width:46px; height:46px; border-radius:50%; object-fit:cover; border:1.5px solid #a855f7;">
@@ -2566,6 +2909,7 @@
                         <div style="font-size:11px; color:var(--text-sub);">القسم: <b>${safeCat}</b> • الطلبات: <b>${ordersCount}</b> • التفاعل: <b>${clicksCount}</b></div>
                     </div>
                 </div>
+                ${flashBoxHtml}
                 <div style="font-size:11.5px; margin-bottom:6px;">📍 <b>العنوان:</b> ${safeAddress}</div>
                 <div style="font-size:11.5px; margin-bottom:8px;">🛒 <b>الطلب:</b> <b>${escapeHtmlText(routing.channelLabel)}</b></div>
                 <div class="info-offer-box">
@@ -2574,7 +2918,7 @@
                 </div>
                 ${galleryHtml}
                 <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
-                    <button type="button" class="in-app-order-btn" onclick="closeModal('plusInfoOffersModal'); openInAppOrderModal('${escapeJsSingleQuote(store.id)}', '');">🛒 اطلب من واتساب أو اتصل مباشر</button>
+                    <button type="button" class="in-app-order-btn ${flashState.active ? 'flash-btn' : ''}" ${orderDisabledAttr} onclick="closeModal('plusInfoOffersModal'); openInAppOrderModal('${escapeJsSingleQuote(store.id)}', '');">${orderBtnLabel}</button>
                     ${instaBtnHtml}
                     <button type="button" class="mini-like-btn" style="flex:1; padding:8px; font-size:11.5px;" onclick="closeModal('plusInfoOffersModal'); openStoreProfile('${escapeJsSingleQuote(store.id)}');">الصفحة كاملة</button>
                 </div>
@@ -2590,7 +2934,7 @@
                 ? item.posts.map(p => `${p.title || ''} ${p.price || ''} ${p.address || ''}`).join(' ')
                 : '';
             const combined = normalizeArabicText(
-                `${item.name || ''} ${item.price || ''} ${postsText} ${item.address || ''} ${item.category || ''} ${item.phone || ''} ${item.orderWhatsapp || ''} ${item.insta || ''}`
+                `${item.name || ''} ${item.price || ''} ${item.flashLabel || ''} ${postsText} ${item.address || ''} ${item.category || ''} ${item.phone || ''} ${item.orderWhatsapp || ''} ${item.insta || ''}`
             );
             if (combined.includes(normalizedQuery)) return true;
             const words = normalizedQuery.split(' ').filter(Boolean);
@@ -2684,6 +3028,7 @@
             isAdminLoggedIn = Boolean(active);
             updateAdminButtonVisibility();
             updateAutoSyncUi();
+            updateAdminListingsStatsCounter();
             document.getElementById('adminLoginView').style.display = isAdminLoggedIn ? 'none' : 'block';
             document.getElementById('adminDashboardView').style.display = isAdminLoggedIn ? 'block' : 'none';
             if (isAdminLoggedIn) {
@@ -2849,6 +3194,7 @@
             const address = document.getElementById('reqAddress').value.trim() || 'غير محدد';
             const price = document.getElementById('reqPrice').value.trim() || '';
             const logoFile = document.getElementById('reqLogoFile').files[0];
+            const flashInput = readClientFlashInput();
 
             if (!name) {
                 alert('يرجى إدخال اسم المحل أو صاحب المشروع.');
@@ -2921,6 +3267,12 @@
                     }
                     if (insta) updateData.insta = insta;
                     if (fb) updateData.fb = fb;
+                    if (flashInput.flashEnabled) {
+                        updateData.flashEnabled = true;
+                        updateData.flashStock = flashInput.flashStock;
+                        updateData.flashLabel = flashInput.flashLabel;
+                        updateData.flashExpiresAt = flashInput.flashExpiresAt;
+                    }
 
                     await window.updateDoc(window.doc(window.db, LISTINGS_COLLECTION, existingStore.id), updateData);
                     Object.assign(existingStore, updateData);
@@ -2942,6 +3294,10 @@
                         orderWhatsapp,
                         logo: logoUrl, images: newImagesUrls, posts: [initialPost],
                         status: 'pending', vip: false,
+                        flashEnabled: flashInput.flashEnabled,
+                        flashStock: flashInput.flashStock,
+                        flashLabel: flashInput.flashLabel,
+                        flashExpiresAt: flashInput.flashExpiresAt,
                         likes: 0, contactClicks: 0, ordersCount: 0, createdAt: new Date().toISOString()
                     };
 
@@ -2961,6 +3317,7 @@
                 document.getElementById('logoFileNameDisplay').style.color = 'var(--text-sub)';
                 selectedFilesArray = [];
                 document.getElementById('selectedImagesPreview').innerHTML = '';
+                resetClientFlashForm();
                 applySavedOwnerProfileToForm();
                 sortAndRenderListings();
                 openAfterSubmitCloseModal(modalTitle, modalMsg);
@@ -3259,6 +3616,7 @@
                 const postsCount = Array.isArray(item.posts) && item.posts.length > 1 ? ` (${item.posts.length} إعلانات)` : '';
                 const statusLabel = item.vip ? '⭐ مميز VIP' : '✓ معتمد';
                 const avail = getAvailabilityBadgeInfo(item);
+                const flashState = getFlashOfferState(item);
                 const alreadyLiked = hasLikedStore(item.id);
                 const safeId = escapeJsSingleQuote(item.id);
                 const safeName = escapeJsSingleQuote(item.name);
@@ -3266,10 +3624,25 @@
                 const safeCat = escapeJsSingleQuote(item.category || '');
                 const safePrice = escapeJsSingleQuote(item.price || '');
 
+                const flashOverlayHtml = flashState.active
+                    ? `<div class="flash-ribbon-overlay">
+                        <span>🔥 احجز قبل النفاد (${escapeHtmlText(flashState.stock)})</span>
+                        <span>${escapeHtmlText(flashState.remainingText || 'محدود')}</span>
+                       </div>`
+                    : (item.flashEnabled && !flashState.expired && flashState.soldOut
+                        ? `<div class="flash-ribbon-overlay sold-out"><span>⛔ نفدت الكمية</span><span>${escapeHtmlText(flashState.label)}</span></div>`
+                        : '');
+
+                const orderDisabledAttr = (item.flashEnabled && !flashState.expired && flashState.soldOut) ? 'disabled' : '';
+                const orderBtnText = (item.flashEnabled && !flashState.expired && flashState.soldOut)
+                    ? '⛔ نفدت الكمية'
+                    : (flashState.active ? `🔥 احجز (${flashState.stock})` : '🛒 اطلب من واتساب أو اتصل مباشر');
+
                 return `
-                    <article class="grid-item-card ${item.vip ? 'vip-card' : ''}" onclick="openStoreProfile('${safeId}')">
+                    <article class="grid-item-card ${item.vip ? 'vip-card' : ''} ${flashState.active ? 'flash-active-card' : ''}" onclick="openStoreProfile('${safeId}')">
                         <div class="grid-img-box">
                             <img src="${mainImg}" alt="${item.name}" onclick="event.stopPropagation(); openImageModal('${mainImg}')">
+                            ${flashOverlayHtml}
                         </div>
                         <div class="grid-ribbon">
                             <span>${statusLabel}</span>
@@ -3280,13 +3653,14 @@
                                 <span class="avail-badge ${avail.isClosed ? 'closed' : ''}">${avail.label}</span>
                             </div>
                             <h3 class="grid-title">${item.name}${postsCount}</h3>
+                            ${flashState.active ? `<div style="font-size:11px; font-weight:800; color:#b91c1c; margin-bottom:3px;">🔥 ${escapeHtmlText(flashState.label)}</div>` : ''}
                             ${item.price ? `<div class="grid-price">${item.price}</div>` : `<div class="grid-price" style="font-size:11.5px; color:var(--text-sub);">${item.category}</div>`}
                             <div class="grid-meta">📍 ${item.address || 'غير محدد'}</div>
                             <div class="grid-actions" onclick="event.stopPropagation()">
                                 <button type="button" class="mini-like-btn ${alreadyLiked ? 'liked' : ''}" onclick="addLike('${safeId}')">${alreadyLiked ? '🧡' : '❤️'} ${item.likes || 0}</button>
                                 <button type="button" class="mini-like-btn" title="مشاركة الإعلان" onclick="shareListingCard('${safeId}', event)">🔗</button>
                                 <button type="button" class="mini-plus-btn" title="معلومات وعروض" onclick="openPlusInfoOffersModal('${safeId}')">+</button>
-                                <button type="button" class="mini-call-link" style="background:#fff7ed; color:#c2410c; border-color:#fdba74; cursor:pointer; font-family:inherit; font-weight:800;" onclick="openInAppOrderModal('${safeId}', '')">🛒 اطلب من واتساب أو اتصل مباشر</button>
+                                <button type="button" class="mini-call-link" ${orderDisabledAttr} style="background:${flashState.active ? '#fef2f2' : '#fff7ed'}; color:${flashState.active ? '#b91c1c' : '#c2410c'}; border-color:${flashState.active ? '#fca5a5' : '#fdba74'}; cursor:pointer; font-family:inherit; font-weight:800;" onclick="openInAppOrderModal('${safeId}', '')">${orderBtnText}</button>
                             </div>
                             ${isAdminLoggedIn ? `
                                 <div style="display:flex; gap:4px; margin-top:6px;" onclick="event.stopPropagation()">
@@ -3528,11 +3902,21 @@
             const ordersCount = Number(store.ordersCount) || 0;
             const routing = resolveOrderRoutingTarget(store);
             const avail = getAvailabilityBadgeInfo(store);
+            const flashState = getFlashOfferState(store);
             const instaUrl = buildInstagramPageUrl(store.insta);
             const fbUrl = buildFacebookPageUrl(store.fb);
             const directPhone = hasValidPhoneNumber(store.orderWhatsapp)
                 ? String(store.orderWhatsapp).trim()
                 : (hasValidPhoneNumber(store.phone) ? String(store.phone).trim() : '');
+
+            const flashBoxHtml = store.flashEnabled
+                ? `<div class="flash-detail-box ${flashState.active ? '' : 'sold-out'}">
+                    <b>🔥 احجز قبل النفاد (${escapeHtmlText(flashState.label)}):</b>
+                    ${flashState.active
+                        ? `متبقي <b>${flashState.stock}</b> فقط${flashState.remainingText ? ` • ينتهي خلال <b>${escapeHtmlText(flashState.remainingText)}</b>` : ''}`
+                        : `<b>${escapeHtmlText(flashState.remainingText || 'نفدت الكمية')}</b>`}
+                   </div>`
+                : '';
 
             const posts = Array.isArray(store.posts) && store.posts.length > 0
                 ? store.posts
@@ -3596,6 +3980,11 @@
                 ? `<a href="tel:${encodeURIComponent(directPhone)}" class="mini-call-link" style="text-decoration:none; padding:10px 12px; font-size:12px; font-weight:800;">📞 اتصال مباشر</a>`
                 : '';
 
+            const orderDisabledAttr = (store.flashEnabled && !flashState.expired && flashState.soldOut) ? 'disabled' : '';
+            const orderBtnLabel = (store.flashEnabled && !flashState.expired && flashState.soldOut)
+                ? '⛔ نفدت الكمية'
+                : (flashState.active ? `🔥 احجز قبل النفاد (${flashState.stock} متبقي)` : '🛒 اطلب من واتساب أو اتصل مباشر');
+
             document.getElementById('mainCatalogView').style.display = 'none';
             const profileView = document.getElementById('storeProfileView');
             profileView.style.display = 'block';
@@ -3610,6 +3999,7 @@
                         <p style="margin:3px 0 0 0; font-size:11px; color:var(--text-sub);">الطلبات: <b>${ordersCount}</b> • زيارات المنصات: <b>${clicksCount}</b></p>
                     </div>
                 </div>
+                ${flashBoxHtml}
                 <div style="margin-bottom:8px; display:flex; gap:6px; flex-wrap:wrap;">
                     <button type="button" class="mini-like-btn ${alreadyLiked ? 'liked' : ''}" onclick="addLike('${safeStoreId}');">${alreadyLiked ? '🧡 تم الإعجاب' : '❤️ إعجاب'} (${store.likes || 0})</button>
                     <button type="button" class="mini-like-btn" onclick="shareListingCard('${safeStoreId}', event)">🔗 مشاركة الصفحة</button>
@@ -3621,7 +4011,7 @@
                 ${postsHtml}
 
                 <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
-                    <button type="button" class="in-app-order-btn" onclick="openInAppOrderModal('${safeStoreId}', '')">🛒 اطلب من واتساب أو اتصل مباشر</button>
+                    <button type="button" class="in-app-order-btn ${flashState.active ? 'flash-btn' : ''}" ${orderDisabledAttr} onclick="openInAppOrderModal('${safeStoreId}', '')">${orderBtnLabel}</button>
                     ${directCallBtnHtml}
                     ${instaBtnHtml}
                     ${fbBtnHtml}
@@ -3689,7 +4079,8 @@
             suggestionsBox.innerHTML = matches.slice(0, 8).map(item => {
                 const isAddressMatch = normalizeArabicText(item.address).includes(query);
                 const isProductMatch = normalizeArabicText(item.allOffersText || item.price).includes(query);
-                let badge = item.category === 'شغل بيوت' ? '🏠 شغل بيوت' : (item.category === 'أفران وصمون' ? '🥖 أفران وصمون' : '🏪 متجر');
+                const flashState = getFlashOfferState(item);
+                let badge = flashState.active ? '🔥 قبل النفاد' : (item.category === 'شغل بيوت' ? '🏠 شغل بيوت' : (item.category === 'أفران وصمون' ? '🥖 أفران وصمون' : '🏪 متجر'));
                 if (isAddressMatch) badge = '📍 منطقة';
                 else if (isProductMatch) badge = '💰 منتج';
 
@@ -3722,6 +4113,7 @@
         });
 
         async function loadAdminListings() {
+            updateAdminListingsStatsCounter();
             const adminContainer = document.getElementById('adminPendingList');
             adminContainer.innerHTML = '<p style="font-size:11px; color:var(--text-sub);">جاري التحميل...</p>';
             try {
@@ -3737,9 +4129,12 @@
                     const safeCat = escapeJsSingleQuote(item.category || '');
                     const safePrice = escapeJsSingleQuote(item.price || '');
                     const waContact = item.orderWhatsapp || (hasValidPhoneNumber(item.phone) ? item.phone : '');
+                    const flashTag = item.flashEnabled
+                        ? ` | 🔥 قبل النفاد: <b>${Number(item.flashStock) || 0}</b> (${escapeHtmlText(item.flashLabel || 'عرض محدود')})`
+                        : '';
                     return `
                         <div style="background:#f9fafb; padding:8px; border-radius:8px; margin-bottom:7px; border:1px solid #e5e7eb; font-size:11px;">
-                            <b>${item.name}</b> (${item.category}) - الحالة: <b>${item.status === 'pending' ? 'بانتظار الموافقة' : 'معتمد'}</b> ${item.vip ? '| <b>VIP</b>' : ''}<br>
+                            <b>${item.name}</b> (${item.category}) - الحالة: <b>${item.status === 'pending' ? 'بانتظار الموافقة' : 'معتمد'}</b> ${item.vip ? '| <b>VIP</b>' : ''}${flashTag}<br>
                             ${waContact ? `💬 واتساب: <b>${escapeHtmlText(waContact)}</b>` : '💬 واتساب: غير مسجل'}${item.insta ? ` | 📸 إنستا: <b>${escapeHtmlText(item.insta)}</b>` : ''}<br>
                             🛒 طلبات: <b>${Number(item.ordersCount) || 0}</b> | 👆 زيارات المنصات: <b>${Number(item.contactClicks) || 0}</b><br>
                             <div style="margin-top:6px; display:flex; gap:4px; flex-wrap:wrap;">
@@ -3890,6 +4285,35 @@
             const newPrice = prompt("تعديل السعر والملاحظات:", currentPrice);
             if (newPrice === null) return;
 
+            const flashChoice = prompt(
+                "تفعيل «احجز قبل النفاد»؟ اكتب (نعم) للتفعيل أو (لا) للإيقاف:",
+                store.flashEnabled ? 'نعم' : 'لا'
+            );
+            if (flashChoice === null) return;
+            const flashEnabled = ['نعم', 'yes', 'true', '1'].includes(normalizeArabicText(flashChoice));
+
+            let flashStock = Number(store.flashStock) || 5;
+            let flashLabel = store.flashLabel || 'عرض سريع قبل النفاد';
+            let flashExpiresAt = Number(store.flashExpiresAt) || 0;
+
+            if (flashEnabled) {
+                const stockInput = prompt("أدخل الكمية المتبقية للحجز قبل النفاد (رقم):", String(flashStock));
+                if (stockInput === null) return;
+                flashStock = Math.max(0, parseInt(stockInput, 10) || 0);
+
+                const labelInput = prompt("أدخل عنوان العرض السريع:", flashLabel);
+                if (labelInput === null) return;
+                flashLabel = labelInput.trim() || 'عرض سريع قبل النفاد';
+
+                const hoursInput = prompt("مدة العرض بالساعات من الآن (0 لعدم تحديد وقت انتهاء):", "6");
+                if (hoursInput === null) return;
+                const hoursNum = Math.max(0, parseFloat(hoursInput) || 0);
+                flashExpiresAt = hoursNum > 0 ? (Date.now() + hoursNum * 3600000) : 0;
+            } else {
+                flashStock = 0;
+                flashExpiresAt = 0;
+            }
+
             const cleanName = newName.trim();
             const cleanOrderWa = newOrderWa.trim();
             const cleanPhone = cleanOrderWa || (store.phone || 'لا يوجد');
@@ -3918,7 +4342,11 @@
                         category: cleanCategory,
                         'فئة': cleanCategory,
                         price: cleanPrice,
-                        'السعر': cleanPrice
+                        'السعر': cleanPrice,
+                        flashEnabled,
+                        flashStock,
+                        flashLabel,
+                        flashExpiresAt
                     });
                 }
                 if (store) {
@@ -3930,6 +4358,10 @@
                     store.address = cleanAddress;
                     store.category = cleanCategory;
                     store.price = cleanPrice;
+                    store.flashEnabled = flashEnabled;
+                    store.flashStock = flashStock;
+                    store.flashLabel = flashLabel;
+                    store.flashExpiresAt = flashExpiresAt;
                 }
                 saveListingsLocalBackup(window.allListings);
                 alert('تم تحديث بيانات الإعلان بنجاح!');
@@ -3989,7 +4421,9 @@
                 : buildGroupedPages(window.allListings);
 
             const filtered = pages.filter(item => {
-                const matchesCat = (currentCat === 'all' || item.category === currentCat);
+                const matchesCat = currentCat === 'all'
+                    ? true
+                    : (currentCat === 'flash' ? getFlashOfferState(item).active : item.category === currentCat);
                 return matchesCat && matchesSearchQuery(item, query);
             });
 
@@ -4036,7 +4470,8 @@
             }, 300);
 
             startAutoSyncLoop();
+            startFlashTickerLoop();
         };
     </script>
 </body>
-    </html>
+                    </html>
