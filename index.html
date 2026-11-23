@@ -62,6 +62,7 @@
         window.updateDoc = updateDoc;
         window.setDoc = setDoc;
         window.increment = increment;
+        window.firebaseReady = true;
 
         try {
           window.messaging = getMessaging(app);
@@ -1013,7 +1014,6 @@
                 <div id="searchSuggestions" class="search-suggestions"></div>
             </div>
 
-            <!-- شريط توجيه لفتح الصفحة في المتصفح الخارجي / Safari عند الفتح من داخل تطبيق آخر -->
             <div id="externalBrowserGuideBar" style="display:none; margin:8px 12px 4px; background:#fff7ed; border:1.5px solid #fdba74; border-radius:10px; padding:10px 11px; font-size:11.5px; color:#111827;">
                 <div style="font-weight:900; color:#c2410c; margin-bottom:4px;">🌐 لسهولة تثبيت التطبيق: افتحه من متصفح الهاتف</div>
                 <div style="font-size:11px; color:#4b5563; line-height:1.5; margin-bottom:8px;">
@@ -1033,10 +1033,8 @@
                 <button type="button" class="install-highlight-btn" onclick="openCustomInstallGuide()">ثبّت التطبيق</button>
             </div>
 
-            <!-- تنبيه حالة قاعدة البيانات عند وجود مشكلة أو فراغ -->
             <div id="dbStatusBanner" class="db-status-banner"></div>
 
-            <!-- تذكير كل يومين داخل التطبيق -->
             <div id="periodicReminderBanner" class="reminder-banner">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
                     <div>
@@ -1167,7 +1165,6 @@
         </button>
     </nav>
 
-    <!-- نافذة الطلب عبر واتساب -->
     <div class="custom-modal" id="inAppOrderModal">
         <div class="custom-modal-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -1299,7 +1296,6 @@
                     <button type="button" onclick="logoutAdminSession()" style="background:#f3f4f6; color:#111827; border:1px solid #d1d5db; border-radius:6px; padding:3px 8px; font-size:10.5px; font-weight:700; cursor:pointer; font-family:inherit;">خروج</button>
                 </div>
 
-                <!-- التحكم الآلي بالمزامنة والتحديث -->
                 <div class="info-offer-box" style="margin-top:0; margin-bottom:10px; font-size:11px; background:#eff6ff; border-color:#bfdbfe;">
                     <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:6px;">
                         <span style="font-weight:800; color:#1d4ed8;">🔄 المزامنة والتحديث الآلي</span>
@@ -1311,7 +1307,6 @@
                     </div>
                 </div>
 
-                <!-- أداة النسخ الاحتياطي والاستعادة اليدوية (JSON) -->
                 <div class="info-offer-box" style="margin-top:0; margin-bottom:10px; font-size:11px; background:#f0fdf4; border-color:#bbf7d0;">
                     <div style="font-weight:800; color:#15803d; margin-bottom:4px;">🛡️ حماية النسخ الاحتياطي والاستعادة</div>
                     <div style="display:flex; gap:6px; flex-wrap:wrap;">
@@ -1321,7 +1316,6 @@
                     </div>
                 </div>
 
-                <!-- أداة رسالة التذكير الدورية للتطبيق -->
                 <div class="info-offer-box" style="margin-top:0; margin-bottom:10px; font-size:11px;">
                     <div style="font-weight:800; color:#c2410c; margin-bottom:4px;">🔔 رسالة تذكير التطبيق (كل يومين)</div>
                     <textarea id="adminReminderText" rows="3" style="width:100%; padding:6px; font-size:11px; border:1px solid #fed7aa; border-radius:7px; font-family:inherit; background:#ffffff; color:#111827; margin-bottom:6px;">تذكير بتطبيق سهل الوصول: تصفح أحدث المحلات، قسم شغل بيوت، والطلبات السريعة في القيارة والموصل، وثبّت التطبيق على هاتفك لسهولة الوصول: https://akrmm4604-a11y.github.io/sahl-alwusool/</textarea>
@@ -1368,7 +1362,11 @@
         const AUTO_SYNC_PREF_KEY = "sahl_alwusool_auto_sync_enabled_v1";
         const TWO_DAY_MS = 48 * 60 * 60 * 1000;
 
-        // تطبيع المستندات لقبول الحقول العربية والإنجليزية معاً
+        // إلغاء الإعلان الاستعراضي نهائياً
+        function getDemoListings() {
+            return [];
+        }
+
         function normalizeListingRecord(rawDoc, idOverride) {
             const d = (rawDoc && typeof rawDoc === 'object') ? rawDoc : {};
             const id = String(idOverride || d.id || ('rec_' + Date.now()));
@@ -1397,7 +1395,7 @@
 
             const rawStatusVal = pickStr(d.status, d['الحالة'], d['حالة']).toLowerCase();
             let normalizedStatus = 'approved';
-            if (rawStatusVal === 'deleted' || rawStatusVal === 'محذوف' || rawStatusVal === 'مؤرشف') {
+            if (d.deleted === true || d.archived === true || rawStatusVal === 'deleted' || rawStatusVal === 'محذوف' || rawStatusVal === 'مؤرشف') {
                 normalizedStatus = 'deleted';
             } else if (
                 rawStatusVal === 'pending' ||
@@ -1410,7 +1408,8 @@
                 rawStatusVal === 'approved' ||
                 rawStatusVal.includes('موافق') ||
                 rawStatusVal.includes('معتمد') ||
-                rawStatusVal.includes('منشور')
+                rawStatusVal.includes('منشور') ||
+                rawStatusVal === ''
             ) {
                 normalizedStatus = 'approved';
             }
@@ -1566,7 +1565,9 @@
                 if (!raw) return [];
                 const parsed = JSON.parse(raw);
                 const list = parsed && Array.isArray(parsed.items) ? parsed.items : [];
-                return list.map(item => normalizeListingRecord(item, item.id));
+                return list
+                    .filter(item => item && item.id && !String(item.id).startsWith('demo'))
+                    .map(item => normalizeListingRecord(item, item.id));
             } catch (e) {
                 return [];
             }
@@ -2583,29 +2584,6 @@
             syncModalScrollLock();
         }
 
-        function getDemoListings() {
-            return [
-                {
-                    id: 'demo1',
-                    name: 'أم محمد للمعجنات والحلويات البيتية',
-                    category: 'شغل بيوت',
-                    address: 'القيارة - حي المعلمين (توصيل متوفر)',
-                    price: '12,000 د.ع - عرض طلب صينية معجنات مع تحلية مجانية',
-                    fb: '',
-                    insta: '',
-                    phone: '',
-                    orderWhatsapp: '',
-                    logo: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=150',
-                    images: ['https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400'],
-                    status: 'approved',
-                    vip: true,
-                    likes: 5,
-                    contactClicks: 0,
-                    ordersCount: 0
-                }
-            ];
-        }
-
         function matchesSearchQuery(item, normalizedQuery) {
             if (!normalizedQuery) return true;
             const postsText = Array.isArray(item.posts)
@@ -2621,12 +2599,12 @@
 
         async function waitForFirebase() {
             let attempts = 0;
-            while ((!window.db || !window.getDocs || !window.addDoc) && attempts < 20) {
+            while ((!window.db || !window.getDocs || !window.addDoc) && attempts < 50) {
                 await new Promise(resolve => setTimeout(resolve, 120));
                 attempts++;
             }
             if (!window.db) {
-                throw new Error("Firebase not ready");
+                throw new Error("قاعدة البيانات غير مهيأة بعد");
             }
         }
 
@@ -3213,7 +3191,7 @@
             }
         }
 
-        // السحابة هي المصدر المعتمد مع تطبيع الحقول العربية والإنجليزية وحماية البيانات المحلية
+        // جلب الإعلانات الحقيقية من مجموعة "قوائم" في Firestore بدون أي إعلان استعراضي
         async function loadApprovedListings() {
             const localBackup = getListingsLocalBackup();
             const currentNonDemo = (window.allListings || [])
@@ -3233,19 +3211,18 @@
                 setDbStatusBanner('');
 
                 if (loaded.length > 0) {
-                    const merged = mergeListingsPreservingLocal(loaded, existingFallback);
+                    const merged = mergeListingsPreservingLocal(loaded, []);
                     window.allListings = merged;
                     saveListingsLocalBackup(merged);
                 } else if (existingFallback.length > 0) {
                     window.allListings = existingFallback;
-                    saveListingsLocalBackup(existingFallback);
                     setDbStatusBanner(
-                        '⚠️ أعادت قاعدة البيانات نتيجة فارغة مؤقتاً؛ تم الإبقاء على الإعلانات المحفوظة محلياً دون مسحها.',
+                        '⚠️ قاعدة البيانات أعادت نتيجة فارغة حالياً؛ يتم عرض النسخة المحفوظة محلياً.',
                         false
                     );
                 } else {
                     window.allListings = [];
-                    setDbStatusBanner('ℹ️ لا توجد إعلانات منشورة في قاعدة البيانات حالياً.', false);
+                    setDbStatusBanner('ℹ️ لا توجد مستندات في مجموعة "قوائم" حالياً أو تحتاج إلى صلاحيات قراءة في Firestore.', false);
                 }
 
                 sortAndRenderListings();
@@ -3255,13 +3232,9 @@
                 }
             } catch (err) {
                 console.error("Load listings error:", err);
-                if (existingFallback.length > 0) {
-                    window.allListings = existingFallback;
-                } else if (!window.allListings || window.allListings.length === 0) {
-                    window.allListings = getDemoListings();
-                }
+                window.allListings = existingFallback.length > 0 ? existingFallback : [];
                 setDbStatusBanner(
-                    `⚠️ تعذر الاتصال بقاعدة البيانات (${escapeHtmlText(err.code || err.message || 'خطأ شبكة')}). تم الإبقاء على النسخة المتوفرة محلياً دون مسح أي إعلانات.`,
+                    `⚠️ تعذر جلب البيانات من Firestore (${escapeHtmlText(err.code || err.message || 'خطأ اتصال أو صلاحيات')}).`,
                     true
                 );
                 sortAndRenderListings();
@@ -3277,7 +3250,7 @@
             const container = document.getElementById('vendorsList');
             if (!container) return;
             if (!items || items.length === 0) {
-                container.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:var(--text-sub); font-size:12px; padding:18px;">لا توجد عناصر مطابقة حالياً.</p>';
+                container.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:var(--text-sub); font-size:12px; padding:18px;">لا توجد إعلانات معتمدة معروضة حالياً.</p>';
                 return;
             }
 
@@ -3318,7 +3291,7 @@
                             ${isAdminLoggedIn ? `
                                 <div style="display:flex; gap:4px; margin-top:6px;" onclick="event.stopPropagation()">
                                     <button type="button" onclick="editListingData('${safeId}', '${safeName}', '${safeAddress}', '${safeCat}', '${safePrice}')" style="flex:1; background:var(--brand-orange); color:#fff; border:none; border-radius:6px; padding:3px; font-size:10px; cursor:pointer;">تعديل</button>
-                                    <button type="button" onclick="deleteListingFromMain('${safeId}')" style="flex:1; background:#dc2626; color:#fff; border:none; border-radius:6px; padding:3px; font-size:10px; cursor:pointer;">أرشفة</button>
+                                    <button type="button" onclick="deleteListingFromMain(event, '${safeId}')" style="flex:1; background:#dc2626; color:#fff; border:none; border-radius:6px; padding:3px; font-size:10px; cursor:pointer;">أرشفة</button>
                                 </div>
                             ` : ''}
                         </div>
@@ -3996,8 +3969,8 @@
             }
         }
 
-        function deleteListingFromMain(id) {
-            event.stopPropagation();
+        function deleteListingFromMain(ev, id) {
+            if (ev) ev.stopPropagation();
             deleteListing(id);
         }
 
@@ -4045,7 +4018,7 @@
             evaluateTwoDayReminder();
             applySavedOwnerProfileToForm();
             const localBackup = getListingsLocalBackup();
-            window.allListings = localBackup.length > 0 ? localBackup : getDemoListings();
+            window.allListings = localBackup;
             sortAndRenderListings();
             loadApprovedListings();
 
