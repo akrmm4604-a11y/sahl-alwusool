@@ -1516,7 +1516,6 @@
         const AUTO_SYNC_PREF_KEY = "sahl_alwusool_auto_sync_enabled_v1";
         const TWO_DAY_MS = 48 * 60 * 60 * 1000;
 
-        // إلغاء الإعلان الاستعراضي نهائياً
         function getDemoListings() {
             return [];
         }
@@ -1985,23 +1984,29 @@
                     return;
                 }
 
-                window.allListings = mergeListingsPreservingLocal(normalizedItems, window.allListings);
-                saveListingsLocalBackup(window.allListings);
+                const mergedNow = mergeListingsPreservingLocal(normalizedItems, window.allListings || []);
+                window.allListings = mergedNow;
+                saveListingsLocalBackup(mergedNow);
                 sortAndRenderListings();
 
+                let syncedCount = 0;
+                let cloudErrorMsg = '';
                 try {
                     await waitForFirebase();
                     for (const cleanDoc of normalizedItems) {
                         const docPayload = { ...cleanDoc };
                         delete docPayload.id;
-                        if (window.setDoc) {
+                        if (window.setDoc && window.doc) {
                             await window.setDoc(window.doc(window.db, LISTINGS_COLLECTION, cleanDoc.id), docPayload, { merge: true });
-                        } else if (window.addDoc) {
+                            syncedCount++;
+                        } else if (window.addDoc && window.collection) {
                             await window.addDoc(window.collection(window.db, LISTINGS_COLLECTION), docPayload);
+                            syncedCount++;
                         }
                     }
                 } catch (cloudErr) {
                     console.warn("Cloud sync after import warning:", cloudErr);
+                    cloudErrorMsg = cloudErr && (cloudErr.code || cloudErr.message) ? (cloudErr.code || cloudErr.message) : 'تعذر الحفظ السحابي';
                 }
 
                 if (isAdminLoggedIn) {
@@ -2009,8 +2014,11 @@
                     loadAdminTrash();
                 }
 
-                alert(`تم استيراد واستعادة ${normalizedItems.length} إعلان بنجاح ✅`);
-                await loadApprovedListings();
+                if (cloudErrorMsg) {
+                    alert(`تم استيراد ${normalizedItems.length} إعلان وحفظها محلياً، لكن تعذر رفعها إلى السحابة (${cloudErrorMsg}). تأكد من صلاحيات Firestore وتسجيل دخول المشرف.`);
+                } else {
+                    alert(`تم استيراد وحفظ ${syncedCount || normalizedItems.length} إعلان بنجاح في التطبيق والسحابة ✅`);
+                }
             } catch (e) {
                 console.error("Import backup error:", e);
                 alert('تعذر قراءة ملف النسخة الاحتياطية: تأكد أنه ملف JSON سليم تم تصديره من التطبيق.');
@@ -3548,13 +3556,12 @@
             }
         }
 
-        // جلب الإعلانات الحقيقية من مجموعة "قوائم" في Firestore بمرونة عالية لتقليل رسالة unavailable
         async function loadApprovedListings() {
             const localBackup = getListingsLocalBackup();
             const currentNonDemo = (window.allListings || [])
                 .filter(i => i && i.id && !String(i.id).startsWith('demo'))
                 .map(i => normalizeListingRecord(i, i.id));
-            const existingFallback = currentNonDemo.length > 0 ? currentNonDemo : localBackup;
+            const existingFallback = mergeListingsPreservingLocal(currentNonDemo, localBackup);
 
             const fetchListingsSnapshot = async () => {
                 await waitForFirebase();
@@ -3578,13 +3585,10 @@
 
                 setDbStatusBanner('');
 
-                if (loaded.length > 0) {
-                    const merged = mergeListingsPreservingLocal(loaded, []);
+                const merged = mergeListingsPreservingLocal(loaded, existingFallback);
+                if (merged.length > 0) {
                     window.allListings = merged;
                     saveListingsLocalBackup(merged);
-                } else if (existingFallback.length > 0) {
-                    window.allListings = existingFallback;
-                    setDbStatusBanner('');
                 } else {
                     window.allListings = [];
                     setDbStatusBanner('ℹ️ لا توجد إعلانات منشورة حالياً.', false);
