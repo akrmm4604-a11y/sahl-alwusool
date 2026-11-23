@@ -1216,7 +1216,7 @@
                 <label class="listing-field-label">💬 رقم واتساب للطلبات (موصى به لاستلام الطلبات مباشرة):</label>
                 <input type="text" id="reqOrderWhatsapp" placeholder="مثال: 07801234567">
 
-                <label class="listing-field-label">📸 رابط أو يوزر إنستغرام (للدخول المباشر للصفحة):</label>
+                <label class="listing-field-label">📸 رابط أو يوزر إنستغرام (اختياري):</label>
                 <input type="text" id="reqInsta" placeholder="مثال: username أو https://instagram.com/username">
 
                 <label class="listing-field-label">📘 رابط فيسبوك (اختياري):</label>
@@ -2794,7 +2794,7 @@
 
             try {
                 await waitForFirebase();
-                const fetchFn = window.getDocsFromServer || window.getDocs;
+                const fetchFn = window.getDocs || window.getDocsFromServer;
                 const snap = await fetchFn(window.collection(window.db, "app_orders"));
                 snap.forEach(d => {
                     const data = d.data() || {};
@@ -3359,7 +3359,7 @@
             listDiv.innerHTML = '<p style="font-size:10.5px; color:var(--text-sub); text-align:center;">جاري تحميل الطلبات...</p>';
             try {
                 await waitForFirebase();
-                const fetchFn = window.getDocsFromServer || window.getDocs;
+                const fetchFn = window.getDocs || window.getDocsFromServer;
                 const snap = await fetchFn(window.collection(window.db, "quick_requests"));
                 let now = Date.now();
                 let requests = [];
@@ -3499,7 +3499,7 @@
 
             try {
                 await waitForFirebase();
-                const fetchFn = window.getDocsFromServer || window.getDocs;
+                const fetchFn = window.getDocs || window.getDocsFromServer;
                 const snap = await fetchFn(window.collection(window.db, "charity_shelf"));
                 snap.forEach(d => {
                     const data = d.data() || {};
@@ -3548,7 +3548,7 @@
             }
         }
 
-        // جلب الإعلانات الحقيقية من مجموعة "قوائم" في Firestore بدون أي إعلان استعراضي
+        // جلب الإعلانات الحقيقية من مجموعة "قوائم" في Firestore بمرونة عالية لتقليل رسالة unavailable
         async function loadApprovedListings() {
             const localBackup = getListingsLocalBackup();
             const currentNonDemo = (window.allListings || [])
@@ -3556,10 +3556,21 @@
                 .map(i => normalizeListingRecord(i, i.id));
             const existingFallback = currentNonDemo.length > 0 ? currentNonDemo : localBackup;
 
-            try {
+            const fetchListingsSnapshot = async () => {
                 await waitForFirebase();
-                const fetchFn = window.getDocsFromServer || window.getDocs;
-                const querySnapshot = await fetchFn(window.collection(window.db, LISTINGS_COLLECTION));
+                const queryFn = window.getDocs || window.getDocsFromServer;
+                return await queryFn(window.collection(window.db, LISTINGS_COLLECTION));
+            };
+
+            try {
+                let querySnapshot;
+                try {
+                    querySnapshot = await fetchListingsSnapshot();
+                } catch (firstErr) {
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    querySnapshot = await fetchListingsSnapshot();
+                }
+
                 const loaded = [];
                 querySnapshot.forEach((docSnap) => {
                     loaded.push(normalizeListingRecord(docSnap.data(), docSnap.id));
@@ -3573,13 +3584,10 @@
                     saveListingsLocalBackup(merged);
                 } else if (existingFallback.length > 0) {
                     window.allListings = existingFallback;
-                    setDbStatusBanner(
-                        '⚠️ قاعدة البيانات أعادت نتيجة فارغة حالياً؛ يتم عرض النسخة المحفوظة محلياً.',
-                        false
-                    );
+                    setDbStatusBanner('');
                 } else {
                     window.allListings = [];
-                    setDbStatusBanner('ℹ️ لا توجد مستندات في مجموعة "قوائم" حالياً أو تحتاج إلى صلاحيات قراءة في Firestore.', false);
+                    setDbStatusBanner('ℹ️ لا توجد إعلانات منشورة حالياً.', false);
                 }
 
                 sortAndRenderListings();
@@ -3588,12 +3596,18 @@
                     loadAdminTrash();
                 }
             } catch (err) {
-                console.error("Load listings error:", err);
+                console.warn("Load listings fallback:", err);
                 window.allListings = existingFallback.length > 0 ? existingFallback : [];
-                setDbStatusBanner(
-                    `⚠️ تعذر جلب البيانات من Firestore (${escapeHtmlText(err.code || err.message || 'خطأ اتصال أو صلاحيات')}).`,
-                    true
-                );
+
+                if (window.allListings.length > 0) {
+                    setDbStatusBanner('');
+                } else {
+                    setDbStatusBanner(
+                        '⚠️ تعذر الاتصال بقاعدة البيانات حالياً؛ يرجى التحقق من الإنترنت وإعادة المحاولة.',
+                        true
+                    );
+                }
+
                 sortAndRenderListings();
             }
         }
@@ -4474,4 +4488,4 @@
         };
     </script>
 </body>
-  </html>
+    </html>
